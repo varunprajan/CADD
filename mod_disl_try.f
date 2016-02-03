@@ -3,7 +3,7 @@
 C     Purpose: Reads/writes/stores information about dislocations
 C     obstacles, and sources for each fe (i.e. continuum) material.
 C     Also contains methods for adding, deleting, updating dislocations,
-C     etc.
+C     etc. Blah.
       
       use mod_types, only: dp
       use mod_math, only: searchSortedBinary
