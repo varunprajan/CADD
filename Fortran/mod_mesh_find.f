@@ -12,7 +12,7 @@ C     TODO: Also, need to check if there are problems with crossing over "intern
       use mod_types, only: dp
       use mod_fe_elements, only: feelements, nfematerials
       use mod_nodes, only: nodes
-      use mod_math, only: invertMat2, checkSameSide
+      use mod_math, only: checkSameSide
       use mod_fe_el_2d, only: felib, getElTypeNum
       implicit none
       

@@ -21,7 +21,7 @@ C     Note: Members of group are assumed to be sorted!!
       public :: groups, ngroups, initGroupData, writeGroupData,
      &          readGroupData, processGroupData, getMaskSortedIntersect,
      &          genGroupMaskAtoms, genGroupMaskFENodes, genGroupMaskAll,
-     &          tempgroupname, getGroupNum
+     &          tempgroupname, getGroupNum, allgroupname
       
       type groupdata
 C     read-in

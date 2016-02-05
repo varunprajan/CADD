@@ -17,7 +17,7 @@ C     constants for dislocation fields --- p_i, etc.).
       public :: materials, nmaterials,
      &          initMaterialData, writeMaterialData,
      &          readMaterialData, processMaterialData,
-     &          getNucleationLength
+     &          getNucleationLength, getMuNuApprox
       
       type materialdata
 C     read-in

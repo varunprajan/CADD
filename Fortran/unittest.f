@@ -20,7 +20,7 @@
      & updateNeighborsNoCheck, updateNeighIncrementCurr
       use mod_materials, only: initMaterialData, materials,
      &    readMaterialData, processMaterialData, writeMaterialData,
-     &    getNucleationLength, nmaterials
+     &    getNucleationLength, nmaterials, getMuNuApprox
       use mod_potentials, only: initPotentialData, potentials,
      &                          readPotentialData, writePotentialData
       use mod_disl_try, only: initDislData, disl, readDislData,
@@ -136,20 +136,12 @@
      
       implicit none
       
-      real(dp) :: burgers
-      real(dp) :: burgersvec(2), trig(2)
-      real(dp) :: thetaactual, thetaguess
-      integer :: isys, bsgn
+      integer :: i
       
-      call initSimulation('detect_test_1','cadd')
-      burgers = detection%burgers
-      thetaactual = piconst/3.0_dp
-      burgersvec = -burgers*[cos(thetaactual),sin(thetaactual)]
-      call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
-      trig = slipsys(1)%trig(:,isys)
-      thetaguess = atan2(trig(2),trig(1))
-      write(*,*) 'thetaactual', thetaactual
-      write(*,*) 'thetaguess', thetaguess
-      write(*,*) 'bsgn', bsgn
+      call initSimulation('source_with_obstacles','dd')
+      do i = 1, 2
+          write(*,*) obstacles(1)%list(i)%localpos
+      end do
+      write(*,*) sources(1)%list(1)%localpos
             
       end program

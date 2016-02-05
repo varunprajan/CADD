@@ -291,7 +291,7 @@ C     local variables
       
       call felib(eltypenum)%getdN_2d_ptr(r,s,dNdr,dNds)
       J = getJ_2d(posn,dNdr,dNds)
-      invJ = invertmat2(J)
+      invJ = invertMat2(J)
       dNuloc = 0.0_dp
       dNvloc = 0.0_dp
       do i = 1, felib(eltypenum)%nelnodes
