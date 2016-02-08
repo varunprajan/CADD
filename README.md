@@ -6,8 +6,9 @@ Performs concurrent multi-scale mechanics simulations in 2D, by implementing the
 
 ## Layout
 
-1) Fortran. The fortran source code is in the folder "Fortran". THe files with prefix "mod_" are module files I have written myself. The files without prefix "mod_" are program files I have written myself, or routines from the Harwell Subroutine Library for linear algebra. I have used MA57, which implements the multifrontal method for solving Ax = b where A is sparse, symmetric, and not necessarily positive definite. Some of the files
+1) Fortran. The Fortran source code is in the folder "Fortran". THe files with prefix "mod_" are module files I have written myself. The files without prefix "mod_" are program files I have written myself, or routines from the Harwell Subroutine Library for linear algebra. I have used MA57, which implements the multifrontal method for solving Ax = b where A is sparse, symmetric, and not necessarily positive definite. This is used to decompose/solve Kx = f in finite elements, where K is linear, and not necessarily positive definite because constraints are imposed using Lagrange multipliers. If this code is used to generate results for a scientific paper, HSL should be given appropriate credit.
 
+2) Python. The Python module files are in the submodule "PythonModules". Their use is illustrated in the IPYthon notebook files in the folder "Python", where each notebook is for a different simulation. (I would suggest starting with "Atomistic_2.ipynb", which is for an atomistic crack simulation, and "Source_with_Obstacles.ipynb", which is for a simple DD dipole simulation.) In short, the modules "cadddatadump" and "cadd_plot" are for visualizing the dump files, and the module "cadd_io" is for various input/output tasks, and the module "cadd_main" has the main routines (in an object with all the simulation information) that drives everything. I have also used the modules "compile_cadd" and "run_cadd" to automate the compilation and running of simulations on the EPFL Linux clusters.
 
 ## Notes on code philosophy and goals
 
