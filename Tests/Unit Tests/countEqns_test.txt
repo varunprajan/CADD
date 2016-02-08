@@ -1,0 +1,23 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: neqnsnormal, neqnstot
+integer :: nentriesnormal, nentriestot
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFEElementData('simplefe_feelements')
+call countEqns(1,neqnsnormal,nentriesnormal,
+&                            neqnstot,nentriestot)
+write(*,*) 'Number of equations'
+write(*,*) neqnsnormal, neqnstot
+write(*,*) 'Number of entries'
+write(*,*) nentriesnormal, nentriestot
+
+Output: ("Normal" entries/eqns checked using Allan Bower's code --- see input_quad4.txt)
+ Number of equations
+          30          39
+ Number of entries
+         288         297
+******************************************************

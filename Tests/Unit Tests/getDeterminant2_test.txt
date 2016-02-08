@@ -1,0 +1,48 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: mat(2,2)
+      real(dp) :: det
+      
+      mat(:,1) = [1.0_dp,0.0_dp]
+      mat(:,2) = [0.0_dp,1.0_dp]
+      det = getDeterminant2(mat)
+      write(*,*) det
+
+Output:
+   1.0000000000000000   
+******************************************************
+Test #2:
+ 
+Code:
+
+      real(dp) :: mat(2,2)
+      real(dp) :: det
+      
+      mat(:,1) = [1.0_dp,0.0_dp]
+      mat(:,2) = [0.0_dp,1.0_dp]
+      mat(:,2) = 2*mat(:,2) + mat(:,1)
+      det = getDeterminant2(mat)
+      write(*,*) det
+
+Output:
+   2.0000000000000000   
+******************************************************
+Test #3:
+ 
+Code:
+
+      real(dp) :: mat(2,2)
+      real(dp) :: det
+      
+      mat(:,1) = [1.0_dp,0.0_dp]
+      mat(:,2) = [0.0_dp,1.0_dp]
+      mat(:,2) = mat(:,2) + pi*mat(:,1)
+      det = getDeterminant2(mat)
+      write(*,*) det
+
+Output:
+   1.0000000000000000   
+******************************************************

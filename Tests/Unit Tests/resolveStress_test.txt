@@ -1,0 +1,98 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: tau
+call initSlipSysData('simple_dd_slipsys')
+tau = resolveStress(1,1,[2.0_dp,-1.0_dp,3.0_dp])
+write(*,*) tau
+  
+Output:
+   3.0000000000000000   
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: tau
+call initSlipSysData('simple_dd_slipsys')
+tau = resolveStress(1,1,[-2.0_dp,8.0_dp,3.0_dp])
+write(*,*) tau
+  
+Output:
+   3.0000000000000000   
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: tau
+call initSlipSysData('simple_dd_slipsys')
+tau = resolveStress(1,1,[-2.0_dp,8.0_dp,10.0_dp])
+write(*,*) tau
+  
+Output:
+   10.0000000000000000   
+******************************************************
+Test #4: 90 degree plane
+ 
+Code:
+
+real(dp) :: tau
+call initSlipSysData('simple_dd_slipsys')
+slipsys(1)%trig(:,1) = [0.0_dp,1.0_dp]
+tau = resolveStress(1,1,[-2.0_dp,8.0_dp,10.0_dp])
+write(*,*) tau
+  
+Output:
+   -10.0000000000000000   
+******************************************************
+Test #5: 45 degree plane
+ 
+Code:
+
+integer :: isys
+real(dp) :: mvec(2), nvec(2)
+real(dp) :: stressvec(3), stressmat(2,2)
+real(dp) :: tau, taualt
+call initSlipSysData('simple_dd_slipsys')
+isys = 2
+mvec = slipsys(1)%trig(:,isys)
+nvec = [-mvec(2),mvec(1)]
+stressvec = [-2.0_dp,-2.0_dp,0.0_dp]
+tau = resolveStress(1,isys,stressvec)
+stressmat(1,:) = [stressvec(1),stressvec(3)]
+stressmat(2,:) = [stressvec(3),stressvec(2)]
+taualt = dot_product(nvec,matmul(stressmat,mvec))
+write(*,*) tau
+write(*,*) taualt
+  
+Output:
+   0.0000000000000000     
+   2.0274580625478933E-017   
+******************************************************
+Test #6: 45 degree plane
+ 
+Code:
+
+integer :: isys
+real(dp) :: mvec(2), nvec(2)
+real(dp) :: stressvec(3), stressmat(2,2)
+real(dp) :: tau, taualt
+call initSlipSysData('simple_dd_slipsys')
+isys = 2
+mvec = slipsys(1)%trig(:,isys)
+nvec = [-mvec(2),mvec(1)]
+stressvec = [-2.0_dp,8.0_dp,10.0_dp]
+tau = resolveStress(1,isys,stressvec)
+stressmat(1,:) = [stressvec(1),stressvec(3)]
+stressmat(2,:) = [stressvec(3),stressvec(2)]
+taualt = dot_product(nvec,matmul(stressmat,mvec))
+write(*,*) tau
+write(*,*) taualt
+  
+Output:
+   5.0000000001489653     
+   5.0000000001489653        
+******************************************************

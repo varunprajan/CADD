@@ -1,0 +1,17 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readSlipSysData('simple_dd_slipsys')
+call prettyPrintVec(slipsys(1)%theta,'theta')
+call prettyPrintMat(transpose(slipsys(1)%origin),'origin')
+
+Output:
+ theta
+   0.0000000000000000     
+  0.78539816339000001     
+ origin
+   0.0000000000000000        0.0000000000000000     
+   4.0000000000000000        0.0000000000000000
+******************************************************

@@ -1,0 +1,33 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initNodeData('simple_dd_nodes')
+call initMaterialData('simple_dd_materials')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call readDislData('simple_dd_disl')
+call activateDislocations()
+do i = 1, 2*disl(1)%ndisl
+  write(*,*) disl(1)%list(i)%active
+end do
+
+Output:
+ T
+ T
+ T
+ T
+ T
+ T
+ T
+ F
+ F
+ F
+ F
+ F
+ F
+ F
+******************************************************

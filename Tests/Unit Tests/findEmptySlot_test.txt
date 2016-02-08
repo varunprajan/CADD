@@ -1,0 +1,36 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: dislnum
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+call findEmptyDislSlot(1,dislnum)
+write(*,*) dislnum
+
+Output:
+8
+******************************************************
+Test #2: 
+
+Code:
+
+integer :: dislnum
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+disl(1)%active(7) = .false.
+call findEmptyDislSlot(1,dislnum)
+write(*,*) dislnum
+
+Output:
+7
+******************************************************

@@ -1,0 +1,41 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initDislData('simplefe_disl')
+call initFELibrary()
+call readFEElementData('simplefe_feelements')
+call processFEElementData()
+call processEdges()
+
+call prettyPrintMat(transpose(feelements(1)%bdedges),'bdedges')
+call prettyPrintMat(transpose(feelements(1)%neighbors),
+& 'neighbors')
+
+Output:
+ bdedges
+           1           2           1
+           6           1           1
+           2           3           2
+           3           4           3
+           4           5           4
+           5          10           4
+          11           6           5
+          10          15           8
+          12          11           5
+          13          12           6
+          14          13           7
+          15          14           8
+ neighbors
+           0           2           5           0
+           0           3           6           1
+           0           4           7           2
+           0           0           8           3
+           1           6           0           0
+           2           7           0           5
+           3           8           0           6
+           4           0           0           7
+******************************************************

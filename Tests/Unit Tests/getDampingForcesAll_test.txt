@@ -1,0 +1,55 @@
+******************************************************
+Test #1: Atom not in group
+ 
+Code:
+
+integer :: j
+real(dp) :: gamma
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test')
+gamma = 0.1_dp
+write(*,*) (groups(3)%members(j), j=1,groups(3)%nmembers)
+write(*,*) (groups(3)%maskatoms(j), j=1,nodes%natoms)
+nodes%posn(6:7,6) = [1.0_dp, 0.0_dp]
+call getDampingForcesAll(3,gamma)
+call prettyPrintRealMat(transpose(nodes%dampforces),'Damping forces')
+
+Output:    
+           2           3           4           5           9
+ T T T T F F F
+ Damping forces
+  -0.0000000000000000       -0.0000000000000000     
+  -0.0000000000000000       -0.0000000000000000     
+  -0.0000000000000000       -0.0000000000000000     
+  -0.0000000000000000       -0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000    
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: j
+real(dp) :: gamma
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test')
+gamma = 0.1_dp
+write(*,*) (groups(3)%members(j), j=1,groups(3)%nmembers)
+write(*,*) (groups(3)%maskatoms(j), j=1,nodes%natoms)
+nodes%posn(6:7,4) = [1.0_dp, 0.0_dp]
+call getDampingForcesAll(3,gamma)
+call prettyPrintRealMat(transpose(nodes%dampforces),'Damping forces')
+
+Output:
+           2           3           4           5           9
+ T T T T F F F
+ Damping forces
+  -0.0000000000000000       -0.0000000000000000     
+  -0.0000000000000000       -0.0000000000000000     
+ -0.10000000000000001       -0.0000000000000000     
+  -0.0000000000000000       -0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000         
+******************************************************

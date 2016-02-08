@@ -1,0 +1,141 @@
+******************************************************
+Test #1: Only one atom moving
+ 
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 5.0
+nodes%posn(1,2) = nodes%posn(1,2) + 2.99
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: F
+******************************************************
+Test #2: Only one atom moving
+ 
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 5.0
+nodes%posn(1,2) = nodes%posn(1,2) + 3.01
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: True
+******************************************************
+Test #3: Irrelevant node moving
+ 
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 5.0
+nodes%posn(1,2) = nodes%posn(1,2) + 2.99
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+nodes%posn(1,9) = nodes%posn(1,9) + 3.01
+nodes%posn(2,9) = nodes%posn(2,9) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: False
+******************************************************
+Test #4: Two nodes moving
+ 
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 5.0
+nodes%posn(1,2) = nodes%posn(1,2) + 2.99
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+nodes%posn(1,8) = nodes%posn(1,8) - 2.99
+nodes%posn(2,8) = nodes%posn(2,8) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: True
+******************************************************
+Test #5: Two nodes moving
+ 
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 10.0
+nodes%posn(1,2) = nodes%posn(1,2) + 2.99
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+nodes%posn(1,8) = nodes%posn(1,8) - 2.99
+nodes%posn(2,8) = nodes%posn(2,8) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: False
+**********************************************************
+Test #6: More than two nodes moving
+
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 10.0
+nodes%posn(1,2) = nodes%posn(1,2) + 2.99
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+nodes%posn(1,8) = nodes%posn(1,8) - 2.99
+nodes%posn(2,8) = nodes%posn(2,8) + 4.0
+nodes%posn(1,6) = nodes%posn(1,6) - 2.0
+nodes%posn(2,6) = nodes%posn(2,6) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: False
+**********************************************************
+Test #7: More than two nodes moving
+
+Code:
+
+logical :: res
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+neighbors%skin = 10.0
+nodes%posn(1,2) = nodes%posn(1,2) + 2.99
+nodes%posn(2,2) = nodes%posn(2,2) + 4.0
+nodes%posn(1,8) = nodes%posn(1,8) - 2.99
+nodes%posn(2,8) = nodes%posn(2,8) + 4.0
+nodes%posn(1,6) = nodes%posn(1,6) - 3.01
+nodes%posn(2,6) = nodes%posn(2,6) + 4.0
+res = checkDisp()
+write(*,*) res
+
+Output: True
+**********************************************************

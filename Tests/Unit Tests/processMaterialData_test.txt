@@ -1,0 +1,16 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readMaterialData('example_materials_test')
+call processMaterialData()
+write(*,*) materials(1)%mu
+write(*,*) materials(1)%nu
+write(*,*) materials(2)%rcore
+
+Output:
+   10.608811196359374     
+  0.25000000000000000     
+   10.000000000000000     
+******************************************************

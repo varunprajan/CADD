@@ -1,0 +1,40 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: x, n
+logical :: res
+x = 4
+n = 0
+res = isMultiple(x,n)
+write(*,*) res
+
+Output: F
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: x, n
+logical :: res
+x = 4
+n = 1
+res = isMultiple(x,n)
+write(*,*) res
+
+Output: T
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: x, n
+logical :: res
+x = 4
+n = 3
+res = isMultiple(x,n)
+write(*,*) res
+
+Output: F
+******************************************************

@@ -1,0 +1,22 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: eltypenumCPE4, eltypenumCPE3
+real(dp), allocatable :: N(:)
+call initFELibrary()
+eltypenumCPE4 = getElTypeNum('CPE4')
+eltypenumCPE3 = getElTypeNum('CPE3')
+write(*,*) felib(eltypenumCPE4)%nelnodes
+write(*,*) felib(eltypenumCPE3)%neldof
+write(*,*) felib(eltypenumCPE3)%nelip
+N = felib(eltypenumCPE4)%getN_2d_ptr(0.0_dp,0.0_dp)
+write(*,*) N
+
+Output:
+           4
+           6
+           1
+  0.25000000000000000       0.25000000000000000       0.25000000000000000       0.25000000000000000     
+******************************************************

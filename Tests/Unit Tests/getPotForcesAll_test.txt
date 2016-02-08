@@ -1,0 +1,39 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test2')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+call initInteractionData('example_interactions_test')
+call initGroupData('example_groups_test2')
+call prettyPrintIntMat(transpose(neighbors%neighlist),'Neighbor list')
+write(*,*) 'Neighbor count'
+write(*,*) neighbors%neighcount
+call getPotForcesAll
+call prettyPrintRealMat(transpose(nodes%atomforces),'Atom forces')
+
+Output: (Checked with manual, direct calculation, assuming forces from getPotForce are correct.)
+
+ Neighbor list
+           3           7           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           4           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           1           4           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           2           3           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           1           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+ Neighbor count
+           2           1           2           2           0           0           1
+ Atom forces
+   0.0000000000000000        0.0000000000000000     
+ -0.43631189060097031       -8.3340473485578562E-002
+ -0.10458973878295960       0.48787253206188197     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+  0.23235066987593372      -0.23235066987593372 
+******************************************************

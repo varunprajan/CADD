@@ -1,0 +1,65 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: relpos(1)
+integer :: objnum(1)
+relpos = [1.0_dp]
+objnum = [2]
+call insertionSortPlane(relpos,objnum,1)
+write(*,*) relpos
+write(*,*) objnum
+
+Output:
+   1.0000000000000000     
+           2
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: relpos(2)
+integer :: objnum(2)
+relpos = [1.0_dp,2.0_dp]
+objnum = [2,1]
+call insertionSortPlane(relpos,objnum,2)
+write(*,*) relpos
+write(*,*) objnum
+
+Output:
+   1.0000000000000000        2.0000000000000000     
+           2           1
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: relpos(2)
+integer :: objnum(2)
+relpos = [2.0_dp,1.0_dp]
+objnum = [2,1]
+call insertionSortPlane(relpos,objnum,2)
+write(*,*) relpos
+write(*,*) objnum
+
+Output:
+   1.0000000000000000        2.0000000000000000     
+           1           2
+******************************************************
+Test #4:
+ 
+Code:
+
+real(dp) :: relpos(6)
+integer :: objnum(6)
+relpos = [1.0_dp,4.0_dp,5.0_dp,6.0_dp,3.0_dp,2.0_dp]
+objnum = [2,3,4,5,6,1]
+call insertionSortPlane(relpos,objnum,6)
+write(*,*) relpos
+write(*,*) objnum
+
+Output:
+   1.0000000000000000        2.0000000000000000        3.0000000000000000        4.0000000000000000        5.0000000000000000        6.0000000000000000     
+           2           1           6           3           4           5
+******************************************************      

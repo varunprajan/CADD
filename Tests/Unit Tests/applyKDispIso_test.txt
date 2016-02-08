@@ -1,0 +1,80 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: KI, KII
+real(dp) :: mu, nu
+real(dp) :: xc, yc
+KI = 1.6_dp
+KII = 0.0_dp
+xc = 0.0_dp
+yc = 0.0_dp
+mu = 15.0_dp
+nu = 0.33_dp
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test2')
+nodes%posn(1:2,5) = [-3.0_dp,-3.0_dp]
+write(*,*) nodes%posn(4:5,5) 
+call applyKDispIso(KI,KII,mu,nu,xc,yc,1)
+write(*,*) nodes%posn(4:5,5)
+write(*,*) nodes%posn(1:2,5) 
+
+Output: (Checked with Python script)
+
+   0.0000000000000000        0.0000000000000000     
+   4.0034870415309391E-002  -9.6652727124489343E-002
+  -2.9599651295846905       -3.0966527271244892   
+******************************************************
+Test #2:
+
+Code:
+
+real(dp) :: KI, KII
+real(dp) :: mu, nu
+real(dp) :: xc, yc
+KI = 0.0_dp
+KII = 1.6_dp
+xc = 0.0_dp
+yc = 0.0_dp
+mu = 15.0_dp
+nu = 0.33_dp
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test2')
+nodes%posn(1:2,5) = [-3.0_dp,-3.0_dp]
+write(*,*) nodes%posn(4:5,5) 
+call applyKDispIso(KI,KII,mu,nu,xc,yc,1)
+write(*,*) nodes%posn(4:5,5)
+write(*,*) nodes%posn(1:2,5)
+
+Output: (Checked with Python script)
+
+   0.0000000000000000        0.0000000000000000     
+ -0.12037091901912975        1.7225910131699097E-002
+  -3.1203709190191296       -2.9827740898683008     
+******************************************************
+Test #3:
+
+real(dp) :: KI, KII
+real(dp) :: mu, nu
+real(dp) :: xc, yc
+KI = -1.0_dp
+KII = 1.6_dp
+xc = 0.0_dp
+yc = 0.0_dp
+mu = 15.0_dp
+nu = 0.33_dp
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test2')
+nodes%posn(1:2,5) = [-3.0_dp,1.0_dp]
+write(*,*) nodes%posn(4:5,5) 
+call applyKDispIso(KI,KII,mu,nu,xc,yc,1)
+write(*,*) nodes%posn(4:5,5) 
+write(*,*) nodes%posn(1:2,5)  
+
+Output: (Checked with Python script)
+
+   0.0000000000000000        0.0000000000000000     
+   9.2051232984135173E-002  -5.3670511395176951E-002
+  -2.9079487670158648       0.94632948860482302    
+******************************************************

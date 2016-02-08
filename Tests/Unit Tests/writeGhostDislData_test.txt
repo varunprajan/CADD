@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readGhostDislData('simple_dd_ghostdisl')
+call writeGhostDislData('simple_dd_ghostdisl_out')
+
+Output: See file --- essentially identical to simple_dd_ghostdisl
+****************************************************** 

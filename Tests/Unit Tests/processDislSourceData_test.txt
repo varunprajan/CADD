@@ -1,0 +1,42 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i, ncount
+call initNodeData('simple_dd_nodes')
+call initMaterialData('simple_dd_materials')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call readDislSourceData('simple_dd_sources')
+call processDislSourceData()
+do i = 1, size(sources(1)%list)
+    write(*,*) sources(1)%list(i)%time
+    write(*,*) sources(1)%list(i)%tauprev
+    write(*,*) sources(1)%list(i)%Lnuc    
+end do
+ncount = sources(1)%splanes(2)%splane(5)%ncount
+write(*,*) 'Plane 5'
+write(*,*) ncount
+write(*,*) sources(1)%splanes(2)%splane(5)%relpos(1:ncount)
+write(*,*) sources(1)%splanes(2)%splane(5)%objnum(1:ncount)
+ncount = sources(1)%splanes(2)%splane(6)%ncount
+write(*,*) 'Plane 6'
+write(*,*) ncount
+write(*,*) sources(1)%splanes(2)%splane(6)%relpos(1:ncount)
+write(*,*) sources(1)%splanes(2)%splane(6)%objnum(1:ncount)
+
+Output:
+   0.0000000000000000     
+   0.0000000000000000     
+   3.6099270197383446E-002
+ Plane 5
+           1
+   1.4142135623520282     
+           1
+ Plane 6
+           0
+
+
+******************************************************

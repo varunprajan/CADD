@@ -1,0 +1,12 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initSimulation('detect_test_1','cadd')
+      call writeDump_ptr()
+      call writeRestart_ptr()
+      
+Output: See detect_test_1.0.dump    
+
+******************************************************

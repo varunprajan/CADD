@@ -1,0 +1,82 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, iplane
+      integer :: mnumfe, isys, bcut, elguess
+      real(dp) :: posnold(2)
+      
+C     initialize simulation, write initial dump
+      call initSimulation('cmesh_1','dd')
+      call writeDump_ptr()
+      
+C     create dipole
+      posnold = [1.0_dp,2.5_dp]
+      mnumfe = 1
+      isys = 2
+      bcut = 0
+      elguess = 1
+      call addDislocation(mnumfe,elguess,
+     &                    posnold(1),posnold(2),isys,1,bcut)   
+      call addDislocation(mnumfe,elguess,
+     &                    posnold(1),posnold(2),isys,-1,bcut)
+     
+C     number of dislocations on each slip plane
+      do i = 1, size(disl(mnumfe)%splanes(isys)%splane)
+          write(*,*) disl(mnumfe)%splanes(isys)%splane(i)%nmax
+      end do
+      iplane = 7
+      
+C     create fake displacements to move dislocations out of body
+      disl(1)%list(1)%disp = 2.0_dp
+      disl(1)%list(2)%disp = -2.0_dp 
+      call updateDislPosSub_ptr(mnumfe,isys,iplane,1,1)
+      call updateDislPosSub_ptr(mnumfe,isys,iplane,2,2)
+      
+C     now we have escaped dislocations    
+      do i = 1, 2
+          write(*,*) escapeddisl(mnumfe)%list(i)%posn
+      end do
+      
+C     update nodal positions (performed in dump step)
+      
+C     fake fe displacements
+      assembly(1)%rhs = 0.0_dp
+      misc%incrementcurr = misc%incrementcurr + 1
+      call writeDump_ptr()
+      
+Output:
+*** Warning message from subroutine MA57AD ***
+       488 off-diagonal duplicate entries found
+           0
+           0
+           0
+           0
+           0
+           0
+           2
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           1           2           7           1
+           1           2           7           2
+   12.313708498984763        22.095917942265427     
+  -10.313708498984763       -17.095917942265427     
+
+******************************************************

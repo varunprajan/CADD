@@ -1,0 +1,36 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, mnumfe, element
+      real(dp) :: r, s
+      character(len=:), allocatable :: pref
+      
+      ! simple_fe_pad
+      call readSimulationTypeName()
+      pref = trim(misc%simname)
+      call initGeneralChunk(pref)
+      call initAtomisticChunk(pref)
+      call initFEChunk(pref)
+      call initPad()
+      do i = 1, size(padatoms)
+          mnumfe = padatoms(i)%mnumfe
+          element = padatoms(i)%element
+          r = padatoms(i)%localpos(1)
+          s = padatoms(i)%localpos(2)
+          write(*,*) mnumfe, element, r, s
+      end do 
+      
+Output:
+
+           1           1   0.0000000000000000        0.0000000000000000     
+           1           2   0.0000000000000000        0.0000000000000000     
+           1           3   0.0000000000000000        0.0000000000000000     
+           1           4   0.0000000000000000        0.0000000000000000     
+           1           5   0.0000000000000000        0.0000000000000000     
+           1           6   0.0000000000000000        0.0000000000000000     
+           1           7   0.0000000000000000        0.0000000000000000     
+           1           8   0.0000000000000000        0.0000000000000000
+
+******************************************************

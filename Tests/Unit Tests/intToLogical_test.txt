@@ -1,0 +1,27 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: num
+logical :: bool
+
+num = 2
+bool = intToLogical(num)
+write(*,*) bool
+
+Output: T
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: num
+logical :: bool
+
+num = 0
+bool = intToLogical(num)
+write(*,*) bool
+
+Output: F
+******************************************************

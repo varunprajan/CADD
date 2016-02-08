@@ -1,0 +1,32 @@
+******************************************************
+Test #1:
+
+Code:
+
+      character(len=:), allocatable :: dumpfile
+      
+      misc%simname = 'test_compute'
+      dumpfile = getDumpFilename()
+      write(*,*) dumpfile
+
+Output:
+
+test_compute.0.dump
+
+ ******************************************************
+ Test #2:
+
+Code:
+
+      character(len=:), allocatable :: dumpfile
+      
+      misc%simname = 'test_compute'
+      misc%incrementcurr = misc%incrementcurr + 1
+      dumpfile = getDumpFilename()
+      write(*,*) dumpfile
+
+Output:
+
+ test_compute.1.dump
+
+ ******************************************************

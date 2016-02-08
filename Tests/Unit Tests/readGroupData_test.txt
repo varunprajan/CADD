@@ -1,0 +1,18 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call readGroupData('example_groups_test')
+write(*,*) groups(3)%members
+write(*,*) groups(4)%nmembers
+write(*,*) groups(3)%gname
+write(*,*) groups(4)%members
+
+Output:
+           2           3           4           5           9
+           3
+ group1              
+           1           7           9
+******************************************************

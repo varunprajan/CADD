@@ -1,0 +1,61 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: a(2), b(2), c(2)
+real(dp) :: perpdist
+a = [0.0_dp,0.0_dp]
+b = [1.0_dp,0.0_dp]
+c = [0.0_dp,0.0_dp]
+perpdist = getPerpDistance(a,b,c)
+write(*,*) perpdist
+
+Output:
+   0.0000000000000000    
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: a(2), b(2), c(2)
+real(dp) :: perpdist
+a = [0.0_dp,0.0_dp]
+b = [1.0_dp,1.0_dp]
+c = [0.5_dp,0.5_dp]
+perpdist = getPerpDistance(a,b,c)
+write(*,*) perpdist
+
+Output:
+   0.0000000000000000 
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: a(2), b(2), c(2)
+real(dp) :: perpdist
+a = [0.0_dp,0.0_dp]
+b = [1.0_dp,0.0_dp]
+c = [0.5_dp,0.5_dp]
+perpdist = getPerpDistance(a,b,c)
+write(*,*) perpdist
+
+Output:
+   0.5000000000000000 
+******************************************************
+Test #4:
+ 
+Code:
+
+real(dp) :: a(2), b(2), c(2)
+real(dp) :: perpdist
+a = [0.0_dp,0.5_dp]
+b = [0.0_dp,1.0_dp]
+c = [0.5_dp,0.5_dp]
+perpdist = getPerpDistance(a,b,c)
+write(*,*) perpdist
+
+Output:
+   0.5000000000000000 
+******************************************************     

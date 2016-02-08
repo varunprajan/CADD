@@ -1,0 +1,17 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readMiscData('example_misc_test')
+write(*,*) misc%increments
+write(*,*) misc%timestep
+write(*,*) misc%restartincrement
+write(*,*) misc%iscrackproblem
+
+Output:
+          20
+   2.0000000000000000E-003
+           0
+ T
+******************************************************   

@@ -1,0 +1,73 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i
+      integer :: eltypenum
+      real(dp) :: disp
+      real(dp) :: strain(3)
+      integer :: node
+      real(dp) :: currentpos(2)
+
+      call initSimulation('simple_fe_pad','cadd_nodisl')
+      
+      ! write dump
+      call writeDump_ptr()
+      
+      ! displace top face in y-direction
+      disp = 0.8_dp
+      do i = 13, 15
+          nodes%posn(2,i) = nodes%posn(2,i) + disp
+          nodes%posn(5,i) = nodes%posn(5,i) + disp
+      end do
+      
+      ! solve
+      call solveAll_ptr()
+      
+      ! report strains
+      write(*,*) 'Strains'
+      eltypenum = feelements(1)%eltypenum
+      do i = 1, size(feelements(1)%connect,2)
+          strain = getFEStrainAtPoint(1,eltypenum,i,0.0_dp,0.0_dp)
+          write(*,*) strain
+      end do
+      
+      ! update pad
+      call updatePad()
+      
+      ! write dump
+      misc%incrementcurr = misc%incrementcurr + 1
+      call writeDump_ptr()
+      
+      ! pad positions
+      write(*,*) 'Pad atom positions'
+      do i = 1, size(nodes%padatomlist)
+          node = nodes%padatomlist(i)
+          currentpos = nodes%posn(1:2,node)
+          write(*,*) currentpos
+      end do  
+      
+Output:
+*** Warning message from subroutine MA57AD ***
+        57 off-diagonal duplicate entries found
+ Strains
+  -3.3333333333333270E-002   9.9999999999999895E-002  -1.4571677198205180E-016
+  -3.3333333333333361E-002  0.10000000000000006       -1.0408340855860843E-016
+  -3.3333333333333312E-002   9.9999999999999936E-002  -1.3877787807814457E-016
+  -3.3333333333333312E-002   9.9999999999999964E-002  -5.5511151231257827E-017
+  -3.3333333333333340E-002  0.10000000000000001       -5.5511151231257827E-017
+  -3.3333333333333319E-002  0.10000000000000001       -2.7755575615628914E-017
+  -3.3333333333333361E-002  0.10000000000000017        0.0000000000000000     
+  -3.3333333333333340E-002   9.9999999999999950E-002   5.5511151231257827E-017
+ Pad atom positions
+   1.0333333333333330        1.0999999999999999     
+   2.9666666666666663        1.1000000000000001     
+   1.0333333333333325        3.2999999999999998     
+   2.9666666666666659        3.3000000000000003     
+   1.0333333333333321        5.5000000000000000     
+   2.9666666666666655        5.5000000000000000     
+   1.0333333333333319        7.7000000000000002     
+   2.9666666666666650        7.7000000000000002     
+
+******************************************************

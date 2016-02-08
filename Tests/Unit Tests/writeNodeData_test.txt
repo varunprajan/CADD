@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readNodeData('example_nodes_test')
+call writeNodeData('example_nodes_out_test')
+
+Output: See file --- essentially identical to example_nodes_test  
+******************************************************

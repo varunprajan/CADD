@@ -1,0 +1,37 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readDislData('simple_dd_disl')
+call readSlipSysData('simple_dd_slipsys')
+call initDislSortedPlanes()
+write(*,*) disl(1)%splanes(1)%splane(5)%ncount
+
+Output:
+0
+******************************************************
+Test #2: Error --- index greater than nslipplanes
+ 
+Code:
+
+call readDislData('simple_dd_disl')
+call readSlipSysData('simple_dd_slipsys')
+call initDislSortedPlanes()
+write(*,*) disl(1)%splanes(1)%splane(9)%ncount
+
+Output:
+Runtime error...
+******************************************************
+Test #3:
+ 
+Code:
+
+call readDislData('simple_dd_disl')
+call readSlipSysData('simple_dd_slipsys')
+call initDislSortedPlanes()
+write(*,*) disl(1)%splanes(2)%splane(9)%ncount
+
+Output:
+0
+******************************************************

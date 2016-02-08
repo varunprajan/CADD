@@ -1,0 +1,81 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: element
+real(dp) :: posndef(2,3)
+real(dp) :: dUdxmat(2,2)
+real(dp) :: E(2,2)
+real(dp) :: Ecomp(2,2)
+
+call initAtomistic()
+call initDetectionData(trim(misc%simname)//'_detection')
+disp = [1.0_dp,0.0_dp]
+nodes%posn(1:2,7) = nodes%posn(1:2,7) + disp
+nodes%posn(4:5,7) = nodes%posn(4:5,7) + disp
+element = 3
+call getDetectionElementStrain(element,posndef,dUdxmat)
+call prettyPrintRealMat(posndef,'posndef')
+call prettyPrintRealMat(dUdxmat,'dUdxmat')
+E = getEforElement(dUdxmat)
+call prettyPrintRealMat(E,'E')
+Ecomp = getEcomp(1,0.0_dp,1.0_dp,1.0_dp)
+call prettyPrintRealMat(Ecomp,'Ecomp')
+
+Output:
+ posndef
+   1.5000000000000000        2.0000000000000000       0.50000000000000000     
+   0.0000000000000000        1.0000000000000000        0.0000000000000000     
+ dUdxmat
+   0.0000000000000000        1.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+ E
+   0.0000000000000000       0.50000000000000000     
+  0.50000000000000000       0.50000000000000000     
+ Ecomp
+   0.0000000000000000       0.50000000000000000     
+  0.50000000000000000       0.50000000000000000     
+******************************************************
+Test #2: Non-zero dislocation angle
+ 
+Code:
+
+real(dp) :: disp(2)
+real(dp) :: theta
+integer :: element
+real(dp) :: posndef(2,3)
+real(dp) :: dUdxmat(2,2)
+real(dp) :: E(2,2)
+real(dp) :: Ecomp(2,2)
+
+call initAtomistic()
+call initDetectionData(trim(misc%simname)//'_detection')
+theta = atan(2.0_dp)
+disp = [-cos(theta),-sin(theta)]
+nodes%posn(1:2,5) = nodes%posn(1:2,5) + disp
+nodes%posn(4:5,5) = nodes%posn(4:5,5) + disp
+element = 3
+call getDetectionElementStrain(element,posndef,dUdxmat)
+call prettyPrintRealMat(posndef,'posndef')
+call prettyPrintRealMat(dUdxmat,'dUdxmat')
+E = getEforElement(dUdxmat)
+call prettyPrintRealMat(E,'E')
+Ecomp = getEcomp(1,theta,1.0_dp,0.89442719099991597_dp)
+call prettyPrintRealMat(Ecomp,'Ecomp')
+
+Output:
+ posndef
+   1.0527864045000419        1.0000000000000000       0.50000000000000000     
+ -0.89442719099991586        1.0000000000000000        0.0000000000000000     
+ dUdxmat
+ -0.44721359549995804       0.22360679774997902     
+ -0.89442719099991586       0.44721359549995793     
+ E
+   5.2786404500041906E-002 -0.58541019662496840     
+ -0.58541019662496840       0.57221359549995787     
+ Ecomp
+   5.2786404500041906E-002 -0.58541019662496829     
+ -0.58541019662496829       0.57221359549995787     
+******************************************************

@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readDampingData('example_damping_test')
+call writeDampingData('example_damping_test_out')
+
+Output: See file --- essentially identical to example_damping_test
+******************************************************

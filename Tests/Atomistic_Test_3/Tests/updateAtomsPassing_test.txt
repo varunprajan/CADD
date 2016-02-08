@@ -1,0 +1,38 @@
+******************************************************
+Test #1: One material
+ 
+Code:
+
+      real(dp) :: dislposold(2), trig(2), dislposnew(2)
+      real(dp) :: dispnorm, burgers
+      integer :: bsgn, bcut
+      
+C     initialize simulation, reset timestep, output dump
+      call initSimulation('atomistic_3','atomistic')
+      misc%incrementcurr = 0
+      call writeDump_ptr()
+      
+C     displace dislocation
+      dislposold = [3.9_dp,17.0_dp] ! by inspection of old dump file
+      trig = [cos(piconst/3.0_dp),sin(piconst/3.0_dp)]
+      dispnorm = 15.0_dp
+      dislposnew = dislposold + dispnorm*trig ! move outside box
+      burgers = 2.0_dp**(1/6)
+      bsgn = 1
+      bcut = 0
+      
+C     update positions, run damped MD
+      detection%mdtimestep = 0.02_dp
+      detection%damp%flag = .true.
+      detection%damp%gname = 'temp'
+      detection%damp%gamma = 0.5_dp
+      detection%mdnincrements = 200
+      call updateAtomsPassing(dislposold,dislposnew,
+     &                        burgers,bsgn,bcut,trig(1),trig(2))
+ 
+C     write dump
+      call updateMiscIncrementCurr(2)
+      call writeDump_ptr()
+
+Output: See atomistic_3.2.dump
+******************************************************

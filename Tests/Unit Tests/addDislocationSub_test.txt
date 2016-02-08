@@ -1,0 +1,111 @@
+******************************************************
+Test #1: Too many disl.
+ 
+Code:
+
+integer :: i, j
+integer :: dislnum
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+do i = 1, size(disl(1)%list)
+  disl(1)%list(i)%active = .true.
+end do 
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+write(*,*) 'posn'
+do i = 1, dislnum
+  write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+end do
+
+Output:
+ Number of dislocations is too large
+ Increase nmaxdisl or nmaximagedisl
+******************************************************
+Test #2:
+ 
+Code:
+integer :: i, j
+integer :: dislnum
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+write(*,*) 'posn'
+do i = 1, dislnum
+  write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+end do
+
+Output:
+           8
+           9
+ posn
+  0.25000000000000000       0.25000000000000000     
+   1.2500000000000000        2.7500000000000000     
+   3.2500000000000000        1.7500000000000000     
+   2.2500000000000000        1.7500000000000000     
+   3.7500000000000000        1.7500000000000000     
+  0.50000000000000000       0.50000000000000000     
+   3.5000000000000000        3.5000000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000     
+
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: i, j
+integer :: dislnum
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+disl(1)%list(4)%active = .false.
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+call addDislocationSub(1,2,3.0_dp,3.0_dp,1,1,0,0.5_dp,0.5_dp,
+&                       dislnum)
+write(*,*) dislnum
+write(*,*) 'posn'
+do i = 1, dislnum
+write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+end do
+
+Output:
+           8
+           4
+           9
+ posn
+  0.25000000000000000       0.25000000000000000     
+   1.2500000000000000        2.7500000000000000     
+   3.2500000000000000        1.7500000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.7500000000000000        1.7500000000000000     
+  0.50000000000000000       0.50000000000000000     
+   3.5000000000000000        3.5000000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000     
+
+****************************************************** 

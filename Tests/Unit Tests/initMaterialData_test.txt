@@ -1,0 +1,28 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initMaterialData('example_materials_test')
+write(*,*) materials(1)%disldrag
+write(*,*) materials(2)%rho
+call prettyPrintRealMat(materials(2)%elconst,'elconst2')
+write(*,*) materials(2)%mname
+write(*,*) materials(2)%lnuc
+write(*,*) materials(1)%mu
+write(*,*) materials(1)%nu
+write(*,*) materials(2)%rcore
+
+Output:
+   1.0000000000000000     
+  0.91648642465999997     
+ elconst2
+   10.000000000000000        5.0000000000000000        0.0000000000000000     
+   5.0000000000000000        15.000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000        10.000000000000000     
+ material2           
+   7.0000000000000000     
+   10.608811196359374     
+  0.25000000000000000     
+   10.000000000000000       
+******************************************************   

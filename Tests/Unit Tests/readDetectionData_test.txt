@@ -1,0 +1,28 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initSimulation('detect_test_1','atomistic')
+      call readDetectionData(trim(misc%simname)//'_detection')
+      call prettyPrintMat(detection%interfaceedges,'edges')
+      call prettyPrintVec(detection%params,'params')
+      write(*,*) 'mnumfe', detection%mnumfe
+      write(*,*) 'damping flag', detection%damp%flag
+      write(*,*) 'damping gamma', detection%damp%gamma
+
+Output:  
+ edges
+           3          11          24
+          11          24           8
+ params
+   0.0000000000000000     
+   0.0000000000000000     
+  0.25000000000000000     
+   2.7500000000000000     
+   2.0000000000000000     
+   2.2500000000000000     
+ mnumfe           1
+ damping flag T
+ damping gamma  0.50000000000000000     
+******************************************************

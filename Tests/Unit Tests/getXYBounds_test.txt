@@ -1,0 +1,52 @@
+******************************************************
+Test #1: 
+ 
+Code:
+
+      real(dp) :: xmin, xmax, ymin, ymax
+      call initNodeData('example_nodes_test')
+      call getXYBounds(xmin,xmax,ymin,ymax)
+      write(*,*) xmin, xmax
+      write(*,*) ymin, ymax
+
+Output:
+  -3.0000000000000000        5.0000000000000000     
+  -3.0000000000000000        3.0000000000000000     
+     
+******************************************************
+Test #2: Displacement invariant
+ 
+Code:
+
+      real(dp) :: xmin, xmax, ymin, ymax
+      real(dp) :: disp(2)
+      call initNodeData('example_nodes_test')
+      disp = [10.0_dp,40.0_dp]
+      nodes%posn(1:2,8) = nodes%posn(1:2,8) + disp
+      nodes%posn(4:5,8) = nodes%posn(4:5,8) + disp
+      call getXYBounds(xmin,xmax,ymin,ymax)
+      write(*,*) xmin, xmax
+      write(*,*) ymin, ymax
+
+Output:
+  -3.0000000000000000        5.0000000000000000     
+  -3.0000000000000000        3.0000000000000000
+******************************************************
+Test #3:
+ 
+Code:
+
+      real(dp) :: xmin, xmax, ymin, ymax
+      real(dp) :: disp(2)
+      call initNodeData('example_nodes_test')
+      disp = [10.0_dp,40.0_dp]
+      nodes%posn(1:2,8) = nodes%posn(1:2,8) + disp
+      call getXYBounds(xmin,xmax,ymin,ymax)
+      write(*,*) xmin, xmax
+      write(*,*) ymin, ymax
+
+Output:
+  -3.0000000000000000        7.0000000000000000     
+  -3.0000000000000000        43.000000000000000     
+******************************************************   
+     

@@ -1,0 +1,45 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: posn(2), vel(2), forcevec(2)
+real(dp) :: gamma
+gamma = 0.1_dp
+posn = [1.0_dp,3.14_dp]
+vel = [0.1_dp,0.0_dp]
+forcevec = getDampingForce(posn,vel,gamma)
+write(*,*) forcevec
+
+Output:    
+
+  -1.0000000000000002E-002  -0.0000000000000000 
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: posn(2), vel(2), forcevec(2)
+real(dp) :: gamma
+gamma = 0.0_dp
+posn = [1.0_dp,3.14_dp]
+vel = [0.1_dp,0.0_dp]
+forcevec = getDampingForce(posn,vel,gamma)
+write(*,*) forcevec
+
+Output:  -0.0000000000000000       -0.0000000000000000     
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: posn(2), vel(2), forcevec(2)
+real(dp) :: gamma
+gamma = 0.1_dp
+posn = [1.0_dp,3.14_dp]
+vel = [0.1_dp,0.2_dp]
+forcevec = getDampingForce(posn,vel,gamma)
+write(*,*) forcevec
+
+Output:  -1.0000000000000002E-002  -2.0000000000000004E-002
+****************************************************** 

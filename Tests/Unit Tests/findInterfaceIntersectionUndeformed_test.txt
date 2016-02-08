@@ -1,0 +1,98 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: p0(2),p1(2),pint(2)
+      logical :: isint
+      integer :: edgenum
+      
+      call initSimulation('detect_test_1','cadd')
+      p0 = [0.0_dp,0.0_dp]
+      p1 = [4.0_dp,0.0_dp]
+      call findInterfaceIntersectionUndeformed(interfaceedges%array,
+     &                               p0,p1,pint,isint,edgenum)
+      write(*,*) 'Intersected?', isint
+      write(*,*) 'Intersection point', pint
+      write(*,*) 'Number of intersected edge', edgenum
+
+Output:
+
+ Intersected? T
+ Intersection point   2.0000000000000000        0.0000000000000000     
+ Number of intersected edge           2
+******************************************************
+Test #2: Undeformed positions
+ 
+Code:
+
+      real(dp) :: p0(2),p1(2),pint(2),disp(2)
+      logical :: isint
+      integer :: edgenum
+      
+      call initSimulation('detect_test_1','cadd')
+      p0 = [0.0_dp,0.0_dp]
+      p1 = [4.0_dp,0.0_dp]
+      disp = [1.0_dp,0.0_dp]
+      nodes%posn(1:2,12) = nodes%posn(1:2,12) + disp
+      nodes%posn(4:5,12) = nodes%posn(4:5,12) + disp
+      call findInterfaceIntersectionUndeformed(interfaceedges%array,
+     &                               p0,p1,pint,isint,edgenum)
+      write(*,*) 'Intersected?', isint
+      write(*,*) 'Intersection point', pint
+      write(*,*) 'Number of intersected edge', edgenum
+
+Output:
+
+ Intersected? T
+ Intersection point   2.0000000000000000        0.0000000000000000     
+ Number of intersected edge           2
+
+
+******************************************************
+Test #3: No intersection
+ 
+Code:
+
+      real(dp) :: p0(2),p1(2),pint(2)
+      logical :: isint
+      integer :: edgenum
+      
+      call initSimulation('detect_test_1','cadd')
+      p0 = [0.0_dp,0.0_dp]
+      p1 = [1.0_dp,1.0_dp]
+      call findInterfaceIntersectionUndeformed(interfaceedges%array,
+     &                               p0,p1,pint,isint,edgenum)
+      write(*,*) 'Intersected?', isint
+      write(*,*) 'Intersection point', pint
+      write(*,*) 'Number of intersected edge', edgenum
+
+Output:
+
+ Intersected? F
+ Intersection point   3.4923780554162054E-307   4.6559507521646377E-307
+ Number of intersected edge           1
+******************************************************
+Test #4: Intersection at corner
+ 
+Code:
+
+      real(dp) :: p0(2),p1(2),pint(2)
+      logical :: isint
+      integer :: edgenum
+      
+      call initSimulation('detect_test_1','cadd')
+      p0 = [1.0_dp,1.0_dp]
+      p1 = [3.0_dp,4.0_dp]
+      call findInterfaceIntersectionUndeformed(interfaceedges%array,
+     &                               p0,p1,pint,isint,edgenum)
+      write(*,*) 'Intersected?', isint
+      write(*,*) 'Intersection point', pint
+      write(*,*) 'Number of intersected edge', edgenum
+
+Output:
+
+ Intersected? T
+ Intersection point   2.0000000000000000        2.5000000000000000     
+ Number of intersected edge           2
+******************************************************

@@ -1,0 +1,65 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2), escapedpos(2)
+
+      posnold = [1.0_dp,0.0_dp]
+      posnnew = [2.0_dp,0.0_dp]
+      box%maxlen = 100.0_dp
+      escapedpos = getEscapedPos(posnold,posnnew)
+      write(*,*) escapedpos
+
+Output:
+   201.00000000000000        0.0000000000000000          
+******************************************************
+Test #2:
+ 
+Code:
+      real(dp) :: posnold(2), posnnew(2), escapedpos(2)
+
+      posnold = [1.0_dp,0.0_dp]
+      posnnew = [2.0_dp,0.0_dp]
+      box%maxlen = 100.0_dp
+      escapedpos = getEscapedPos(posnold,posnnew)
+      write(*,*) escapedpos
+
+Output:
+   1.0000000000000000        200.00000000000000     
+
+
+******************************************************
+Test #3:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2), escapedpos(2)
+
+      posnold = [1.0_dp,0.0_dp]
+      posnnew = [2.0_dp,1.0_dp]
+      box%maxlen = 100.0_dp
+      escapedpos = getEscapedPos(posnold,posnnew)
+      write(*,*) escapedpos
+
+Output:
+  142.42135623730948        141.42135623730948     
+
+******************************************************
+Test #4:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2), escapedpos(2)
+
+      posnold = [1.0_dp,0.0_dp]
+      posnnew = [2.0_dp,1.0_dp]
+      box%maxlen = 100.0_dp
+      escapedpos = getEscapedPos(posnnew,posnold)
+      write(*,*) escapedpos
+
+Output:
+  -139.42135623730948       -140.42135623730948     
+
+
+******************************************************

@@ -1,0 +1,61 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+logical :: check
+real(dp) :: r, s
+integer :: i
+r = 0.5_dp
+s = -1.1_dp
+do i = 1, 4
+  check = checkCPE4(i,r,s)
+  write(*,*) check
+end do 
+
+Output:
+ F
+ T
+ T
+ T
+****************************************************** 
+Test #2:
+ 
+Code:
+
+logical :: check
+real(dp) :: r, s
+integer :: i
+r = 2.2_dp
+s = 2.2_dp
+do i = 1, 4
+  check = checkCPE4(i,r,s)
+  write(*,*) check
+end do 
+
+Output:
+ T
+ F
+ F
+ T
+******************************************************  
+Test #3:
+ 
+Code:
+
+logical :: check
+real(dp) :: r, s
+integer :: i
+r = 0.6_dp
+s = -0.1_dp
+do i = 1, 4
+  check = checkCPE4(i,r,s)
+  write(*,*) check
+end do 
+
+Output:
+ T
+ T
+ T
+ T
+******************************************************   

@@ -1,0 +1,194 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: posn(2,4)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [-1.0_dp, -1.0_dp]
+posn(:,2) = [1.0_dp, -1.0_dp]
+posn(:,3) = [1.0_dp, 1.0_dp]
+posn(:,4) = [-1.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE4')
+call getdN_CPE4_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+
+ J
+   1.0000000000000000        0.0000000000000000     
+   0.0000000000000000        1.0000000000000000     
+ detJ    1.0000000000000000      
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: posn(2,4)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [-1.0_dp, -1.0_dp]
+posn(:,2) = [3.0_dp, -1.0_dp]
+posn(:,3) = [3.0_dp, 1.0_dp]
+posn(:,4) = [-1.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE4')
+call getdN_CPE4_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+
+J
+   2.0000000000000000        0.0000000000000000     
+   0.0000000000000000        1.0000000000000000     
+ detJ    2.0000000000000000    
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: posn(2,4)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [-1.0_dp, -1.0_dp]
+posn(:,2) = [3.0_dp, -1.0_dp]
+posn(:,3) = [5.0_dp, 1.0_dp]
+posn(:,4) = [1.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE4')
+call getdN_CPE4_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+ J
+   2.0000000000000000        0.0000000000000000     
+   1.0000000000000000        1.0000000000000000     
+ detJ    2.0000000000000000    
+******************************************************
+Test #4:
+ 
+Code:
+real(dp) :: posn(2,3)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [0.0_dp, 0.0_dp]
+posn(:,2) = [1.0_dp, 0.0_dp]
+posn(:,3) = [0.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE3')
+call getdN_CPE3_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+ J
+   1.0000000000000000        0.0000000000000000     
+   0.0000000000000000        1.0000000000000000     
+ detJ    1.0000000000000000       
+******************************************************
+Test #5:
+ 
+Code:
+
+real(dp) :: posn(2,3)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [0.0_dp, 0.0_dp]
+posn(:,2) = [0.0_dp, 1.0_dp]
+posn(:,3) = [1.0_dp, 0.0_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE3')
+call getdN_CPE3_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+ J
+   0.0000000000000000        1.0000000000000000     
+   1.0000000000000000        0.0000000000000000     
+ detJ   -1.0000000000000000           
+******************************************************
+Test #6:
+ 
+Code:
+
+real(dp) :: posn(2,3)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [0.0_dp, 0.0_dp]
+posn(:,2) = [3.0_dp, 0.0_dp]
+posn(:,3) = [0.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE3')
+call getdN_CPE3_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+ J
+   3.0000000000000000        0.0000000000000000     
+   0.0000000000000000        1.0000000000000000     
+ detJ    3.0000000000000000   
+******************************************************
+Test #7:
+ 
+Code:
+
+real(dp) :: posn(2,3)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+real(dp), allocatable :: dNdr(:), dNds(:)
+integer :: elnum
+posn(:,1) = [0.0_dp, 0.0_dp]
+posn(:,2) = [0.70710678118_dp, 0.70710678118_dp]
+posn(:,3) = [-0.70710678118_dp, 0.70710678118_dp]
+call initMaterialData('example_materials_test')
+call initFELibrary()
+elnum = getElNum('CPE3')
+call getdN_CPE3_2d(0.0_dp,0.0_dp,dNdr,dNds)
+J = getJ_2d(posn,dNdr,dNds)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+ J
+  0.70710678118000003       0.70710678118000003     
+ -0.70710678118000003       0.70710678118000003     
+ detJ   0.99999999998148092   
+******************************************************

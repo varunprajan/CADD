@@ -1,0 +1,261 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 1.0_dp
+sources(mnumfe)%list(sourcenum)%time = 0.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = 40.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time   
+
+Output:
+ tauprev   40.000000000000000     
+ time   0.0000000000000000      
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 1.0_dp
+sources(mnumfe)%list(sourcenum)%time = 0.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = 60.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time   
+
+Output:
+ tauprev   60.000000000000000     
+ time   1.0000000000000000      
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 1.0_dp
+sources(mnumfe)%list(sourcenum)%time = 0.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = -60.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time   
+
+Output:
+ tauprev   -60.000000000000000     
+ time   1.0000000000000000      
+******************************************************
+Test #4:
+ 
+Code:
+
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 60.0_dp
+sources(mnumfe)%list(sourcenum)%time = 2.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = -60.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time   
+
+Output:
+ tauprev  -60.000000000000000     
+ time   1.0000000000000000         
+******************************************************
+Test #5:
+ 
+Code:
+
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 60.0_dp
+sources(mnumfe)%list(sourcenum)%time = 2.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = 60.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time   
+
+Output:
+ tauprev   60.000000000000000     
+ time   3.0000000000000000           
+******************************************************
+Test #6:
+ 
+Code:
+
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 60.0_dp
+sources(mnumfe)%list(sourcenum)%time = 3.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = 20.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time   
+
+Output:
+ tauprev   60.000000000000000     
+ time   2.0000000000000000               
+******************************************************
+Test #7: Pop dipole
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 60.0_dp
+sources(mnumfe)%list(sourcenum)%time = 4.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = 60.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time
+
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%posn
+  write(*,*) disl(mnumfe)%list(i)%sgn
+end do     
+
+Output:
+ tauprev   60.000000000000000     
+ time   0.0000000000000000     
+  0.50000000000000000       0.50000000000000000     
+           1
+  0.75000000000000000       0.50000000000000000     
+          -1
+   1.5000000000000000       0.50000000000000000     
+           1
+   1.7500000000000000       0.50000000000000000     
+           1
+   2.5000000000000000       0.50000000000000000     
+           1
+   3.2500000000000000       0.50000000000000000     
+          -1
+   3.5000000000000000       0.50000000000000000     
+           1
+   3.7500000000000000       0.50000000000000000     
+          -1
+   2.2680496350986918       0.50000000000000000     
+           1
+   2.2319503649013082       0.50000000000000000     
+          -1          
+******************************************************
+Test #8: Pop dipole, negative stress
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, sourcenum
+real(dp) :: tau, dt
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = -60.0_dp
+sources(mnumfe)%list(sourcenum)%time = 4.0_dp
+sources(mnumfe)%list(sourcenum)%tnuc = 4.0_dp
+sources(mnumfe)%list(sourcenum)%taucr = 50.0_dp
+tau = -60.0_dp
+dt = 1.0_dp
+
+call updateSource(dt,tau,mnumfe,sources(mnumfe)%list(sourcenum))
+
+write(*,*) 'tauprev', sources(mnumfe)%list(sourcenum)%tauprev
+write(*,*) 'time', sources(mnumfe)%list(sourcenum)%time
+
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%posn
+  write(*,*) disl(mnumfe)%list(i)%sgn
+end do     
+
+Output:
+ tauprev  -60.000000000000000     
+ time   0.0000000000000000     
+  0.50000000000000000       0.50000000000000000     
+           1
+  0.75000000000000000       0.50000000000000000     
+          -1
+   1.5000000000000000       0.50000000000000000     
+           1
+   1.7500000000000000       0.50000000000000000     
+           1
+   2.5000000000000000       0.50000000000000000     
+           1
+   3.2500000000000000       0.50000000000000000     
+          -1
+   3.5000000000000000       0.50000000000000000     
+           1
+   3.7500000000000000       0.50000000000000000     
+          -1
+   2.2319503649013082       0.50000000000000000     
+           1
+   2.2680496350986918       0.50000000000000000     
+          -1
+******************************************************

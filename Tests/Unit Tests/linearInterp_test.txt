@@ -1,0 +1,80 @@
+Notes: Output checked using interp1d in scipy.interpolate in Python
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: xvec(3), yvec(3)
+xvec = [0.0_dp, 0.9_dp, 2.0_dp]
+yvec = [1.0_dp, 3.0_dp, 1.0_dp]
+res = linearInterp(-0.0000001_dp,xvec,yvec,3)
+write(*,*) res
+
+Output: Error: Bounds of pot. table are bad: extrapolation
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: xvec(3), yvec(3)
+xvec = [0.0_dp, 0.9_dp, 2.0_dp]
+yvec = [1.0_dp, 3.0_dp, 1.0_dp]
+res = linearInterp(2.000001_dp,xvec,yvec,3)
+write(*,*) res
+
+Output: Error: Bounds of pot. table are bad: extrapolation
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: xvec(3), yvec(3)
+xvec = [0.0_dp, 0.9_dp, 2.0_dp]
+yvec = [1.0_dp, 3.0_dp, 1.0_dp]
+res = linearInterp(0.0000001_dp,xvec,yvec,3)
+write(*,*) res
+
+Output:    1.0000002222222222
+******************************************************
+Test #4:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: xvec(3), yvec(3)
+xvec = [0.0_dp, 0.9_dp, 2.0_dp]
+yvec = [1.0_dp, 3.0_dp, 1.0_dp]
+res = linearInterp(1.7_dp,xvec,yvec,3)
+write(*,*) res
+
+Output:    1.5454545454545456
+******************************************************
+Test #5:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: xvec(2), yvec(2)
+xvec = [0.9_dp, 2.0_dp]
+yvec = [3.0_dp, 1.0_dp]
+res = linearInterp(1.7_dp,xvec,yvec,2)
+write(*,*) res
+
+Output:    1.5454545454545456
+******************************************************
+Test #6:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: xvec(4), yvec(4)
+xvec = [-0.5_dp,0.0_dp, 0.9_dp, 2.0_dp]
+yvec = [1.0_dp,1.0_dp, 3.0_dp, 1.0_dp]
+res = linearInterp(1.7_dp,xvec,yvec,4)
+write(*,*) res
+
+Output:    1.5454545454545456
+******************************************************

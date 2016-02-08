@@ -1,0 +1,30 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call readNeighborData('example_neighbors_test')
+call processNeighborData()
+write(*,*) neighbors%rhomax
+write(*,*) neighbors%rneigh
+write(*,*) neighbors%nmaxneigh
+call prettyPrintRealMat(transpose(neighbors%possincelastcheck),'since last')
+
+Output:
+
+  0.91648642465999997     
+   2.3090000000000002     
+          31
+ since last
+  -1.5000000000000000        1.5000000000000000     
+   2.7799999999999998        2.3399999999999999     
+   0.0000000000000000        0.0000000000000000     
+   1.0000000000000000        2.0000000000000000     
+   5.0000000000000000        3.0000000000000000     
+  -3.0000000000000000       -3.0000000000000000     
+  -3.0000000000000000        3.0000000000000000 
+******************************************************

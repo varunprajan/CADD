@@ -1,0 +1,57 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initDislData('simplefe_disl')
+call initFELibrary()
+call readFEElementData('simplefe_feelements') 
+call processFEElementData()
+call processEdges()
+call processNodeLists()
+write(*,*) 'Boundary nodes'
+write(*,*) feelements(1)%bdnodelist
+write(*,*) 'All nodes'
+write(*,*) feelements(1)%nodelist
+write(*,*) 'Inverse node list'
+write(*,*) feelements(1)%nodeinvlist
+
+Output:
+ Boundary nodes
+           1           2           3           4           5           6           7           8          10          11          12          13          14          15
+ All nodes
+           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15
+ Inverse node list
+           1           2           3           4           5           6           7           8           9          10          11          12          13          14          15           0
+******************************************************
+Test #2:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initDislData('simplefe_disl')
+call initFELibrary()
+call readFEElementData('simplefe_feelements')
+feelements(1)%connect(3,8) = 16
+call processFEElementData()
+call processEdges()
+call processNodeLists()
+write(*,*) 'Boundary nodes'
+write(*,*) feelements(1)%bdnodelist
+write(*,*) 'All nodes'
+write(*,*) feelements(1)%nodelist
+write(*,*) 'Inverse node list'
+write(*,*) feelements(1)%nodeinvlist
+
+Output:
+ Boundary nodes
+           1           2           3           4           5           6           7           8          10          11          12          13          14          16
+ All nodes
+           1           2           3           4           5           6           7           8           9          10          11          12          13          14          16
+ Inverse node list
+           1           2           3           4           5           6           7           8           9          10          11          12          13          14           0          15
+
+******************************************************

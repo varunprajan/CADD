@@ -1,0 +1,22 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readDislSourceData('simple_dd_sources')
+write(*,*) 'Posn'
+do i = 1, size(sources(1)%list)
+  write(*,*) (sources(1)%list(i)%posn(j), j = 1,2)
+end do    
+write(*,*) 'taucr'
+do i = 1, size(sources(1)%list)
+  write(*,*) sources(1)%list(i)%taucr
+end do
+
+Output:
+ Posn
+   3.0000000000000000        3.0000000000000000     
+ taucr
+   70.000000000000000     
+
+******************************************************

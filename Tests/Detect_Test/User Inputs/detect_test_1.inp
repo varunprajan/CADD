@@ -1,0 +1,70 @@
+# compute
+files_compute: input.compute
+
+# misc
+files_misc: input.misc
+
+# damping
+files_damping: input.damping
+
+# interactions
+files_interactions: input.interactions
+
+# neighbors
+files_neighbors: input.neighbors
+
+# dislocations
+files_disl:
+input.dislmat1
+end
+
+# escaped dislocations
+files_escapeddisl:
+input.escapeddislmat1
+end
+
+# ghost dislocations
+files_ghostdisl:
+input.ghostdislmat1
+end
+
+# sources
+files_sources:
+input.sourcesmat1
+end
+
+# obstacles
+files_obstacles:
+input.obstaclesmat1
+end
+
+# slip systems
+files_slipsys:
+input.slipsysmat1
+end
+
+# detection
+files_detection: input.detection
+
+# nodes
+files_nodes: input.nodes
+
+# feelements
+files_feelements:
+input.feelementsmat1
+end
+
+# materials
+files_materials:
+input.material1
+end
+
+# potentials
+files_potentials:
+input.inter1
+end
+
+# groups
+files_groups:
+input.group1
+end

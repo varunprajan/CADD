@@ -1,0 +1,19 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call readGroupData('example_groups_test')
+call processGroupData()
+write(*,*) groups(3)%maskatoms
+write(*,*) groups(4)%maskall
+write(*,*) groups(4)%maskfenodes
+write(*,*) groups(1)%maskatoms
+
+Output:
+ T T T T F F F
+ T F F F F F T F T
+ T F F F T
+ T T T T T T T
+******************************************************

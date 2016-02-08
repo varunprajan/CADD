@@ -1,0 +1,42 @@
+******************************************************
+Test #1: No dislocations
+ 
+Code:
+
+integer :: neqnsnormal, neqnstot
+integer :: nentriesnormal, nentriestot
+integer :: nedgenodes, nedgeip
+integer :: j
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+call countEqns(1,neqnsnormal,nentriesnormal,
+&                            neqnstot,nentriestot)
+call initAssembly()
+assembly(1)%rhs = 0.0_dp
+nedgenodes = feelements(1)%nedgenodes
+nedgeip = feelements(1)%nedgeip
+C     boundary conditions
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 2.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 2.0_dp
+call getDispRHS(1)
+do j = neqnsnormal+1, neqnstot
+  write(*,*) assembly(1)%rhs(j)
+end do
+
+Output:
+   0.0000000000000000     
+   0.0000000000000000     
+   1.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   1.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   2.0000000000000000 
+******************************************************

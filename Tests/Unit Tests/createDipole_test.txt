@@ -1,0 +1,78 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, sourcenum
+real(dp) :: tau
+
+mnumfe = 1
+sourcenum = 1
+call initDD()
+sources(mnumfe)%list(sourcenum)%tauprev = 60.0_dp
+sources(mnumfe)%list(sourcenum)%time = 4.0_dp
+sources(mnumfe)%list(sourcenum)%lnuc = 2.0_dp
+tau = 60.0_dp
+disl(mnumfe)%splanes(1)%splane(1)%resort = .false.
+
+call createDipole(mnumfe,sources(mnumfe)%list(sourcenum),tau)
+
+write(*,*) 'Dislocations'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%posn
+  write(*,*) disl(mnumfe)%list(i)%sgn
+end do
+
+write(*,*) 'Dislocation plane'
+do i = 1, disl(mnumfe)%splanes(1)%splane(1)%nmax
+  write(*,*) disl(mnumfe)%splanes(1)%splane(1)%relpos(i)
+  write(*,*) disl(mnumfe)%splanes(1)%splane(1)%objnum(i)
+end do 
+
+Output:
+ Dislocations
+  0.50000000000000000       0.50000000000000000     
+           1
+  0.75000000000000000       0.50000000000000000     
+          -1
+   1.5000000000000000       0.50000000000000000     
+           1
+   1.7500000000000000       0.50000000000000000     
+           1
+   2.5000000000000000       0.50000000000000000     
+           1
+   3.2500000000000000       0.50000000000000000     
+          -1
+   3.5000000000000000       0.50000000000000000     
+           1
+   3.7500000000000000       0.50000000000000000     
+          -1
+   3.2500000000000000       0.50000000000000000     
+           1
+   1.2500000000000000       0.50000000000000000     
+          -1
+ Dislocation plane
+  0.50000000000000000     
+           1
+  0.75000000000000000     
+           2
+   1.5000000000000000     
+           3
+   1.7500000000000000     
+           4
+   2.5000000000000000     
+           5
+   3.2500000000000000     
+           6
+   3.5000000000000000     
+           7
+   3.7500000000000000     
+           8
+   3.2500000000000000     
+           9
+   1.2500000000000000     
+          10
+ Resort T
+    
+******************************************************

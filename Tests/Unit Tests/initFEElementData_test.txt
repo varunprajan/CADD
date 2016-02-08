@@ -1,0 +1,45 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initDislData('simplefe_disl')
+call initFEElementData('simplefe_feelements')
+call prettyPrintIntMat(transpose(feelements(1)%neighbors),'Neigh')
+call prettyPrintIntMat(transpose(feelements(1)%bdedges),
+&    'Boundary edges')
+write(*,*) 'Boundary nodes'
+write(*,*) feelements(1)%bdnodelist
+write(*,*) 'Inverse material list'
+write(*,*) fematerials%invlist
+
+Output:
+ Neigh
+           0           2           5           0
+           0           3           6           1
+           0           4           7           2
+           0           0           8           3
+           1           6           0           0
+           2           7           0           5
+           3           8           0           6
+           4           0           0           7
+ Boundary edges
+           1           2
+           6           1
+           2           3
+           3           4
+           4           5
+           5          10
+          11           6
+          10          15
+          12          11
+          13          12
+          14          13
+          15          14
+ Boundary nodes
+           1           2           3           4           5           6          10          11          12          13          14          15
+ Inverse material list
+           0           0           1
+******************************************************

@@ -1,0 +1,31 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: neqnsnormal, neqnstot
+integer :: nentriesnormal, nentriestot
+integer :: j
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFEElementData('simplefe_feelements')
+call countEqns(1,neqnsnormal,nentriesnormal,
+&                            neqnstot,nentriestot)
+call initAssembly()
+call assembleLagrange(1)
+do j = nentriesnormal+1, nentriestot
+  write(*,*) assembly(1)%rowindex(j), assembly(1)%colindex(j),
+&               assembly(1)%Ksparse(j)
+end do
+
+Output: (Appears to be correct from inspection)
+           1          31   1.0000000000000000     
+           2          32   1.0000000000000000     
+           9          33   1.0000000000000000     
+          11          34   1.0000000000000000     
+          12          35   1.0000000000000000     
+          19          36   1.0000000000000000     
+          21          37   1.0000000000000000     
+          22          38   1.0000000000000000     
+          29          39   1.0000000000000000  
+******************************************************

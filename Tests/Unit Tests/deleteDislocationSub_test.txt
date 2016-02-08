@@ -1,0 +1,86 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+call deleteDislocationSub(1,7)
+write(*,*) disl(1)%ndisl
+do i = 1, 7
+    write(*,*) disl(1)%list(i)%active
+end do
+
+Output:
+           6
+ T
+ T
+ T
+ T
+ T
+ T
+ F
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: i
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+call deleteDislocationSub(1,6)
+call deleteDislocationSub(1,7)
+write(*,*) disl(1)%ndisl
+do i = 1, 7
+    write(*,*) disl(1)%list(i)%active
+end do
+
+Output:
+           5
+ T
+ T
+ T
+ T
+ T
+ F
+ F
+
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: i
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+call deleteDislocationSub(1,7)
+call deleteDislocationSub(1,5)
+write(*,*) disl(1)%ndisl
+do i = 1, 7
+    write(*,*) disl(1)%list(i)%active
+end do
+
+Output:
+           6
+ T
+ T
+ T
+ T
+ F
+ T
+ F
+
+******************************************************

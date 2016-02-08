@@ -1,0 +1,18 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initDislData('simplefe_disl')
+call initFELibrary()
+call readFEElementData('simplefe_feelements')
+call processFEElementData()
+write(*,*) 'nfeelements', feelements(1)%nfeelements
+write(*,*) 'elnum', feelements(1)%elnum
+
+Output:
+ nfeelements           8
+ elnum           1
+******************************************************

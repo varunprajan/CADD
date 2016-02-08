@@ -1,0 +1,170 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, atom, atomtype
+      real(dp) :: dt
+      logical :: dampflag
+      real(dp) :: gamma
+      call initNodeData('example_nodes_test')
+      call initMaterialData('example_materials_test2')
+      call initPotentialData('example_potentials_test')
+      call initMiscData('example_misc_test')
+      call initNeighborData('example_neighbors_test')
+      call initInteractionData('example_interactions_test')
+      call initGroupData('example_groups_test2')
+      i = 6
+      atom = nodes%atomlist(i)
+      atomtype = nodes%types(1,atom)
+      dampflag = .false.
+      gamma = 0.0_dp
+      materials(atomtype)%mass = 1.0_dp
+      nodes%potforces(:,i) = [4.0_dp,0.0_dp]
+      dt = 0.002_dp
+      write(*,*) 'Original'
+      write(*,*) nodes%posn(:,atom)
+C     velocity verlet mimic
+C     update velocities (step 1)
+      call velocityVerletSub1(0.5_dp*dt,1)
+C     update positions (step 2)
+      call velocityVerletSub2(dt,1)
+C     keep forces the same
+C     update velocities (step 4)     
+      call velocityVerletSub1(0.5_dp*dt,1)
+      write(*,*) 'Final'
+      write(*,*) nodes%posn(:,atom)
+      
+Output:
+ Original
+  -3.0000000000000000       -3.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Final
+  -2.9999920000000002       -3.0000000000000000        0.0000000000000000        7.9999999999999996E-006   0.0000000000000000        8.0000000000000002E-003   0.0000000000000000     
+******************************************************
+Test #2: Change mass to 2.0
+
+Code:
+
+      integer :: i, atom, atomtype
+      real(dp) :: dt
+      logical :: dampflag
+      real(dp) :: gamma
+      call initNodeData('example_nodes_test')
+      call initMaterialData('example_materials_test2')
+      call initPotentialData('example_potentials_test')
+      call initMiscData('example_misc_test')
+      call initNeighborData('example_neighbors_test')
+      call initInteractionData('example_interactions_test')
+      call initGroupData('example_groups_test2')
+      i = 6
+      atom = nodes%atomlist(i)
+      atomtype = nodes%types(1,atom)
+      dampflag = .false.
+      gamma = 0.0_dp
+      materials(atomtype)%mass = 2.0_dp
+      nodes%potforces(:,i) = [4.0_dp,0.0_dp]
+      dt = 0.002_dp
+      write(*,*) 'Original'
+      write(*,*) nodes%posn(:,atom)
+C     velocity verlet mimic
+C     update velocities (step 1)
+      call velocityVerletSub1(0.5_dp*dt,1)
+C     update positions (step 2)
+      call velocityVerletSub2(dt,1)
+C     keep forces the same
+C     update velocities (step 4)     
+      call velocityVerletSub1(0.5_dp*dt,1)
+      write(*,*) 'Final'
+      write(*,*) nodes%posn(:,atom)
+      
+Output:
+ Original
+  -3.0000000000000000       -3.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Final
+  -2.9999959999999999       -3.0000000000000000        0.0000000000000000        3.9999999999999998E-006   0.0000000000000000        4.0000000000000001E-003   0.0000000000000000     
+******************************************************
+Test #3: Atom that can't move, because it's a pad
+
+Code:
+
+      integer :: i, atom, atomtype
+      real(dp) :: dt
+      logical :: dampflag
+      real(dp) :: gamma
+      call initNodeData('example_nodes_test')
+      call initMaterialData('example_materials_test2')
+      call initPotentialData('example_potentials_test')
+      call initMiscData('example_misc_test')
+      call initNeighborData('example_neighbors_test')
+      call initInteractionData('example_interactions_test')
+      call initGroupData('example_groups_test2')
+      i = 4
+      atom = nodes%atomlist(i)
+      atomtype = nodes%types(1,atom)
+      dampflag = .false.
+      gamma = 0.0_dp
+      materials(atomtype)%mass = 2.0_dp
+      nodes%potforces(:,i) = [4.0_dp,0.0_dp]
+      dt = 0.002_dp
+      write(*,*) 'Original'
+      write(*,*) nodes%posn(:,atom)
+C     velocity verlet mimic
+C     update velocities (step 1)
+      call velocityVerletSub1(0.5_dp*dt,1)
+C     update positions (step 2)
+      call velocityVerletSub2(dt,1)
+C     keep forces the same
+C     update velocities (step 4)     
+      call velocityVerletSub1(0.5_dp*dt,1)
+      write(*,*) 'Final'
+      write(*,*) nodes%posn(:,atom)
+      
+Output:
+
+ Original
+   1.0000000000000000        2.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Final
+   1.0000000000000000        2.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+******************************************************
+Test #4: Atom that can't move, because it's fixed
+
+Code:
+
+      integer :: i, atom, atomtype
+      real(dp) :: dt
+      logical :: dampflag
+      real(dp) :: gamma
+      call initNodeData('example_nodes_test')
+      call initMaterialData('example_materials_test2')
+      call initPotentialData('example_potentials_test')
+      call initMiscData('example_misc_test')
+      call initNeighborData('example_neighbors_test')
+      call initInteractionData('example_interactions_test')
+      call initGroupData('example_groups_test2')
+      i = 1
+      atom = nodes%atomlist(i)
+      atomtype = nodes%types(1,atom)
+      dampflag = .false.
+      gamma = 0.0_dp
+      materials(atomtype)%mass = 2.0_dp
+      nodes%atomforces(:,i) = [4.0_dp,0.0_dp]
+      dt = 0.002_dp
+      write(*,*) 'Original'
+      write(*,*) nodes%posn(:,atom)
+C     velocity verlet mimic
+C     update velocities (step 1)
+      call velocityVerletSub1(0.5_dp*dt,1)
+C     update positions (step 2)
+      call velocityVerletSub2(dt,1)
+C     keep forces the same
+C     update velocities (step 4)     
+      call velocityVerletSub1(0.5_dp*dt,1)
+      write(*,*) 'Final'
+      write(*,*) nodes%posn(:,atom)
+      
+Output:
+ Original
+  -1.5000000000000000        1.5000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Final
+  -1.5000000000000000        1.5000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+******************************************************    

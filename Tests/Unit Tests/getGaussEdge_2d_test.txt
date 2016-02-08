@@ -1,0 +1,44 @@
+******************************************************
+Test #1: Constant traction
+ 
+Code:
+
+real(dp) :: f(2)
+real(dp) :: sgauss(2)
+real(dp) :: wgauss(2,2)
+call getGaussEdge_2d('CPE4',2,2,sgauss,wgauss)
+C     constant traction
+f = matmul(wgauss,[1.0_dp,1.0_dp])
+write(*,*) f
+
+Output:
+  0.50000000000000000       0.50000000000000000   
+****************************************************** 
+Test #2: Linear traction (centered on node 1)
+ 
+Code:
+real(dp) :: f(2)
+real(dp) :: sgauss(2)
+real(dp) :: wgauss(2,2)
+call getGaussEdge_2d('CPE4',2,2,sgauss,wgauss)
+C     linear traction
+f = matmul(wgauss,[1.0_dp-sgauss(1),1.0_dp-sgauss(2)])
+write(*,*) f   
+
+Output:
+  0.33333333333333331       0.16666666666666666
+******************************************************
+Test #3: Linear traction (centered on node 2)
+ 
+Code:
+real(dp) :: f(2)
+real(dp) :: sgauss(2)
+real(dp) :: wgauss(2,2)
+call getGaussEdge_2d('CPE4',2,2,sgauss,wgauss)
+C     linear traction
+f = matmul(wgauss,sgauss)
+write(*,*) f   
+
+Output:
+  0.16666666666666666       0.33333333333333331
+******************************************************  

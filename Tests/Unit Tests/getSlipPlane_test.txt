@@ -1,0 +1,77 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer:: iplane
+real(dp) :: relpos
+real(dp) :: pt(2)
+call initSlipSysData('simple_dd_slipsys')
+pt = [0.0_dp,0.0_dp]
+call getSlipPlane(pt,1,1,iplane,relpos)
+write(*,*) 'pt', pt
+write(*,*) 'slip plane', iplane
+write(*,*) 'relpos', relpos
+
+Output:
+ pt   0.0000000000000000        0.0000000000000000     
+ slip plane           1
+ relpos   0.0000000000000000     
+******************************************************
+Test #2:
+ 
+Code:
+
+integer:: iplane
+real(dp) :: relpos
+real(dp) :: pt(2)
+call initSlipSysData('simple_dd_slipsys')
+pt = [2.0_dp,0.0_dp]
+call getSlipPlane(pt,1,1,iplane,relpos)
+write(*,*) 'pt', pt
+write(*,*) 'slip plane', iplane
+write(*,*) 'relpos', relpos
+
+Output:
+ pt   2.0000000000000000        0.0000000000000000     
+ slip plane           1
+ relpos   2.0000000000000000     
+******************************************************
+Test #3:
+ 
+Code:
+
+integer:: iplane
+real(dp) :: relpos
+real(dp) :: pt(2)
+call initSlipSysData('simple_dd_slipsys')
+pt = [0.0_dp,0.0_dp]
+call getSlipPlane(pt,1,2,iplane,relpos)
+write(*,*) 'pt', pt
+write(*,*) 'slip plane', iplane
+write(*,*) 'relpos', relpos
+
+Output:
+ pt   3.6224356847469608E-012  -3.6224356847469608E-012
+ slip plane           5
+ relpos  -2.8284271247672570
+******************************************************
+Test #4:
+ 
+Code:
+
+integer:: iplane
+real(dp) :: relpos
+real(dp) :: pt(2)
+call initSlipSysData('simple_dd_slipsys')
+pt = [4.0_dp,4.0_dp]
+call getSlipPlane(pt,1,2,iplane,relpos)
+write(*,*) 'pt', pt
+write(*,*) 'slip plane', iplane
+write(*,*) 'relpos', relpos
+
+Output:
+ pt   4.0000000000334159        3.9999999999665841     
+ slip plane           5
+ relpos   2.8284271247251231     
+******************************************************

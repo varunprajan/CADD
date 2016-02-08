@@ -1,0 +1,15 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readSlipSysData('simple_dd_slipsys')
+call processSlipSysData()
+call prettyPrintMat(transpose(slipsys(1)%trig),'trig')
+
+Output:
+ trig
+   1.0000000000000000        0.0000000000000000     
+  0.70710678119181425       0.70710678118128079     
+
+******************************************************

@@ -1,0 +1,35 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: elconst(3,3)
+real(dp) :: mu, nu
+elconst(1,:) = [40.0_dp, 20.0_dp, 0.0_dp]
+elconst(2,:) = [20.0_dp, 40.0_dp, 0.0_dp]
+elconst(3,:) = [0.0_dp, 0.0_dp, 10.0_dp]
+call getMuNuApprox(elconst,mu,nu)
+write(*,*) mu
+write(*,*) nu
+
+Output:
+   10.000000000000000     
+  0.33333333333333331 
+******************************************************
+Test #2: (example of incorrect behavior, due to neglect of anisotropy)
+ 
+Code:
+
+real(dp) :: elconst(3,3)
+real(dp) :: mu, nu
+elconst(1,:) = [40.0_dp, 20.0_dp, 0.0_dp]
+elconst(2,:) = [20.0_dp, 80.0_dp, 0.0_dp]
+elconst(3,:) = [1.0_dp, 0.0_dp, 10.0_dp]
+call getMuNuApprox(elconst,mu,nu)
+write(*,*) mu
+write(*,*) nu
+
+Output:
+   10.000000000000000     
+  0.33333333333333331 
+****************************************************** 

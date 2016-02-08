@@ -1,0 +1,4 @@
+# damping
+flag: 0
+gamma: 5.0
+gname: all

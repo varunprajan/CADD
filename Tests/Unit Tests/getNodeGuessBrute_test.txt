@@ -1,0 +1,55 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: xp, yp
+integer :: closestnode
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+xp = 3.5_dp
+yp = 1.5_dp
+closestnode = getNodeGuessBrute(1,xp,yp)
+write(*,*) closestnode
+
+Output:
+           9   
+****************************************************** 
+Test #2:
+ 
+Code:
+
+real(dp) :: xp, yp
+integer :: closestnode
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+xp = 3.6_dp
+yp = 1.5_dp
+closestnode = getNodeGuessBrute(1,xp,yp)
+write(*,*) closestnode
+
+Output:
+          10
+****************************************************** 
+Test #3:
+ 
+Code:
+
+real(dp) :: xp, yp
+integer :: closestnode
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+xp = 3.6_dp
+yp = 1.6_dp
+closestnode = getNodeGuessBrute(1,xp,yp)
+write(*,*) closestnode
+
+Output:
+          15
+****************************************************** 

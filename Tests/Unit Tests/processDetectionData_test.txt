@@ -1,0 +1,59 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+real(dp) :: p(2,3)
+real(dp) :: circumsqactual, circumsqmax
+call initDD()
+call readDetectionData('detect_test_1_detection')
+call processDetectionData()
+write(*,*) 'lattice ', detection%lattice
+write(*,*) 'burgers', detection%burgers
+do i = 1, 6
+  write(*,*) 'i', i
+  write(*,*) 'isys', detection%comp(i)%isys
+  write(*,*) 'bsgn', detection%comp(i)%bsgn
+  write(*,*) 'burgers vector', detection%comp(i)%burgersvec
+end do
+
+! check circumradius
+p(:,1) = [0.0_dp,0.0_dp]
+p(:,2) = p(:,1) + detection%comp(2)%burgersvec ! at 0 degrees
+p(:,3) = p(:,1) + detection%comp(4)%burgersvec ! at 60 degrees
+circumsqactual = getCircumradiusSqForTriangle(p)
+circumsqmax = delaunay%circumradiussqcutoff
+write(*,*) 'Actual circumradius**2 at equil.', circumsqactual
+write(*,*) 'Max circumradius**2', circumsqmax
+
+Output:
+ lattice hex                 
+ burgers   1.1224600000000000     
+ i           1
+ isys           1
+ bsgn          -1
+ burgers vector  -1.1224600000000000       -0.0000000000000000     
+ i           2
+ isys           1
+ bsgn           1
+ burgers vector   1.1224600000000000        0.0000000000000000     
+ i           3
+ isys           2
+ bsgn          -1
+ burgers vector -0.56123000000000012      -0.97207887473188093     
+ i           4
+ isys           2
+ bsgn           1
+ burgers vector  0.56123000000000012       0.97207887473188093     
+ i           5
+ isys           3
+ bsgn          -1
+ burgers vector -0.56123000000000012       0.97207887473188093     
+ i           6
+ isys           3
+ bsgn           1
+ burgers vector  0.56123000000000012      -0.97207887473188093     
+ Actual circumradius**2 at equil.  0.41997215053333325     
+ Max circumradius**2  0.83994430106666673
+******************************************************

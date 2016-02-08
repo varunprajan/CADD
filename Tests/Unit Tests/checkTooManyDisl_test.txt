@@ -1,0 +1,20 @@
+******************************************************
+Test #1: Error
+ 
+Code:
+
+call checkTooManyDisl(1001)
+
+Output:
+ Number of dislocations is too large
+ Increase nmaxdisl
+******************************************************
+Test #2: No error
+ 
+Code:
+
+call checkTooManyDisl(101)
+
+Output:
+
+******************************************************

@@ -1,0 +1,23 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initNodeData('example_nodes_test')
+call readGroupData('example_groups_test')
+allocate(groups(1)%members(nodes%nnodes))
+do i = 1, nodes%nnodes
+groups(1)%members(i) = i
+end do
+allocate(groups(1)%maskall(nodes%nnodes))
+call genGroupMaskAll(1)
+write(*,*) groups(1)%maskall
+allocate(groups(3)%maskall(nodes%nnodes))
+call genGroupMaskAll(3)
+write(*,*) groups(3)%maskall
+
+Output:
+ T T T T T T T T T
+ F T T T T F F F T
+******************************************************

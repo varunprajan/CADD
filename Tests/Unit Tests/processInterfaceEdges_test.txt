@@ -1,0 +1,22 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initDislData('simplefe_disl')
+call initFELibrary()
+call readFEElementData('simplefe_feelements')
+call processFEElementData()
+call processEdges()
+call processInterfaceEdges()
+
+call prettyPrintMat(transpose(interfaceedges%array),
+&               'interfaceedges')
+
+Output:
+ interfaceedges
+           6           1           1           1
+          11           6           1           5
+******************************************************

@@ -1,0 +1,11 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call readGroupData('example_groups_test')
+call writeGroupData('example_groups_out_test')
+
+Output: See file --- essentially identical to example_groups_test
+******************************************************

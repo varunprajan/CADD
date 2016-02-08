@@ -1,0 +1,36 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      character(len=:), allocatable :: pref
+      character(len=:), allocatable :: suff
+      misc%incrementcurr = 0
+      misc%simname = 'test_1'
+      call getRestartPrefSuff(pref,suff)
+      write(*,*) pref
+      write(*,*) suff
+
+Output:
+ test_1
+ .0.restart
+     
+******************************************************
+Test #2:
+ 
+Code:
+
+      character(len=:), allocatable :: pref
+      character(len=:), allocatable :: suff
+      misc%incrementcurr = 0
+      misc%simname = 'test_1'
+      misc%incrementcurr = misc%incrementcurr + 1
+      call getRestartPrefSuff(pref,suff)
+      write(*,*) pref
+      write(*,*) suff
+
+Output:
+ test_1
+ .1.restart
+
+******************************************************

@@ -1,0 +1,232 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(1)%disp = 1.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .true.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+  0.67500000000000004     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(3)%disp = -1.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .true.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+   0.0000000000000000     
+   0.0000000000000000     
+ -0.22500000000000001     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000        
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(1)%disp = 1.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .false.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+   1.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000        
+******************************************************
+Test #4:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(3)%disp = -1.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .false.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+   0.0000000000000000     
+   0.0000000000000000     
+  -1.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000        
+******************************************************
+Test #5:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(3)%disp = 1.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .true.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+   0.0000000000000000     
+   0.0000000000000000     
+   1.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000      
+******************************************************
+Test #6:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(1)%disp = 5.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .true.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+  0.67500000000000004     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+******************************************************
+Test #7:
+ 
+Code:
+
+integer :: i
+integer :: mnumfe, isys, iplane
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+disl(mnumfe)%list(9)%disp = -5.0_dp
+do i = 1, size(obstacles(mnumfe)%list)
+  obstacles(mnumfe)%list(i)%computed = .true.
+  obstacles(mnumfe)%list(i)%active = .true.
+end do
+call enforceObstacles(mnumfe,isys,iplane,
+&                      disl(mnumfe)%splanes(isys)%splane(iplane))
+write(*,*) 'Dislocation displacements'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) disl(mnumfe)%list(i)%disp
+end do    
+
+Output:
+ Dislocation displacements
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+ -0.90000000000000002        
+******************************************************

@@ -1,0 +1,51 @@
+******************************************************
+Test #1: Just the dislocations
+ 
+Code:
+
+integer :: i, j
+call readGhostDislData('simple_dd_ghostdisl')
+write(*,*) 'Posn'
+do i = 1, 2
+write(*,*) (ghostdisl(1)%list(i)%posn(j), j = 1,2)
+end do    
+write(*,*) 'Branch cut'
+do i = 1, 2
+write(*,*) ghostdisl(1)%list(i)%cut
+end do
+
+Output:
+ Posn
+  0.50000000000000000       0.50000000000000000     
+   2.5000000000000000        2.5000000000000000     
+ Branch cut
+           0
+           1
+******************************************************
+Test #2: Parts of the rest of the array
+ 
+Code:
+
+integer :: i, j
+call readGhostDislData('simple_dd_ghostdisl')
+write(*,*) 'Posn'
+do i = 1, 4
+write(*,*) (ghostdisl(1)%list(i)%posn(j), j = 1,2)
+end do    
+write(*,*) 'Branch cut'
+do i = 1, 4
+write(*,*) ghostdisl(1)%list(i)%cut
+end do
+
+Output:
+ Posn
+  0.50000000000000000       0.50000000000000000     
+   2.5000000000000000        2.5000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+ Branch cut
+           0
+           1
+           0
+           0
+******************************************************

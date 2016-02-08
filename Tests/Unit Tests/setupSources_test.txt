@@ -1,0 +1,20 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initSlipSysData('simple_dd_slipsys')
+call readDislSourceData('simple_dd_sources')
+call setupSources()
+write(*,*) 'time'
+do i = 1, size(sources(1)%list)
+    write(*,*) sources(1)%list(i)%time
+    write(*,*) sources(1)%list(i)%tauprev
+end do
+
+Output:
+ time
+   0.0000000000000000
+   0.0000000000000000    
+******************************************************

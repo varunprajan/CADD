@@ -1,0 +1,34 @@
+******************************************************
+Test #1: Construct triangular element (normal should point outward)
+ 
+Code:
+
+real(dp) :: elnodes(3,2)
+real(dp) :: vec(2), normal(2)
+real(dp) :: normallength
+integer :: i, j
+elnodes(1,:) = [2.0_dp, 0.5_dp]
+elnodes(2,:) = [3.0_dp, 1.0_dp]
+elnodes(3,:) = [2.5_dp, 5.0_dp]
+do i = 1, 3
+  if (i == 3) then
+      j = 1
+  else
+      j = i + 1
+  end if    
+  vec = elnodes(j,:) - elnodes(i,:)
+  normal = getUnitNormalRHR(vec)
+  normallength = normal(1)**2 + normal(2)**2
+  write(*,*) i, vec
+  write(*,*) normal, normallength
+end do
+
+Output:
+
+           1   1.0000000000000000       0.50000000000000000     
+  0.44721359549995793      -0.89442719099991586        1.0000000000000000     
+           2 -0.50000000000000000        4.0000000000000000     
+  0.99227787671366763       0.12403473458920845        1.0000000000000000     
+           3 -0.50000000000000000       -4.5000000000000000     
+ -0.99388373467361890       0.11043152607484655        1.0000000000000000       
+******************************************************  

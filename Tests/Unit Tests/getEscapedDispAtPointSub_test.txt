@@ -1,0 +1,79 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      dxn = -1.0_dp
+      dyn = 0.5_dp
+      burgers = 3.0_dp
+      bsgn = 1
+      call getEscapedDispAtPointSub(dxn,dyn,bsgn,burgers,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   1.5000000000000000        0.0000000000000000     
+
+******************************************************
+Test #2:
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      dxn = 1.0_dp
+      dyn = 0.5_dp
+      burgers = 3.0_dp
+      bsgn = 1
+      call getEscapedDispAtPointSub(dxn,dyn,bsgn,burgers,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   0.0000000000000000        0.0000000000000000     
+
+
+******************************************************
+Test #3:
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      dxn = -1.0_dp
+      dyn = -0.5_dp
+      burgers = 3.0_dp
+      bsgn = 1
+      call getEscapedDispAtPointSub(dxn,dyn,bsgn,burgers,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   -1.5000000000000000        0.0000000000000000     
+
+******************************************************
+Test #4:
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      dxn = -1.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = -1
+      call getEscapedDispAtPointSub(dxn,dyn,bsgn,burgers,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   -2.5000000000000000        0.0000000000000000     
+
+
+******************************************************   

@@ -1,0 +1,22 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: neqnsnormal, neqnstot
+integer :: nentriesnormal, nentriestot
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFEElementData('simplefe_feelements')
+call countEqns(1,neqnsnormal,nentriesnormal,
+&                            neqnstot,nentriestot)
+call initAssembly()
+write(*,*) shape(assembly(1)%Ksparse)
+write(*,*) shape(assembly(1)%rhs)
+write(*,*) shape(assembly(1)%rowindex)
+
+Output: ("Normal" entries/eqns checked using Allan Bower's code --- see input_quad4.txt)
+         297
+          39
+         297
+******************************************************

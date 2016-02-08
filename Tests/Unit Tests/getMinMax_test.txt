@@ -1,0 +1,37 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: amin,amax
+real(dp) :: avec(1)
+avec = [0.5_dp]
+call getMinMax(avec,amin,amax)
+write(*,*) amin, amax
+
+Output:    0.50000000000000000       0.50000000000000000
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: amin,amax
+real(dp) :: avec(2)
+avec = [1.0_dp,0.5_dp]
+call getMinMax(avec,amin,amax)
+write(*,*) amin, amax
+
+Output:   0.50000000000000000        1.0000000000000000
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: amin,amax
+real(dp) :: avec(4)
+avec = [1.0_dp,-45.0_dp,42.0_dp,0.5_dp]
+call getMinMax(avec,amin,amax)
+write(*,*) amin, amax
+
+Output:     -45.000000000000000        42.000000000000000  
+******************************************************

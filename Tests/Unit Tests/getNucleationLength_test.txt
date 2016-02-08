@@ -1,0 +1,28 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: mu, nu, E, burgers
+real(dp) :: taucr
+real(dp) :: lnucalt, lnuc
+call initMaterialData('simple_dd_materials')
+mu = 100.0_dp
+nu = 0.25_dp
+burgers = 3.0_dp
+taucr = 25.5_dp
+materials(1)%mu = mu
+materials(1)%nu = nu
+materials(1)%burgers = burgers
+E = materials(1)%mu*(2.0_dp*(1+materials(1)%nu))
+write(*,*) E
+lnucalt = E/(4*piconst*(1.0_dp-nu)*(1.0_dp+nu))*burgers/taucr
+lnuc = getNucleationLength(1,taucr)
+write(*,*) 'lnuc', lnuc
+write(*,*) 'lnucalt', lnucalt
+
+Output:
+
+ lnuc   2.4965481269316916     
+ lnucalt   2.4965481269316916     
+****************************************************** 

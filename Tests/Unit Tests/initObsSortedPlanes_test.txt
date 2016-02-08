@@ -1,0 +1,42 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readDislObsData('simple_dd_obstacles')
+call readSlipSysData('simple_dd_slipsys')
+call initObsSortedPlanes()
+write(*,*) obstacles(1)%splanes(1)%splane(5)%ncount
+write(*,*) size(obstacles(1)%splanes(1)%splane(5)%relpos)
+
+Output:
+           0
+          20
+******************************************************
+Test #2: Error --- index greater than nslipplanes
+ 
+Code:
+
+call readDislObsData('simple_dd_obstacles')
+call readSlipSysData('simple_dd_slipsys')
+call initObsSortedPlanes()
+write(*,*) obstacles(1)%splanes(1)%splane(9)%ncount
+write(*,*) size(obstacles(1)%splanes(1)%splane(9)%relpos)
+
+Output:
+Runtime error...
+******************************************************
+Test #3:
+ 
+Code:
+
+call readDislObsData('simple_dd_obstacles')
+call readSlipSysData('simple_dd_slipsys')
+call initObsSortedPlanes()
+write(*,*) obstacles(1)%splanes(2)%splane(9)%ncount
+write(*,*) size(obstacles(1)%splanes(2)%splane(9)%relpos)
+
+Output:
+           0
+          20
+******************************************************

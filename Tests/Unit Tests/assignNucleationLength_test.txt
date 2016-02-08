@@ -1,0 +1,22 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initNodeData('simple_dd_nodes')
+call initMaterialData('simple_dd_materials')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call readDislSourceData('simple_dd_sources')
+call assignNucleationLength()
+do i = 1, size(sources(1)%list)
+    write(*,*) sources(1)%list(i)%lnuc
+end do
+
+Output:
+
+ lnuc   2.4965481269316916     
+ lnucalt   2.4965481269316916     
+****************************************************** 

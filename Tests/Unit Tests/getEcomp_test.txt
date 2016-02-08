@@ -1,0 +1,62 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: Ecomp(2,2)
+real(dp) :: theta, burgers, d
+integer :: bsgn
+bsgn = 1
+theta = 0.0_dp
+burgers = 3.0_dp
+d = 2.0_dp
+Ecomp = getEcomp(bsgn,theta,burgers,d)
+call prettyPrintRealMat(Ecomp,'Ecomp')
+
+Output: (Checked using Equation 19 in Shilkrot et al., 2004, JMPS)
+ Ecomp
+   0.0000000000000000       0.75000000000000000     
+  0.75000000000000000        1.1250000000000000     
+   
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: Ecomp(2,2)
+real(dp) :: theta, burgers, d
+integer :: bsgn
+bsgn = -1
+theta = 0.0_dp
+burgers = 1.0_dp
+d = 2.0_dp
+Ecomp = getEcomp(bsgn,theta,burgers,d)
+call prettyPrintRealMat(Ecomp,'Ecomp')
+
+Output: (Checked using Equation 19 in Shilkrot et al., 2004, JMPS)
+ Ecomp
+   0.0000000000000000      -0.25000000000000000     
+ -0.25000000000000000       0.12500000000000000
+   
+******************************************************
+Test #3: Non-zero dislocation angle
+ 
+Code:
+
+real(dp) :: Ecomp(2,2)
+real(dp) :: theta, burgers, d
+integer :: bsgn
+bsgn = 1
+theta = piconst/3
+burgers = 1.0_dp
+d = 2.0_dp
+Ecomp = getEcomp(bsgn,theta,burgers,d)
+call prettyPrintRealMat(Ecomp,'Ecomp')
+
+Output: (Checked using Equation 19 in Shilkrot et al., 2004, JMPS)
+        (See Mathematica notebook deformationgradient_2.nb
+ Ecomp
+  -5.8012701892219465E-002 -0.46650635094610959     
+ -0.46650635094610959       0.55801270189221941  
+   
+******************************************************

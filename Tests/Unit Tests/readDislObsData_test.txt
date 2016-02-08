@@ -1,0 +1,25 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i, j
+
+call readDislObsData('simple_dd_obstacles')
+write(*,*) 'Posn'
+do i = 1, size(obstacles(1)%list)
+  write(*,*) (obstacles(1)%list(i)%posn(j), j = 1,2)
+end do    
+write(*,*) 'taucr'
+do i = 1, size(obstacles(1)%list)
+  write(*,*) obstacles(1)%list(i)%taucr
+end do 
+
+Output:
+ Posn
+  0.50000000000000000       0.50000000000000000     
+   3.5000000000000000        3.5000000000000000     
+ Critical stress
+   20.000000000000000     
+   40.000000000000000     
+******************************************************

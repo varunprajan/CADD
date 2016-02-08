@@ -1,0 +1,66 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: nedgenodes, nedgeip
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+nedgenodes = feelements(1)%nedgenodes
+nedgeip = feelements(1)%nedgeip
+assembly(1)%rhs = 0.0_dp ! initialize/wipe previous solution
+call getDislForceRHS(1,nedgenodes,nedgeip)
+call getDispRHS(1)
+call solveOneMat(1)
+call updateNodalPosn(1)
+call prettyPrintRealMat(transpose(nodes%posn(1:2,:)),
+&       'New positions')
+call prettyPrintRealMat(transpose(nodes%posn(4:5,:)),
+&       'New displacements')
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+ New positions
+   0.0000000000000000        0.0000000000000000     
+   1.2487869549709525        8.7061638165980837E-002
+   2.4937816720841499        8.6178352950675566E-002
+   3.7466906247266007        8.4396640487775385E-002
+   5.0000000000000000        8.4310835638286064E-002
+   0.0000000000000000        1.0000000000000000     
+   1.2302682495137773       0.99999999999999956     
+   2.4930548545355355       0.99999999999999889     
+   3.7470388914686401       0.99999999999999833     
+   5.0000000000000000       0.99999999999999800     
+   0.0000000000000000        2.0000000000000000     
+   1.2487869549709532        1.9129383618340181     
+   2.4937816720841512        1.9138216470493223     
+   3.7466906247266012        1.9156033595122213     
+   5.0000000000000000        1.9156891643617102     
+   10.000000000000000        10.000000000000000     
+ New displacements
+   0.0000000000000000        0.0000000000000000     
+  0.24878695497095241        8.7061638165980837E-002
+  0.49378167208415008        8.6178352950675566E-002
+  0.74669062472660075        8.4396640487775385E-002
+   1.0000000000000000        8.4310835638286064E-002
+   0.0000000000000000        0.0000000000000000     
+  0.23026824951377733       -4.1333914110205913E-016
+  0.49305485453553544       -1.0849748192759658E-015
+  0.74703889146863989       -1.6960896116605871E-015
+   1.0000000000000000       -1.9763857600628885E-015
+   0.0000000000000000        0.0000000000000000     
+  0.24878695497095321       -8.7061638165981795E-002
+  0.49378167208415108       -8.6178352950677675E-002
+  0.74669062472660142       -8.4396640487778757E-002
+   1.0000000000000000       -8.4310835638289741E-002
+   0.0000000000000000        0.0000000000000000     
+******************************************************

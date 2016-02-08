@@ -1,0 +1,15 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call readDampingData('example_damping_test')
+      write(*,*) normaldamping%gamma
+      write(*,*) normaldamping%flag
+      write(*,*) normaldamping%gname
+
+Output:    
+  0.10000000000000001     
+ F
+ all                                                         
+******************************************************

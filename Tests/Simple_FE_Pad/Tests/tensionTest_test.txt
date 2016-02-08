@@ -1,0 +1,68 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i
+      integer :: eltypenum
+      real(dp) :: stress(3)
+      real(dp) :: disp, Y, sigma, L, eps
+      
+      ! note: lfactfac = 3.0_dp, lifactfac = 3.0_dp
+      
+      call initSimulation('simple_fe_pad','cadd_nodisl')
+      
+      ! write dump, restart
+      call writeDump_ptr()
+      call writeRestart_ptr()
+      
+      ! displace boundary nodes in y-direction
+      L = nodes%posn(2,13) - nodes%posn(2,1)
+      disp = 0.8_dp
+      eps = disp/L
+      do i = 13, 15
+          nodes%posn(2,i) = nodes%posn(2,i) + disp
+          nodes%posn(5,i) = nodes%posn(5,i) + disp
+      end do
+      
+      ! solve
+      call solveAll_ptr()
+      
+      ! report stresses
+      write(*,*) 'Stresses'
+      eltypenum = feelements(1)%eltypenum
+      do i = 1, size(feelements(1)%connect,2)
+          stress = getFEStressAtPoint(1,i,0.0_dp,0.0_dp)
+          write(*,*) stress          
+      end do
+      
+      ! update pad
+      call updatePad()
+      
+      ! write dump
+      misc%incrementcurr = misc%incrementcurr + 1
+      call writeDump_ptr()
+      
+      ! stress check
+      Y = 2*materials(1)%mu*(1+materials(1)%nu)
+      Y = Y/(1-materials(1)%nu**2) ! plane strain
+      sigma = Y*eps
+      write(*,*) 'sigma'
+      write(*,*) sigma
+      
+Output:
+*** Warning message from subroutine MA57AD ***
+        57 off-diagonal duplicate entries found                                          
+ Stresses
+   9.6830096024680401E-016   2.8290163190291637       -1.5458817221005371E-015
+  -1.5157146371347352E-016   2.8290163190291682       -1.1042012300718122E-015
+   7.7737295767210668E-017   2.8290163190291646       -1.4722683067624163E-015
+   3.7220660581427367E-016   2.8290163190291655       -5.8890732270496650E-016
+  -7.4376269032505604E-017   2.8290163190291664       -5.8890732270496650E-016
+   5.9175754574258832E-016   2.8290163190291668       -2.9445366135248325E-016
+   1.0263057764747785E-015   2.8290163190291717        0.0000000000000000     
+  -6.6320646890938306E-016   2.8290163190291646        5.8890732270496650E-016
+ sigma
+   2.8290163190291668     
+
+******************************************************

@@ -1,0 +1,44 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initPotentialData('example_potentials_test')
+      write(*,*) 'Potential names:'
+      write(*,*) potentials(1)%pname
+      write(*,*) potentials(2)%pname
+      
+      write(*,*) 'Force cutoff:'
+      write(*,*) potentials(1)%forcecutoff
+      write(*,*) potentials(2)%forcecutoff
+      
+      write(*,*) 'Potential tables:'
+      call prettyPrintMat(potentials(1)%pottable,'pottable1')
+      call prettyPrintMat(potentials(2)%pottable,'pottable2')
+      
+      write(*,*) 'Cutoff squared:'
+      write(*,*) potentials(1)%forcecutoffsq
+      write(*,*) potentials(2)%forcecutoffsq
+
+Output:
+
+ Potential names:
+ brittle             
+ none                
+ Force cutoff:
+   1.8089999999999999     
+   1.8089999999999999     
+ Potential tables:
+ pottable1
+   1.0000000000000000E-008   2083.0202892299999        8713.1162290499997     
+  0.10000000000000001        1211.7087534600000        8713.1162290499997     
+  0.20010003000000001        586.37819863000004        4281.3130645700003     
+   1.6762587499999999       -2.1804219999999999E-002 -0.49502993000000001     
+   3.0000000000000000        0.0000000000000000        0.0000000000000000     
+ pottable2
+   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+   3.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Cutoff squared:
+   3.2724810000000000     
+   3.2724810000000000 
+******************************************************     

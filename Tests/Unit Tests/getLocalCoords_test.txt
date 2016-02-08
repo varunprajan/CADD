@@ -1,0 +1,48 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: posn(4,2)
+real(dp) :: r, s
+real(dp) :: xp, yp
+integer :: eltypenum
+call initFELibrary()
+posn(1,:) = [0.0_dp,0.0_dp]
+posn(2,:) = [1.0_dp,1.0_dp]
+posn(3,:) = [0.0_dp,2.0_dp]
+posn(4,:) = [-1.0_dp,1.0_dp] 
+xp = 0.0_dp
+yp = 1.5_dp
+r = 0.0_dp
+s = 0.0_dp
+eltypenum = getElTypeNum('CPE4')
+call getLocalCoords(posn,eltypenum,xp,yp,r,s)
+write(*,*) r, s
+
+Output:
+  0.50000000000000000       0.50000000000000000 
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: posn(3,2)
+real(dp) :: r, s
+real(dp) :: xp, yp
+integer :: eltypenum
+call initFELibrary()
+posn(1,:) = [1.0_dp,1.0_dp]
+posn(2,:) = [2.0_dp,1.0_dp]
+posn(3,:) = [1.0_dp,2.0_dp] 
+xp = 1.5_dp
+yp = 1.5_dp
+r = 0.0_dp
+s = 0.0_dp
+eltypenum = getElTypeNum('CPE3')
+call getLocalCoords(posn,eltypenum,xp,yp,r,s)
+write(*,*) r, s
+
+Output:
+  0.50000000000000000       0.50000000000000000 
+******************************************************

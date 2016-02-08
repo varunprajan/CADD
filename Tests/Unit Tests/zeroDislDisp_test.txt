@@ -1,0 +1,25 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initSlipSysData('simple_dd_slipsys')
+call readDislData('simple_dd_disl')
+call zeroDislDisp()
+write(*,*) 'disp'
+do i = 1, disl(1)%ndisl
+  write(*,*) disl(1)%list(i)%disp
+end do
+
+Output:
+ disp
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+
+******************************************************

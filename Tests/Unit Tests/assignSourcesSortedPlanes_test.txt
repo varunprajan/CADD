@@ -1,0 +1,32 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: ncount
+call initSlipSysData('simple_dd_slipsys')
+call readDislSourcesData('simple_dd_sources')
+call initSourcesSortedPlanes()
+call assignSourcesSortedPlanes()
+ncount = sources(1)%splanes(1)%splane(2)%ncount
+write(*,*) 'Plane 1'
+write(*,*) ncount
+write(*,*) sources(1)%splanes(1)%splane(2)%relpos(1:ncount)
+write(*,*) sources(1)%splanes(1)%splane(2)%objnum(1:ncount)
+ncount = sources(1)%splanes(2)%splane(5)%ncount
+write(*,*) 'Plane 5'
+write(*,*) ncount
+write(*,*) sources(1)%splanes(2)%splane(5)%relpos(1:ncount)
+write(*,*) sources(1)%splanes(2)%splane(5)%objnum(1:ncount)
+
+Output:
+ Plane 1
+           0
+
+
+ Plane 5
+           1
+   1.4142135623520282     
+           1
+
+******************************************************

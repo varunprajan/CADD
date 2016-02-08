@@ -1,0 +1,61 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: idx
+real(dp) :: vec(2)
+vec = [-0.5_dp,2.0_dp]
+idx = searchSortedBrute(1.7_dp,vec,2)
+write(*,*) idx
+
+Output:    1
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: idx
+real(dp) :: vec(2)
+vec = [-0.5_dp,2.0_dp]
+idx = searchSortedBrute(-0.499_dp,vec,2)
+write(*,*) idx
+
+Output:    1
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: idx
+real(dp) :: vec(3)
+vec = [-0.5_dp,0.0_dp,2.0_dp]
+idx = searchSortedBrute(-0.499_dp,vec,3)
+write(*,*) idx
+
+Output:    1
+******************************************************
+Test #4:
+ 
+Code:
+
+integer :: idx
+real(dp) :: vec(3)
+vec = [-0.5_dp,0.0_dp,2.0_dp]
+idx = searchSortedBrute(0.1_dp,vec,3)
+write(*,*) idx
+
+Output:    2
+******************************************************
+Test #5:
+ 
+Code:
+
+integer :: idx
+real(dp) :: vec(4)
+vec = [-0.5_dp,0.0_dp,0.1_dp,2.0_dp]
+idx = searchSortedBrute(0.2_dp,vec,4)
+write(*,*) idx
+
+Output:    3
+******************************************************

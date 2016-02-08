@@ -1,0 +1,95 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: strain(3), stress(3)
+real(dp), allocatable :: rgauss(:), sgauss(:), wgauss(:)
+integer :: i
+integer :: mnum
+integer :: eltypenum
+real(dp) :: C(3,3)
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initSlipSysData('simplefe_slipsys')
+call initDislData('simplefe_disl')
+call initImageDislData('simplefe_imagedisl')
+call initDislSourceData('simplefe_sources')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+call getGauss_CPE4_2d(rgauss,sgauss,wgauss)
+mnum = fematerials%list(1)
+C = materials(mnum)%elconst
+eltypenum = getElTypeNum('CPE4')
+do i = 1, 4
+  stress = getFEStressAtPoint(1,1,rgauss(i),sgauss(i))
+  write(*,*) 'Integration point', i
+  write(*,*) 'Stress', stress
+end do
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+ Integration point           1
+ Stress   6.7247322113720234       0.29908004976983354        4.0239713630114742E-002
+ Integration point           2
+ Stress   7.0650134241478364       0.41250712069510426       0.57349224739709581     
+ Integration point           3
+ Stress   7.2579847451390043        1.8988376510707761       0.15366678455538571     
+ Integration point           4
+ Stress   7.5982659579148173        2.0122647219960470       0.68691931832236675   
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: strain(3), stress(3)
+real(dp), allocatable :: rgauss(:), sgauss(:), wgauss(:)
+integer :: i
+integer :: mnum
+integer :: eltypenum
+real(dp) :: C(3,3)
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initSlipSysData('simplefe_slipsys')
+call initDislData('simplefe_disl')
+call initImageDislData('simplefe_imagedisl')
+call initDislSourceData('simplefe_sources')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+call getGauss_CPE4_2d(rgauss,sgauss,wgauss)
+mnum = fematerials%list(1)
+C = materials(mnum)%elconst
+eltypenum = getElTypeNum('CPE4')
+do i = 1, 4
+  stress = getFEStressAtPoint(1,7,rgauss(i),sgauss(i))
+  write(*,*) 'Integration point', i
+  write(*,*) 'Stress', stress
+end do
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+ Integration point           1
+ Stress   7.1570782421406793       -1.2553801117810221E-002   1.3622961357651149E-002
+ Integration point           2
+ Stress   7.1768329159814588       -5.9689098375502580E-003   2.7099725223834734E-003
+ Integration point           3
+ Stress   7.1461652533054130       -4.5292767623610036E-002   2.0207852637912169E-002
+ Integration point           4
+ Stress   7.1659199271461924       -3.8707876343350073E-002   9.2948638026444930E-003
+******************************************************

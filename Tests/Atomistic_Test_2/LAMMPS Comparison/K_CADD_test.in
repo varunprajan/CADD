@@ -1,0 +1,138 @@
+# 2d crack simulation of fake nickel (Derek Warner potential)
+# units - length - ?, time - ?, mass - ?, stress - ?
+
+#file prefix
+variable prefix string K_CADD_test_lammps_damped
+
+#applied K (unitless)
+variable Kstart equal 0
+variable Kincr equal 8
+variable K equal 8
+
+# box has dimensions 2*lx by 2*ly by 1 plane
+variable lx equal 2.5e1
+variable ly equal 2.5e1
+
+# timesteps
+variable Nsteps equal 5000
+variable timestep equal 0.002
+variable timestepdamp equal 0.02
+
+#Mass
+variable m equal 1.0
+
+# lattice constant (in Angstroms) and orientation of axes (given by lattice vectors)
+variable rho equal 0.9165
+variable x1 equal 1
+variable x2 equal 0
+variable x3 equal 0
+variable y1 equal 0
+variable y2 equal 1
+variable y3 equal 0
+variable z1 equal 0
+variable z2 equal 0
+variable z3 equal 1
+# length of lattice in different directions (using orientation of lattice vectors)
+variable ax equal sqrt(${x1}*${x1}+${x2}*${x2}+${x3}*${x3})
+variable ay equal sqrt(${y1}*${y1}+${y2}*${y2}+${y3}*${y3})
+variable az equal sqrt(${z1}*${z1}+${z2}*${z2}+${z3}*${z3})
+
+# Define minimization parameters and damping
+variable etol equal 1.0e-15
+variable ftol equal 1.0e-10
+variable maxiter equal 30000
+variable maxeval equal 50000
+variable gamma equal 0.1
+
+# lengths (in lattice units - depends on respective directions))
+variable lxpos equal round(${lx}/${ax})
+variable lxneg equal -1*${lxpos}
+variable lypos equal round(${ly}/${ay})
+variable lyneg equal -1*${lypos}
+variable bdthickness equal 3
+variable lxposless equal ${lxpos}-${bdthickness}
+variable lxnegless equal -1*${lxposless}
+variable lyposless equal ${lypos}-${bdthickness}
+variable lynegless equal -1*${lyposless}
+variable fac equal 1.5
+
+# boundary conditions
+dimension	2
+boundary	f f p
+atom_style	atomic
+
+# create geometry
+units		lj
+lattice         hex ${rho} orient x ${x1} ${x2} ${x3} orient y ${y1} ${y2} ${y3} spacing ${ax} ${ay} ${az}
+region		myregion block ${lxneg} ${lxpos} ${lyneg} ${lypos} -0.25 0.25 units lattice
+create_box	3 myregion
+create_atoms	1 box
+change_box all x scale ${fac} y scale ${fac}
+
+# define groups
+region		dumpatoms block -400 400 -400 400 INF INF units lattice
+group		dumpatoms region dumpatoms
+region      left block INF ${lxnegless} INF INF INF INF units lattice
+group       left region left
+region      right block ${lxposless} INF INF INF INF INF units lattice
+group       right region right
+region      bottom block INF INF INF ${lynegless} INF INF units lattice
+group       bottom region bottom
+region      top block INF INF ${lyposless} INF INF INF units lattice
+group       top region top
+group       boundary union left right bottom top
+set         group boundary type 2
+region      delete block INF 0 -0.25 0.25 INF INF units box
+group       delete region delete
+
+# define masses
+mass * $m
+
+# define elastic constants
+variable nu equal 0.25
+variable mu equal 10.633
+
+# potentials
+pair_style      table linear 3001
+pair_coeff      * * vpotential_inter1new dummy
+neighbor	0.3 nsq
+neigh_modify	delay 10 check yes
+
+# Setup output
+thermo		1
+thermo_style custom step temp pe
+thermo_modify norm no
+
+# relax atoms initially
+min_style hftn
+minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+
+# write dump
+reset_timestep 0
+
+variable nloop equal round(($K-${Kstart})/${Kincr})
+variable i loop ${nloop}
+fix	1 boundary setforce 0.0 0.0 NULL
+fix 8 all viscous ${gamma}   
+fix 2 all nve
+displace_atoms_crack_iso all ${Kincr} ${mu} ${nu} 0.25 0.25 # fudge because there is an atom at 0.0, 0.0
+run 0
+# write_dump all custom ${prefix}.0.dump id type xu yu zu
+dump 1 all custom ${Nsteps} ${prefix}.*.dump id type xu yu zu
+label loop1
+    
+    variable Kcurr equal ${Kstart}+($i-1)*${Kincr}
+    print "Kcurr equals ${Kcurr}"
+    
+    # displace atoms
+    # displace_atoms_crack_iso all ${Kincr} ${mu} ${nu} 0.25 0.25 # fudge because there is an atom at 0.0, 0.0
+
+    # min_style hftn
+	# minimize ${etol} ${ftol} ${maxiter} ${maxeval}
+	timestep ${timestepdamp}
+	run ${Nsteps}
+
+    # write_dump all custom ${prefix}.$i.dump id type xu yu zu
+    
+    next i
+jump SELF loop1

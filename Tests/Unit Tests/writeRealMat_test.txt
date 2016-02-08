@@ -1,0 +1,72 @@
+******************************************************
+Test #1:
+
+Code:
+
+integer :: i, j, iunit
+real(dp) :: array(2,2)
+do i = 1,2
+    do j = 1,2
+        array(i,j) = i*j**2
+    end do
+end do
+open(newunit=iunit,file='test.txt')
+call writeRealMat(array,iunit,.false.)
+close(iunit)
+
+Output: (In 'test.txt')
+
+           2           2
+   1.0000000000000000        4.0000000000000000     
+   2.0000000000000000        8.0000000000000000 
+******************************************************           
+Test #2:
+
+Code:
+
+integer :: iunit
+real(dp) :: array(4,4)
+array(:,:) = 3.0_dp
+open(newunit=iunit,file='test.txt')
+call writeRealMat(array(:,1:2),iunit,.false.)
+close(iunit)
+
+Output: (In 'test.txt')
+
+           4           2
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000  
+******************************************************
+Test #3: Transpose
+
+Code:
+
+integer :: iunit
+real(dp) :: array(4,4)
+array(:,:) = 3.0_dp
+open(newunit=iunit,file='test.txt')
+call writeRealMat(array(:,1:2),iunit,.true.)
+close(iunit)
+
+Output: (In 'test.txt')
+
+           2           4
+   3.0000000000000000        3.0000000000000000        3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000        3.0000000000000000        3.0000000000000000  
+******************************************************          
+Test #4: Error --- doesn't work for vectors
+
+Code:
+
+integer :: iunit
+real(dp) :: array(4,4)
+array(:,:) = 3.0_dp
+open(newunit=iunit,file='test.txt')
+call writeRealMat(array(:,1),iunit,.false.)
+close(iunit)
+
+Output: Error: Rank mismatch in argument 'mat' at (1) (rank-2 and rank-1)
+
+

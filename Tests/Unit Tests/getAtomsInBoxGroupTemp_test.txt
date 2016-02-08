@@ -1,0 +1,42 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+misc%simname = 'detect_test_1'
+call initAtomistic()
+call getAtomsInBoxGroupTemp(-1.0_dp,2.0_dp,-2.25_dp,2.25_dp)
+write(*,*) groups(2)%members
+
+Output:
+           2           3           4           1           6           7           9           5           8 
+******************************************************
+Test #2: Reallocate
+ 
+Code:
+
+misc%simname = 'detect_test_1'
+call initAtomistic()
+call getAtomsInBoxGroupTemp(-1.0_dp,2.0_dp,-2.25_dp,2.25_dp)
+write(*,*) groups(2)%members
+call getAtomsInBoxGroupTemp(-1.0_dp,2.0_dp,-2.25_dp,2.25_dp)
+write(*,*) groups(2)%members
+
+Output:
+           2           3           4           1           6           7           9           5           8
+           2           3           4           1           6           7           9           5           8  
+******************************************************
+Test #3: New box
+ 
+Code:
+
+misc%simname = 'detect_test_1'
+call initAtomistic()
+call getAtomsInBoxGroupTemp(-1.0_dp,2.0_dp,-2.25_dp,2.25_dp)
+write(*,*) groups(2)%members
+call getAtomsInBoxGroupTemp(-1.0_dp,2.0_dp,0.0_dp,2.25_dp)
+write(*,*) groups(2)%members
+
+Output:
+           7           9           8   
+******************************************************

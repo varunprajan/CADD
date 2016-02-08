@@ -1,0 +1,75 @@
+******************************************************
+Test #1: Perfect lattice
+
+Code:
+
+real(dp), allocatable :: circuits(:,:)
+
+integer :: point_num
+real(dp) :: point_xy(2,5)
+real(dp) :: a1(2), a2(2)
+
+point_num = 5
+a1 = [1.0_dp,0.0_dp]
+a2 = [0.5_dp,0.5_dp*sqrt(3.0_dp)]
+point_xy(:,1) = [0.0_dp,0.0_dp]
+point_xy(:,2) = a1
+point_xy(:,3) = a2
+point_xy(:,4) = a2 - a1
+point_xy(:,5) = 2*a2 - a1
+delaunay%numpoints = point_num
+delaunay%xy = point_xy
+call genDelaunay()
+
+call initDD()
+call initDislIdentData()
+circuits = computeCircuits()
+
+call prettyPrintMat(circuits,'Burgers vectors')
+
+Output:
+ Burgers vectors
+   2.2204460492503131E-016  -2.2204460492503131E-016   1.1102230246251565E-016
+   1.3745716479114655E-016   2.2204460492503131E-016   1.1102230246251565E-016
+******************************************************
+Test #2: Realistic example (see dislocated_hex)
+
+Code:
+
+integer :: i
+real(dp), allocatable :: circuits(:,:)
+real(dp) :: posn(2)
+
+call initNodeData('dislocated_hex_nodes')
+call initMaterialData('dislocated_hex_materials')
+
+! introduce dislocation
+
+delaunay%numpoints = size(nodes%posn,2)
+delaunay%xy = nodes%posn(1:2,:)
+delaunay%circumradiussqcutoff =
+&                  2.0_dp*(materials(1)%burgers/sqrt(3.0_dp))**2
+call initDislIdentData()
+call genDelaunay()
+
+circuits = computeCircuits()
+
+do i = 1, delaunay%numtri
+  if (delaunay%trigood(i)) then
+      if (norm2(circuits(:,i)) > tolconst)  then
+          write(*,*) 'Dislocation found'
+          posn = getTriCenter(i)
+          write(*,*) posn
+          write(*,*) 'burgers vector', circuits(:,i)
+      end if
+  end if    
+end do
+
+Output:
+ Dislocation found
+   58.928238773333305        86.574825600000054     
+ burgers vector  0.56123000000000089       0.97207887473188082     
+ Dislocation found
+   64.307035146666749       -95.755932639999969     
+ burgers vector -0.56123000000000012       0.97207887473188104
+******************************************************

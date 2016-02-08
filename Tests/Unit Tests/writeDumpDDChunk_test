@@ -1,0 +1,41 @@
+******************************************************
+Test #1:
+
+Code:
+
+integer :: iunit
+character(len=:), allocatable :: dumpfile
+integer :: ndisl
+
+nmaterials = 1
+allocate(disl(nmaterials))
+ndisl = 3
+allocate(disl(1)%list(ndisl))
+disl(1)%ndisl = ndisl
+disl(1)%list(1)%active = .true.
+disl(1)%list(2)%active = .false.
+disl(1)%list(3)%active = .true.
+disl(1)%list(1)%posn = [1.0_dp,2.0_dp]
+disl(1)%list(2)%posn = [0.5_dp,-3.0_dp]
+disl(1)%list(3)%posn = [1.0_dp,2.0_dp]
+disl(1)%list(1)%sgn = 1
+disl(1)%list(1)%slipsys = 2
+disl(1)%list(2)%sgn = 1
+disl(1)%list(2)%slipsys = 1
+disl(1)%list(3)%sgn = -1
+disl(1)%list(3)%slipsys = 4
+allocate(sources(nmaterials))
+allocate(sources(1)%list(2))
+sources(1)%list(1)%posn = [6.0_dp,-piconst]
+sources(1)%list(2)%posn = [0.5_dp,piconst]
+allocate(obstacles(nmaterials))
+allocate(obstacles(1)%list(1))
+obstacles(1)%list(1)%posn = [0.33_dp,0.45_dp]
+misc%simname = 'test'
+dumpfile = getDumpFilename()
+open(newunit=iunit,file=dumpfile)
+call writeDumpDDChunk(iunit)
+
+Output: See test.0.dump
+
+ ******************************************************

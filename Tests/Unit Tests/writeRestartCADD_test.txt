@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initSimulation('detect_test_1','cadd')
+      call writeRestartCADD()
+
+Output: See restart files and comparison in Detect_Simple.ipynb
+******************************************************

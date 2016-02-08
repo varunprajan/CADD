@@ -1,0 +1,28 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: ndisl
+call readDislData('simple_dd_disl')
+call activateDislocations()
+ndisl = countActiveDisl(1)
+write(*,*) ndisl
+
+Output:
+           7
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: ndisl
+call readDislData('simple_dd_disl')
+call activateDislocations()
+disl(1)%list(6)%active = .false.
+ndisl = countActiveDisl(1)
+write(*,*) ndisl
+
+Output:
+           6
+******************************************************

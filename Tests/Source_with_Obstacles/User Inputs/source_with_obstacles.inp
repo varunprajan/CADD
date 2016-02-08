@@ -1,0 +1,45 @@
+# misc
+files_misc: input.misc
+
+# dislocations
+files_disl:
+input.dislmat1
+end
+
+# escaped dislocations
+files_escapeddisl:
+input.escapeddislmat1
+end
+
+# ghost dislocations
+files_ghostdisl:
+input.ghostdislmat1
+end
+
+# sources
+files_sources:
+input.sourcesmat1
+end
+
+# obstacles
+files_obstacles:
+input.obstaclesmat1
+end
+
+# slip systems
+files_slipsys:
+input.slipsysmat1
+end
+
+# nodes
+files_nodes: input.nodes
+
+# feelements
+files_feelements:
+input.feelementsmat1
+end
+
+# materials
+files_materials:
+input.material1
+end

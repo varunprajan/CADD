@@ -1,0 +1,92 @@
+******************************************************
+Test #1: Outside core
+ 
+Code:
+
+real(dp) :: dxn, dyn, rcore
+dxn = 1.5_dp
+dyn = 0.0_dp
+rcore = 1.0_dp
+call adjustDxnDyn(dxn,dyn,rcore**2)
+write(*,*) dxn, dyn
+
+Output:
+
+   1.5000000000000000        0.0000000000000000 
+******************************************************
+Test #2: Inside core
+ 
+Code:
+
+real(dp) :: dxn, dyn, rcore
+dxn = 0.5_dp
+dyn = 0.0_dp
+rcore = 1.0_dp
+call adjustDxnDyn(dxn,dyn,rcore**2)
+write(*,*) dxn, dyn
+
+Output: 
+
+   1.0000000000000000        0.0000000000000000
+******************************************************
+Test #3: Inside tol
+ 
+Code:
+
+real(dp) :: dxn, dyn, rcore
+dxn = 1e-11_dp
+dyn = 3e-11_dp
+rcore = 1.0_dp
+call adjustDxnDyn(dxn,dyn,rcore**2)
+write(*,*) dxn, dyn
+
+Output: 
+
+  0.70710678118654746       0.70710678118654746      
+******************************************************
+Test #4: Inside tol
+ 
+Code:
+
+real(dp) :: dxn, dyn, rcore
+dxn = 1e-11_dp
+dyn = -3e-11_dp
+rcore = 1.0_dp
+call adjustDxnDyn(dxn,dyn,rcore**2)
+write(*,*) dxn, dyn
+
+Output: 
+
+  0.70710678118654746      -0.70710678118654746
+******************************************************
+ Test #5: Different rcore
+ 
+Code:
+
+real(dp) :: dxn, dyn, rcore
+dxn = 1e-11_dp
+dyn = -3e-11_dp
+rcore = 2.0_dp
+call adjustDxnDyn(dxn,dyn,rcore**2)
+write(*,*) dxn, dyn
+
+Output: 
+
+   1.4142135623730949       -1.4142135623730949  
+******************************************************
+Test #6: Inside core
+ 
+Code:
+
+real(dp) :: dxn, dyn, rcore
+dxn = 0.5_dp
+dyn = 0.6_dp
+rcore = 2.0_dp
+call adjustDxnDyn(dxn,dyn,rcore**2)
+write(*,*) (dxn**2+dyn**2)
+write(*,*) dyn/dxn
+
+Output: 
+   4.0000000000000000
+   1.2000000000000000  
+******************************************************   

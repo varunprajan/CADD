@@ -1,0 +1,15 @@
+# material info
+mname: material1
+mass: 1.0
+lattice: hex
+rho: 0.91648642466
+
+elconst:
+31.826433589078121 10.608811196359374 0.0
+10.608811196359374 31.826433589078121 0.0
+0.0 0.0 10.608811196359374
+end elconst
+
+burgers: 1.12246
+disldrag: 1.0
+lannih: 6.0

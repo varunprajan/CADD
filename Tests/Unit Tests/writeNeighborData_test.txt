@@ -1,0 +1,14 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call readNeighborData('example_neighbors_test')
+call writeNeighborData('example_neighbors_out_test')
+
+Output: See file --- essentially identical to example_neighbors_test
+******************************************************

@@ -1,0 +1,47 @@
+******************************************************
+Test #1:
+
+Code:
+
+integer :: i, j
+real(dp) :: array(2,2)
+do i = 1,2
+    do j = 1,2
+        array(i,j) = i*j**2
+    end do
+end do
+call prettyPrintRealMat(array,'myarray')
+
+Output:
+
+ myarray
+   1.0000000000000000        4.0000000000000000     
+   2.0000000000000000        8.0000000000000000 
+******************************************************           
+Test #2:
+
+Code:
+
+real(dp) :: array(4,4)
+array(:,:) = 3.0_dp
+call prettyPrintRealMat(array(:,1:2),'blahblahblah')
+
+Output:
+
+ blahblahblah
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000     
+   3.0000000000000000        3.0000000000000000 
+******************************************************           
+Test #3:
+
+Code:
+
+real(dp) :: array(4,4)
+array(:,:) = 3.0_dp
+call prettyPrintRealMat(array(:,1),'blahblahblah')
+
+Output: Error: Rank mismatch in argument 'mat' at (1) (rank-2 and rank-1)
+
+

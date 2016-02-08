@@ -1,0 +1,42 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i, j, n
+call initNodeData('simple_dd_nodes')
+call initMaterialData('simple_dd_materials')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call readDislData('simple_dd_disl')
+call assignDislLocalPos()
+n = disl(1)%ndisl
+write(*,*) 'locpos'
+do i = 1, n
+  write(*,*) (disl(1)%list(i)%localpos(j), j = 1,2)
+end do
+write(*,*) 'Element'
+do i = 1, n
+  write(*,*) disl(1)%list(i)%element
+end do
+
+Output:
+ locpos
+ -0.50000000000000000      -0.50000000000000000     
+ -0.50000000000000000       0.50000000000000000     
+ -0.50000000000000000       0.50000000000000000     
+ -0.50000000000000000       0.50000000000000000     
+  0.50000000000000000       0.50000000000000000     
+   0.0000000000000000        0.0000000000000000     
+   0.0000000000000000        0.0000000000000000     
+ Element
+           1
+          10
+           8
+           7
+           8
+           1
+          16
+  
+******************************************************

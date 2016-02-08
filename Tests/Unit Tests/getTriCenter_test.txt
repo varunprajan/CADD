@@ -1,0 +1,28 @@
+******************************************************
+Test #1:
+
+Code:
+
+integer :: i
+integer :: point_num
+real(dp) :: point_xy(2,4)
+real(dp) :: res(2)
+
+point_num = 4
+point_xy(:,1) = [0.0_dp,0.0_dp]
+point_xy(:,2) = [1.0_dp,0.0_dp]
+point_xy(:,3) = [1.0_dp,1.0_dp]
+point_xy(:,4) = [0.0_dp,1.0_dp]
+delaunay%numpoints = point_num
+delaunay%xy = point_xy
+
+call genDelaunay()
+do i = 1, delaunay%numtri
+  res = getTriCenter(i)
+  write(*,*) res
+end do 
+
+Output:
+  0.33333333333333331       0.33333333333333331     
+  0.66666666666666663       0.66666666666666663
+******************************************************

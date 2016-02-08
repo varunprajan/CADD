@@ -1,0 +1,43 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: mat(2,2)
+real(dp) :: invmat(2,2)
+mat(1,:) = [0.4_dp, 0.5_dp]
+mat(2,:) = [-0.6_dp,3.0_dp]
+invmat = invertMat2(mat)
+call prettyPrintRealMat(invmat,'invmat')
+call prettyPrintRealMat(matmul(mat,invmat),'out1')
+call prettyPrintRealMat(matmul(invmat,mat),'out2')
+
+Output:
+
+ invmat
+   2.0000000000000000      -0.33333333333333331     
+  0.39999999999999997       0.26666666666666666     
+ out1
+   1.0000000000000000        0.0000000000000000     
+  -5.5511151231257827E-017   1.0000000000000000     
+ out2
+   1.0000000000000000        5.5511151231257827E-017
+   1.1478990501190278E-017   1.0000000000000000    
+******************************************************
+Test #2: Singular matrix
+ 
+Code:
+
+real(dp) :: mat(2,2)
+real(dp) :: invmat(2,2)
+mat(1,:) = [1.0_dp, 0.5_dp]
+mat(2,:) = [2.0_dp, 1.0_dp]
+invmat = invertMat2(mat)
+call prettyPrintRealMat(invmat,'invmat')
+call prettyPrintRealMat(matmul(mat,invmat),'out1')
+call prettyPrintRealMat(matmul(invmat,mat),'out2')
+
+Output:
+
+ Matrix is singular   
+******************************************************  

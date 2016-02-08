@@ -1,0 +1,112 @@
+******************************************************
+Test #1: Perfect lattice
+ 
+Code:
+
+      real(dp) :: a1(2), a2(2), orig(2)
+      real(dp) :: centro
+      integer :: i
+      
+      nodes%nnodes = 7
+      allocate(nodes%posn(7,nodes%nnodes))
+      allocate(nodes%types(3,nodes%nnodes))
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      orig = [0.0_dp,0.0_dp]
+C     create hex array
+      nodes%posn = 0.0_dp
+      nodes%posn(1:2,1) = orig
+      nodes%posn(1:2,2) = orig + a1
+      nodes%posn(1:2,3) = orig - a1
+      nodes%posn(1:2,4) = orig + a2
+      nodes%posn(1:2,5) = orig - a2
+      nodes%posn(1:2,6) = orig + a2 - a1
+      nodes%posn(1:2,7) = orig - a2 + a1
+      do i = 1, nodes%nnodes
+          nodes%types(:,i) = [1,1,0]
+      end do    
+      call processNodeData()
+      call initMiscData('atomistic_2_misc')
+      call initMaterialData('atomistic_2_materials')
+      call initPotentialData('atomistic_2_potentials')
+      call initNeighborData('atomistic_2_neighbors')
+      centro = getCentroAtom(1,6)
+      write(*,*) centro
+
+Output:
+   0.0000000000000000   
+******************************************************
+Test #2: Too few neighbors
+ 
+Code:
+
+      real(dp) :: a1(2), a2(2), orig(2)
+      real(dp) :: centro
+      integer :: i
+      
+      nodes%nnodes = 6
+      allocate(nodes%posn(7,nodes%nnodes))
+      allocate(nodes%types(3,nodes%nnodes))
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      orig = [0.0_dp,0.0_dp]
+C     create hex array
+      nodes%posn = 0.0_dp
+      nodes%posn(1:2,1) = orig
+      nodes%posn(1:2,2) = orig + a1
+      nodes%posn(1:2,3) = orig - a1
+      nodes%posn(1:2,4) = orig + a2
+      nodes%posn(1:2,5) = orig - a2
+      nodes%posn(1:2,6) = orig + a2 - a1
+      do i = 1, nodes%nnodes
+          nodes%types(:,i) = [1,1,0]
+      end do    
+      call processNodeData()
+      call initMiscData('atomistic_2_misc')
+      call initMaterialData('atomistic_2_materials')
+      call initPotentialData('atomistic_2_potentials')
+      call initNeighborData('atomistic_2_neighbors')
+      centro = getCentroAtom(1,6)
+      write(*,*) centro
+
+Output:
+   0.0000000000000000   
+******************************************************
+Test #3: Distorted
+ 
+Code:
+
+      real(dp) :: a1(2), a2(2), orig(2), fudge(2)
+      real(dp) :: centro
+      integer :: i
+      
+      nodes%nnodes = 7
+      allocate(nodes%posn(7,nodes%nnodes))
+      allocate(nodes%types(3,nodes%nnodes))
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      orig = [0.0_dp,0.0_dp]
+      fudge = [0.5_dp,0.0_dp]
+C     create hex array
+      nodes%posn = 0.0_dp
+      nodes%posn(1:2,1) = orig
+      nodes%posn(1:2,2) = orig + a1 + fudge
+      nodes%posn(1:2,3) = orig - a1
+      nodes%posn(1:2,4) = orig + a2
+      nodes%posn(1:2,5) = orig - a2
+      nodes%posn(1:2,6) = orig + a2 - a1
+      nodes%posn(1:2,7) = orig - a2 + a1
+      do i = 1, nodes%nnodes
+          nodes%types(:,i) = [1,1,0]
+      end do    
+      call processNodeData()
+      call initMiscData('atomistic_2_misc')
+      call initMaterialData('atomistic_2_materials')
+      call initPotentialData('atomistic_2_potentials')
+      call initNeighborData('atomistic_2_neighbors')
+      centro = getCentroAtom(1,6)
+      write(*,*) centro
+
+Output:
+  0.25000000000000000   
+******************************************************

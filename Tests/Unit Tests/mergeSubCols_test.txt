@@ -1,0 +1,117 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: A(2,1)
+integer :: B(2,1)
+integer :: C(2,2)
+A(:,1) = [0,4]
+B(:,1) = [1,3]
+call mergeSubCols(A,1,B,1,C,2,2,2)
+call prettyPrintIntMat(C,'C')
+
+Output:
+ C
+           0           1
+           4           3
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: A(2,1)
+integer :: B(2,1)
+integer :: C(2,2)
+A(:,1) = [1,4]
+B(:,1) = [1,3]
+call mergeSubCols(A,1,B,1,C,2,2,2)
+call prettyPrintIntMat(C,'C')
+
+Output:
+ C
+           1           1
+           3           4
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: A(2,1)
+integer :: B(2,1)
+integer :: C(2,2)
+A(:,1) = [1,4]
+B(:,1) = [1,3]
+call mergeSubCols(A,1,B,1,C,2,1,2)
+call prettyPrintIntMat(C,'C')
+
+Output:
+ C
+           1           1
+           4           3
+******************************************************
+Test #4:
+ 
+Code:
+
+integer :: A(2,1)
+integer :: B(2,1)
+integer :: C(2,2)
+A(:,1) = [2,3]
+B(:,1) = [1,3]
+call mergeSubCols(A,1,B,1,C,2,1,2)
+call prettyPrintIntMat(C,'C')
+
+Output:
+ C
+           1           2
+           3           3
+******************************************************
+Test #5:
+ 
+Code:
+
+integer :: A(2,5)
+integer :: B(2,4)
+integer :: C(2,9)
+A(:,1) = [2,3]
+A(:,2) = [2,4]
+A(:,3) = [5,6]
+A(:,4) = [5,7]
+A(:,5) = [6,2]
+B(:,1) = [2,2]
+B(:,2) = [3,3]
+B(:,3) = [6,1]
+B(:,4) = [6,2]
+call mergeSubCols(A,5,B,4,C,9,1,2)
+call prettyPrintIntMat(C,'C')
+
+Output:
+ C
+           2           2           2           3           5           5           6           6           6
+           3           4           2           3           6           7           2           1           2
+******************************************************
+Test #6:
+ 
+Code:
+
+integer :: A(2,5)
+integer :: B(2,4)
+integer :: C(2,9)
+A(:,1) = [2,3]
+A(:,2) = [2,4]
+A(:,3) = [5,6]
+A(:,4) = [5,7]
+A(:,5) = [6,2]
+B(:,1) = [2,2]
+B(:,2) = [3,3]
+B(:,3) = [6,1]
+B(:,4) = [6,2]
+call mergeSubCols(A,5,B,4,C,9,2,2)
+call prettyPrintIntMat(C,'C')
+
+Output:
+ C
+           2           2           2           3           5           5           6           6           6
+           2           3           4           3           6           7           1           2           2
+******************************************************

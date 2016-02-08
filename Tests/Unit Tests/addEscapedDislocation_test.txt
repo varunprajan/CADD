@@ -1,0 +1,66 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, j
+      call readNodeData('example_nodes_test')
+      call readEscapedDislData('example_escapeddisl_test')
+      call processEscapedDislData()
+      call addEscapedDislocation([3.4_dp,3.4_dp],[4.4_dp,4.4_dp],
+     &                           1,1,0,1)
+      write(*,*) 'Posn'
+      do i = 1, escapeddisl(1)%nescapeddisl
+      write(*,*) (escapeddisl(1)%list(i)%posn(j), j = 1,2)
+      end do    
+      write(*,*) 'Branch cut'
+      do i = 1, escapeddisl(1)%nescapeddisl
+      write(*,*) escapeddisl(1)%list(i)%cut
+      end do
+
+Output:
+ Posn
+   2.0000000000000000E-002   4.0000000000000001E-002
+   1.2400000000000000        1.3500000000000001     
+   17.542135623730950        17.542135623730950     
+ Branch cut
+           1
+           0
+           0
+
+******************************************************
+Test #2:
+ 
+Code:
+
+      integer :: i, j
+      call readNodeData('example_nodes_test')
+      call readEscapedDislData('example_escapeddisl_test')
+      misc%iscrackproblem = .false.
+      call processEscapedDislData()
+      call addEscapedDislocation([3.4_dp,3.4_dp],[4.4_dp,4.4_dp],
+     &                           1,1,0,1)
+      call addEscapedDislocation([4.4_dp,4.4_dp],[3.4_dp,3.4_dp],
+     &                           1,1,1,1)
+      write(*,*) 'Posn'
+      do i = 1, escapeddisl(1)%nescapeddisl
+      write(*,*) (escapeddisl(1)%list(i)%posn(j), j = 1,2)
+      end do    
+      write(*,*) 'Branch cut'
+      do i = 1, escapeddisl(1)%nescapeddisl
+      write(*,*) escapeddisl(1)%list(i)%cut
+      end do
+
+Output:
+ Posn
+   2.0000000000000000E-002   4.0000000000000001E-002
+   1.2400000000000000        1.3500000000000001     
+   17.542135623730950        17.542135623730950     
+  -9.7421356237309507       -9.7421356237309507     
+ Branch cut
+           1
+           0
+           0
+           1
+
+******************************************************

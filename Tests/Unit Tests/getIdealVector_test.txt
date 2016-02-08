@@ -1,0 +1,73 @@
+******************************************************
+Test #1:
+
+Code:
+
+real(dp) :: vec(2), idealvec(2)
+
+call initDD()
+call initDislIdentData()
+
+vec = identsimple%burgers*[1,0]
+idealvec = getIdealVector(vec)
+write(*,*) 'vec', vec
+write(*,*) 'ideal vec', idealvec
+
+Output:
+ vec   1.1224600000000000        0.0000000000000000     
+ ideal vec   1.1224600000000000        0.0000000000000000     
+******************************************************
+Test #2:
+
+Code:
+
+real(dp) :: vec(2), idealvec(2)
+
+call initDD()
+call initDislIdentData()
+
+vec = identsimple%burgers*[cos(piconst/3.0),sin(piconst/3.0)]
+idealvec = getIdealVector(vec)
+write(*,*) 'vec', vec
+write(*,*) 'ideal vec', idealvec
+
+Output:
+ vec  0.56123000000000012       0.97207887473188093     
+ ideal vec  0.56123000000000012       0.97207887473188093      
+******************************************************
+Test #3:
+
+Code:
+
+real(dp) :: vec(2), idealvec(2)
+
+call initDD()
+call initDislIdentData()
+
+vec = -identsimple%burgers*[cos(piconst/3.0),sin(piconst/3.0)]
+idealvec = getIdealVector(vec)
+write(*,*) 'vec', vec
+write(*,*) 'ideal vec', idealvec
+
+Output:
+ vec -0.56123000000000012      -0.97207887473188093     
+ ideal vec -0.56123000000000045      -0.97207887473188070     
+******************************************************
+Test #4:
+
+Code:
+
+real(dp) :: vec(2), idealvec(2)
+
+call initDD()
+call initDislIdentData()
+
+vec = 0.5*identsimple%burgers*[1,0]
+idealvec = getIdealVector(vec)
+write(*,*) 'vec', vec
+write(*,*) 'ideal vec', idealvec
+
+Output:
+ vec  0.56123000000000001        0.0000000000000000     
+ ideal vec   1.1224600000000000        0.0000000000000000     
+******************************************************

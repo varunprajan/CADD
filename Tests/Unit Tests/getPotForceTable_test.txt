@@ -1,0 +1,99 @@
+******************************************************
+Test #1: Force is repulsive, along x-axis
+ 
+Code:
+
+      real(dp) :: atompos(3), neighpos(3)
+      integer :: pnum
+      real(dp) :: forcevec(3)
+      call initPotentialData('example_potentials_test')
+      atompos = [0.0_dp,0.0_dp,0.0_dp]
+      neighpos = [0.1_dp,0.0_dp,0.0_dp]
+      pnum = 1
+      forcevec = getPotForceTable(pnum,atompos,neighpos)
+      write(*,*) forcevec
+
+Output:  -8713.1162290499997        0.0000000000000000        0.0000000000000000     
+******************************************************
+Test #2: Force is repulsive, along y-axis
+ 
+Code:
+
+      real(dp) :: atompos(3), neighpos(3)
+      integer :: pnum
+      real(dp) :: forcevec(3)
+      call initPotentialData('example_potentials_test')
+      atompos = [0.0_dp,0.0_dp,0.0_dp]
+      neighpos = [0.0_dp,0.1_dp,0.0_dp]
+      pnum = 1
+      forcevec = getPotForceTable(pnum,atompos,neighpos)
+      write(*,*) forcevec
+
+Output:   0.0000000000000000       -8713.1162290499997        0.0000000000000000      
+******************************************************
+Test #3: Force is attractive, along y-axis
+ 
+Code:
+
+      real(dp) :: atompos(3), neighpos(3)
+      integer :: pnum
+      real(dp) :: forcevec(3)
+      call initPotentialData('example_potentials_test')
+      atompos = [0.0_dp,0.0_dp,0.0_dp]
+      neighpos = [0.0_dp,1.7_dp,0.0_dp]
+      pnum = 1
+      forcevec = getPotForceTable(pnum,atompos,neighpos)
+      write(*,*) forcevec
+
+Output:  -0.0000000000000000       0.48615158664882580       -0.0000000000000000     
+
+******************************************************
+Test #4: Force at an angle
+ 
+Code:
+
+      real(dp) :: atompos(3), neighpos(3)
+      integer :: pnum
+      real(dp) :: forcevec(3)
+      call initPotentialData('example_potentials_test')
+      atompos = [0.0_dp,0.0_dp,0.0_dp]
+      neighpos = [0.5_dp,1.0_dp,0.0_dp]
+      pnum = 1
+      forcevec = getPotForceTable(pnum,atompos,neighpos)
+      write(*,*) forcevec(2)/forcevec(1)
+
+Output:      2.0000000000000000
+******************************************************
+Test #5: Force at an angle
+ 
+Code:
+
+      real(dp) :: atompos(3), neighpos(3)
+      integer :: pnum
+      real(dp) :: forcevec(3)
+      call initPotentialData('example_potentials_test')
+      atompos = [0.0_dp,0.0_dp,0.0_dp]
+      neighpos = [0.5_dp,1.0_dp,0.0_dp]
+      pnum = 1
+      forcevec = getPotForceTable(pnum,atompos,neighpos)
+      write(*,*) forcevec
+
+Output:  -723.91144493893421       -1447.8228898778684        0.0000000000000000     
+******************************************************
+Test #6: Translation invariance
+ 
+Code:
+
+      real(dp) :: atompos(3), neighpos(3), trans(3)
+      integer :: pnum
+      real(dp) :: forcevec(3)
+      call initPotentialData('example_potentials_test')
+      trans = [1.0_dp,3.14_dp,0.0_dp]
+      atompos = [0.0_dp,0.0_dp,0.0_dp]
+      neighpos = [0.5_dp,1.0_dp,0.0_dp]
+      pnum = 1
+      forcevec = getPotForceTable(pnum,atompos,neighpos)
+      write(*,*) forcevec
+
+Output:  -723.91144493893421       -1447.8228898778684        0.0000000000000000     
+******************************************************

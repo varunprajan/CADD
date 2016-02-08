@@ -1,0 +1,33 @@
+******************************************************
+Test #1:
+
+Code:
+
+integer :: n
+type(sortedplanedata) :: splane
+call initMaterialData('simple_dd_materials')
+call initNodeData('simple_dd_nodes')
+call initFELibrary()
+call initFEElementData('simple_dd_feelements')
+call initSlipSysData('simple_dd_slipsys')
+call initDislData('simple_dd_disl')
+splane = disl(1)%splanes(1)%splane(3)
+n = splane%ncount
+write(*,*) n
+write(*,*) splane%relpos(1:n)
+write(*,*) splane%objnum(1:n)
+call addObjSub(splane,0.4_dp,9)
+n = splane%ncount
+write(*,*) n
+write(*,*) splane%relpos(1:n)
+write(*,*) splane%objnum(1:n)
+
+Output:
+           3
+   2.2500000000000000        3.2500000000000000        3.7500000000000000     
+           4           3           5
+           4
+   2.2500000000000000        3.2500000000000000        3.7500000000000000       0.40000000000000002     
+           4           3           5           9
+
+ ******************************************************

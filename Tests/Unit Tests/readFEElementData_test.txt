@@ -1,0 +1,25 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call readFEElementData('simplefe_feelements')
+write(*,*) feelements(1)%elname
+write(*,*) feelements(1)%mnum
+call prettyPrintIntMat(transpose(feelements(1)%connect),'connect')
+
+Output:
+ CPE4                
+           3
+ connect
+           1           2           7           6
+           2           3           8           7
+           3           4           9           8
+           4           5          10           9
+           6           7          12          11
+           7           8          13          12
+           8           9          14          13
+           9          10          15          14
+******************************************************

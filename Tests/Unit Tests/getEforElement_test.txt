@@ -1,0 +1,39 @@
+Note: Checked output using numpy
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: dUdxmat(2,2)
+real(dp) :: E(2,2)
+
+dUdxmat = 0.0_dp
+dUdxmat(1,1) = 0.01_dp
+E = getEforElement(dUdxmat)
+call prettyPrintRealMat(E,'E')
+
+Output:
+ E
+   1.0050000000000003E-002   0.0000000000000000     
+   0.0000000000000000        0.0000000000000000        
+   
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: dUdxmat(2,2)
+real(dp) :: E(2,2)
+
+dUdxmat = 0.0_dp
+dUdxmat(2,1) = 0.01_dp
+dUdxmat(1,2) = 0.01_dp
+E = getEforElement(dUdxmat)
+call prettyPrintRealMat(E,'E')
+
+Output:
+ E
+   4.9999999999994493E-005   1.0000000000000000E-002
+   1.0000000000000000E-002   4.9999999999994493E-005
+
+******************************************************

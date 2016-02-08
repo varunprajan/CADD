@@ -1,0 +1,153 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [0.0_dp,0.0_dp]
+p1 = [1.0_dp,1.0_dp]
+p2 = [1.0_dp,0.0_dp]
+p3 = [0.0_dp,1.0_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? T
+ Intersection  0.50000000000000000       0.50000000000000000     
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [0.0_dp,0.0_dp]
+p1 = [0.3_dp,0.3_dp]
+p2 = [1.0_dp,0.0_dp]
+p3 = [0.0_dp,1.0_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? F
+ Intersection   3.3156184233832380E-316   1.3273053812899255E-317  
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p1 = [0.0_dp,0.0_dp]
+p0 = [1.0_dp,1.0_dp]
+p2 = [1.0_dp,0.0_dp]
+p3 = [0.0_dp,1.0_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? T
+ Intersection  0.50000000000000000       0.50000000000000000       
+******************************************************
+Test #4:
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [0.0_dp,0.0_dp]
+p1 = [1.0_dp,1.0_dp]
+p3 = [1.0_dp,0.0_dp]
+p2 = [0.0_dp,1.0_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? T
+ Intersection  0.50000000000000000       0.50000000000000000        
+******************************************************
+Test #5:
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [0.0_dp,0.0_dp]
+p1 = [0.499_dp,0.499_dp]
+p3 = [1.0_dp,0.0_dp]
+p2 = [0.0_dp,1.0_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? F
+ Intersection   3.3156184233832380E-316   1.3273053812899255E-317       
+******************************************************
+Test #6: T-intersection
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [0.0_dp,0.0_dp]
+p1 = [0.5_dp,0.5_dp]
+p3 = [1.0_dp,0.0_dp]
+p2 = [0.0_dp,1.0_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? T
+ Intersection  0.50000000000000000       0.50000000000000000     
+******************************************************
+Test #6: Parallel lines
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [0.0_dp,0.0_dp]
+p1 = [0.5_dp,0.5_dp]
+p3 = [1.0_dp,0.0_dp]
+p2 = [1.5_dp,0.5_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? F
+ Intersection   3.3156184233832380E-316   1.3273053812899255E-317    
+******************************************************
+Test #7:
+ 
+Code:
+
+real(dp) :: p0(2), p1(2), p2(2), p3(2)
+real(dp) :: pint(2)
+logical :: isint
+p0 = [1.0_dp,0.0_dp]
+p1 = [1.5_dp,2.0_dp]
+p3 = [1.0_dp,1.8_dp]
+p2 = [3.0_dp,1.8_dp]
+call getIntersectionTwoLines(p0,p1,p2,p3,pint,isint)
+write(*,*) 'Is intersection?', isint
+write(*,*) 'Intersection', pint
+
+Output:
+ Is intersection? T
+ Intersection   1.4500000000000000        1.8000000000000000    
+******************************************************

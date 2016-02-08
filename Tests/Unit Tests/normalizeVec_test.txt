@@ -1,0 +1,53 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp), allocatable :: vec(:), vecnorm(:)
+
+vec = [1.0_dp,0.0_dp]
+vecnorm = normalizeVec(vec)
+write(*,*) vecnorm
+
+Output:
+   1.0000000000000000        0.0000000000000000     
+******************************************************
+Test #2:
+
+Code:
+
+real(dp), allocatable :: vec(:), vecnorm(:)
+
+vec = [1.0_dp,0.0_dp,0.0_dp]
+vecnorm = normalizeVec(vec)
+write(*,*) vecnorm   
+
+Output:
+   1.0000000000000000        0.0000000000000000        0.0000000000000000
+******************************************************
+Test #3:
+
+Code:
+
+real(dp), allocatable :: vec(:), vecnorm(:)
+
+vec = [2.0_dp,0.0_dp,0.0_dp]
+vecnorm = normalizeVec(vec)
+write(*,*) vecnorm   
+
+Output:
+   1.0000000000000000        0.0000000000000000        0.0000000000000000
+******************************************************
+Test #4:
+
+Code:
+
+real(dp), allocatable :: vec(:), vecnorm(:)
+
+vec = [1.0_dp,1.0_dp,0.0_dp]
+vecnorm = normalizeVec(vec)
+write(*,*) vecnorm   
+
+Output:
+  0.70710678118654746       0.70710678118654746        0.0000000000000000
+******************************************************     

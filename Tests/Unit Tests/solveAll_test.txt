@@ -1,0 +1,73 @@
+******************************************************
+Test #1: One material
+ 
+Code:
+
+integer :: neqnsnormal, neqnstot
+integer :: nentriesnormal, nentriestot
+integer :: j
+call initFELibrary()
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+call countEqns(1,neqnsnormal,nentriesnormal,
+&                            neqnstot,nentriestot)
+call initAssembly()
+call assembleAndFactorAll()
+C     boundary conditions
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call solveAll()
+write(*,*) 'Solution'
+do j = 1, neqnstot
+  write(*,*) assembly(1)%rhs(j)
+end do
+
+Output: (Compare with "dofs" variable from Allan Bower's code --- input_quad4.txt)
+        (Not sure how to compare constraint forces (Lagrange multipliers))
+ Solution
+   0.0000000000000000     
+  -1.4157027361766989E-017
+  0.24878695497095241     
+   8.7061638165980837E-002
+  0.49378167208415008     
+   8.6178352950675566E-002
+  0.74669062472660075     
+   8.4396640487775385E-002
+   1.0000000000000000     
+   8.4310835638286064E-002
+   1.6269162672275419E-018
+   4.1583660287841953E-018
+  0.23026824951377733     
+  -4.1333914110205913E-016
+  0.49305485453553544     
+  -1.0849748192759658E-015
+  0.74703889146863989     
+  -1.6960896116605871E-015
+   1.0000000000000000     
+  -1.9763857600628885E-015
+   0.0000000000000000     
+  -1.2763392196043329E-017
+  0.24878695497095321     
+  -8.7061638165981795E-002
+  0.49378167208415108     
+  -8.6178352950677675E-002
+  0.74669062472660142     
+  -8.4396640487778757E-002
+   1.0000000000000000     
+  -8.4310835638289741E-002
+   3.8280264502419690     
+   1.0674994448462061     
+  -3.5812850055264067     
+   6.6669452688029036     
+  -1.4674831475247517E-015
+  -7.1604281582340894     
+   3.8280264502419805     
+  -1.0674994448462101     
+  -3.5812850055263969 
+******************************************************

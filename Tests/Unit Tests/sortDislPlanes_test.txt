@@ -1,0 +1,51 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: ncount
+call initSlipSysData('simple_dd_slipsys')
+call readDislData('simple_dd_disl')
+call initDislSortedPlanes()
+call assignDislSortedPlanes()
+call sortDislPlanes()
+ncount = disl(1)%splanes(1)%splane(1)%ncount
+write(*,*) 'Plane 1'
+write(*,*) ncount
+write(*,*) disl(1)%splanes(1)%splane(1)%relpos(1:ncount)
+write(*,*) disl(1)%splanes(1)%splane(1)%objnum(1:ncount)
+ncount = disl(1)%splanes(1)%splane(2)%ncount
+write(*,*) 'Plane 2'
+write(*,*) ncount
+write(*,*) disl(1)%splanes(1)%splane(2)%relpos(1:ncount)
+write(*,*) disl(1)%splanes(1)%splane(2)%objnum(1:ncount)
+ncount = disl(1)%splanes(1)%splane(3)%ncount
+write(*,*) 'Plane 3'
+write(*,*) ncount
+write(*,*) disl(1)%splanes(1)%splane(3)%relpos(1:ncount)
+write(*,*) disl(1)%splanes(1)%splane(3)%objnum(1:ncount)
+ncount = disl(1)%splanes(2)%splane(5)%ncount
+write(*,*) 'Plane 4'
+write(*,*) ncount
+write(*,*) disl(1)%splanes(2)%splane(5)%relpos(1:ncount)
+write(*,*) disl(1)%splanes(2)%splane(5)%objnum(1:ncount)
+
+Output:
+ Plane 1
+           1
+  0.25000000000000000     
+           1
+ Plane 2
+           0
+
+
+ Plane 3
+           3
+   2.2500000000000000        3.2500000000000000        3.7500000000000000     
+           4           3           5
+ Plane 4
+           2
+  -2.1213203435807095        2.1213203435385757     
+           6           7
+
+******************************************************

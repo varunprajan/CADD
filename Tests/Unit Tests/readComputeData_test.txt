@@ -1,0 +1,19 @@
+******************************************************
+Test #1: 
+ 
+Code:
+
+      call initNodeData('example_nodes_test')
+      call initComputeData('example_compute_test')
+      write(*,*) compute%centro%gname
+      write(*,*) compute%centro%params
+      write(*,*) compute%centro%active
+      write(*,*) compute%centro%res
+
+Output:
+ all                                                         
+   6.0000000000000000     
+ T   
+     
+******************************************************  
+     

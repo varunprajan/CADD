@@ -1,0 +1,39 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readInteractionData('example_interactions_test')
+call initMaterialData('example_materials_test2')
+call processInteractionData()
+call prettyPrintIntMat(transpose(interactions%table),'Table')
+call prettyPrintIntMat(interactions%mat,'Mat')
+
+Output:
+ Table
+           1           1           1
+           1           2           1
+           1           3           1
+           2           2           1
+           3           3           1
+           2           3           2
+ Mat
+           1           1           1
+           1           1           2
+           1           2           1
+******************************************************
+Test #2: Bad input
+ 
+Code:
+
+call readInteractionData('example_interactions_test')
+call initMaterialData('example_materials_test2')
+interactions%table(:,6) = [3,3,2]
+call processInteractionData()
+call prettyPrintIntMat(transpose(interactions%table),'Table')
+call prettyPrintIntMat(interactions%mat,'Mat')
+
+Output: Error:
+ Uninitialized interaction between:
+ Atom            2  and atom            3
+******************************************************

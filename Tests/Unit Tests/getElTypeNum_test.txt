@@ -1,0 +1,28 @@
+******************************************************
+Test #1: Element type in library
+ 
+Code:
+
+integer :: eltypenum
+call initFELibrary()
+eltypenum = getElTypeNum('CPE3')
+write(*,*) eltypenum
+
+Output:
+           2  
+******************************************************
+Test #2: Element type not in library
+
+Code:
+
+integer :: eltypenum
+call initFELibrary()
+eltypenum = getElTypeNum('CPS4')
+write(*,*) eltypenum
+
+Output:
+ Unknown element type
+ Currently defined elements:
+ CPE4                
+ CPE3
+******************************************************

@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readPotentialData('example_potentials_test')
+call writePotentialData('example_potentials_out_test')
+
+Output: See file --- essentially identical to example_potentials_test
+******************************************************   

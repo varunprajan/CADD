@@ -1,0 +1,8 @@
+# misc
+dumpincrement: 100
+restartincrement: 0
+incrementcurr: 0
+increments: 5000
+timestep: 0.02
+potstyle: table
+iscrackproblem: 1

@@ -1,0 +1,169 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp]
+p1 = -1.0_dp
+p2 = 1.0_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between T
+ idx           1
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp]
+p1 = -1.0_dp
+p2 = -2.0_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between F
+ idx           1
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp]
+p1 = 1.0_dp
+p2 = -2.0_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between T
+ idx           1
+******************************************************
+Test #4:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp]
+p1 = 1.0_dp
+p2 = 0.5_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between F
+ idx           1
+******************************************************
+Test #5:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp,1.0_dp,2.0_dp]
+p1 = -0.5_dp
+p2 = 0.5_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between T
+ idx           1
+******************************************************
+Test #6:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp,1.0_dp,2.0_dp]
+p1 = -0.5_dp
+p2 = 1.5_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between T
+ idx           1
+******************************************************
+Test #7:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp,1.0_dp,2.0_dp]
+p1 = 1.5_dp
+p2 = -0.5_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between T
+ idx           2
+******************************************************
+Test #7:
+ 
+Code:
+
+real(dp), allocatable :: vec(:)
+real(dp) :: p1, p2
+integer :: n, idx
+logical :: between
+
+vec = [0.0_dp,1.0_dp,2.0_dp]
+p1 = 1.5_dp
+p2 = 2.5_dp
+n = size(vec)
+call findPointBetween(p1,p2,vec,n,between,idx)
+write(*,*) 'between', between
+write(*,*) 'idx', idx
+
+Output:
+ between T
+ idx           3
+******************************************************

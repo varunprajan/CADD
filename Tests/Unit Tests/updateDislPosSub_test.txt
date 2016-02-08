@@ -1,0 +1,38 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: mnumfe, dislnum, isys, iplane, iobj
+
+mnumfe = 1
+isys = 1
+iplane = 1
+iobj = 1
+dislnum = 1
+call initDD()
+disl(mnumfe)%list(dislnum)%disp = 2.0_dp
+
+write(*,*) 'Before'
+write(*,*) disl(mnumfe)%list(dislnum)%posn
+write(*,*) disl(mnumfe)%list(dislnum)%element
+write(*,*) disl(mnumfe)%list(dislnum)%localpos
+
+call updateDislPosSub(mnumfe,isys,iplane,iobj,dislnum)
+
+write(*,*) 'After'
+write(*,*) disl(mnumfe)%list(dislnum)%posn
+write(*,*) disl(mnumfe)%list(dislnum)%element
+write(*,*) disl(mnumfe)%list(dislnum)%localpos
+
+Output:
+ Before
+  0.50000000000000000       0.50000000000000000     
+           1
+   0.0000000000000000        0.0000000000000000     
+ After
+   2.5000000000000000       0.50000000000000000     
+           3
+   0.0000000000000000        0.0000000000000000     
+
+******************************************************

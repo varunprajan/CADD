@@ -1,0 +1,31 @@
+# compute
+files_compute: input.compute
+
+# misc
+files_misc: input.misc
+
+# damping
+files_damping: input.damping
+
+# interactions
+files_interactions: input.interactions
+
+# neighbors
+files_neighbors: input.neighbors
+
+# nodes
+files_nodes: input.nodes
+
+# materials
+files_materials:
+input.material1
+end
+
+# potentials
+files_potentials:
+input.inter1
+end
+
+# groups
+files_groups:
+end

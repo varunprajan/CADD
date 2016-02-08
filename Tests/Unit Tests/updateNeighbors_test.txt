@@ -1,0 +1,70 @@
+******************************************************
+Test #1: Delay true, every false
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+nodes%posn(1,2) = nodes%posn(1,2) + 2.0
+nodes%posn(2,2) = nodes%posn(2,2) - 1.0
+neighbors%delay = 2
+neighbors%every = 3
+neighbors%checkdisp = .false.
+neighbors%incrsincelastupdate = 0
+misc%incrementcurr = 2
+call updateNeighbors()
+******************************************************
+Test #2: Delay true, every true
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+nodes%posn(1,2) = nodes%posn(1,2) + 2.0
+nodes%posn(2,2) = nodes%posn(2,2) - 1.0
+neighbors%delay = 2
+neighbors%every = 2
+neighbors%checkdisp = .false.
+neighbors%incrsincelastupdate = 0
+misc%incrementcurr = 2
+call updateNeighbors()
+
+Output: (Verified this with direct (distance matrix) calculation using Python)
+
+ Updated neighbors
+ Neighbor list
+           3           4           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           4           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           1           4           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           1           2           3           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0           0
+******************************************************
+Test #3: Delay true, every true, check not
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call initNeighborData('example_neighbors_test')
+nodes%posn(1,2) = nodes%posn(1,2) + 0.1
+nodes%posn(2,2) = nodes%posn(2,2) - 0.0
+neighbors%delay = 2
+neighbors%every = 2
+neighbors%checkdisp = .true.
+neighbors%incrsincelastupdate = 0
+misc%incrementcurr = 2
+call updateNeighbors()
+
+Output:
+[Nothing]
+******************************************************

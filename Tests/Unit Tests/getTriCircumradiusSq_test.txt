@@ -1,0 +1,49 @@
+******************************************************
+Test #1: (Circumradius of right triangle is half the hypotenuse)
+ 
+Code:
+
+real(dp) :: p(2,3)
+real(dp) :: circumradiussq
+
+p(:,1) = [0.0_dp,0.0_dp]
+p(:,2) = [3.0_dp,0.0_dp]
+p(:,3) = [0.0_dp,4.0_dp]
+circumradiussq = getTriCircumradiusSq(p)
+write(*,*) circumradiussq
+
+Output:
+   6.2500000000000000  
+******************************************************
+Test #2: (Circumradius of equilateral triangle is S/sqrt(3))
+ 
+Code:
+
+real(dp) :: p(2,3)
+real(dp) :: circumradiussq
+
+p(:,1) = [0.0_dp,0.0_dp]
+p(:,2) = [1.0_dp,0.0_dp]
+p(:,3) = [0.5_dp,sqrt(3.0_dp)/2.0_dp]
+circumradiussq = getTriCircumradiusSq(p)
+write(*,*) circumradiussq
+
+Output:
+  0.33333333333333331
+******************************************************
+Test #3: (Small triangle)
+ 
+Code:
+
+real(dp) :: p(2,3)
+real(dp) :: circumradiussq
+
+p(:,1) = [0.0_dp,0.0_dp]
+p(:,2) = [0.0_dp,tolconst]
+p(:,3) = [tolconst,0.0_dp]
+circumradiussq = getTriCircumradiusSq(p)
+write(*,*) circumradiussq
+
+Output:
+   5.0000000000000022E-049
+****************************************************** 

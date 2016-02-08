@@ -1,0 +1,23 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initNodeData('example_nodes_test')
+call readGroupData('example_groups_test')
+allocate(groups(1)%members(nodes%nnodes))
+do i = 1, nodes%nnodes
+  groups(1)%members(i) = i
+end do
+allocate(groups(1)%maskfenodes(nodes%nfenodes))
+call genGroupMaskFENodes(1)
+write(*,*) groups(1)%maskfenodes
+allocate(groups(3)%maskfenodes(nodes%nfenodes))
+call genGroupMaskFENodes(3)
+write(*,*) groups(3)%maskfenodes
+
+Output:
+ T T T T T
+ F T T F T
+******************************************************

@@ -1,0 +1,56 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initSimulation('detect_test_1','dd')
+call initDetectionData('detect_test_1_detection')
+call prettyPrintMat(detection%interfaceedges,'neighbors')
+call prettyPrintVec(detection%params,'params')
+write(*,*) 'mnumfe', detection%mnumfe
+do i = 1, 6
+  write(*,*) 'i', i
+  write(*,*) 'isys', detection%comp(i)%isys
+  write(*,*) 'bsgn', detection%comp(i)%bsgn
+  write(*,*) 'burgers vector', detection%comp(i)%burgersvec
+end do
+
+Output:   
+ neighbors
+           3          11          24
+          11          24           8
+ params
+   0.0000000000000000     
+   0.0000000000000000     
+  0.25000000000000000     
+   2.7500000000000000     
+   2.0000000000000000     
+   2.2500000000000000     
+ mnumfe           1
+ i           1
+ isys           1
+ bsgn          -1
+ burgers vector  -1.1224600000000000       -0.0000000000000000     
+ i           2
+ isys           1
+ bsgn           1
+ burgers vector   1.1224600000000000        0.0000000000000000     
+ i           3
+ isys           2
+ bsgn          -1
+ burgers vector -0.56123000000000012      -0.97207887473188093     
+ i           4
+ isys           2
+ bsgn           1
+ burgers vector  0.56123000000000012       0.97207887473188093     
+ i           5
+ isys           3
+ bsgn          -1
+ burgers vector -0.56123000000000012       0.97207887473188093     
+ i           6
+ isys           3
+ bsgn           1
+ burgers vector  0.56123000000000012      -0.97207887473188093     
+
+******************************************************

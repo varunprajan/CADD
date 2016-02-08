@@ -1,0 +1,50 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i, mnumfe, dislnum, isys, iplane
+
+mnumfe = 1
+isys = 1
+iplane = 1
+dislnum = 1
+call initDD()
+disl(mnumfe)%list(7)%active = .false.
+do i = 1, disl(mnumfe)%ndisl
+  disl(mnumfe)%list(i)%disp = min((i-1)/8.0_dp,0.20_dp)
+end do
+
+write(*,*) 'Before'
+do i = 1, disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+  write(*,*) disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(i)
+end do    
+
+call updateDislRelpos(mnumfe,
+&             disl(mnumfe)%splanes(isys)%splane(iplane))
+
+write(*,*) 'After'
+do i = 1, disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+  write(*,*) disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(i)
+end do  
+
+Output:
+ Before
+  0.50000000000000000     
+  0.75000000000000000     
+   1.5000000000000000     
+   1.7500000000000000     
+   2.5000000000000000     
+   3.2500000000000000     
+   3.5000000000000000     
+   3.7500000000000000     
+ After
+  0.50000000000000000     
+  0.87500000000000000     
+   1.7000000000000000     
+   1.9500000000000000     
+   2.7000000000000002     
+   3.4500000000000002     
+   3.5000000000000000     
+   3.9500000000000002         
+******************************************************

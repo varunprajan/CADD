@@ -1,0 +1,88 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2)
+      integer :: regioncrack
+      posnold = [0.0_dp,1.0_dp]
+      posnnew = [1.0_dp,0.0_dp]
+      regioncrack = getEscapedRegionCrack(posnold,posnnew)
+      select case (regioncrack)
+          case (1)
+              write(*,*) 'regionupper'
+          case (-1)
+              write(*,*) 'regionlower'
+          case (0)
+              write(*,*) 'regionmain'
+      end select
+
+Output:
+ regionmain
+******************************************************
+Test #2:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2)
+      integer :: regioncrack
+      posnold = [0.0_dp,1.0_dp]
+      posnnew = [-1.0_dp,0.0_dp]
+      regioncrack = getEscapedRegionCrack(posnold,posnnew)
+      select case (regioncrack)
+          case (1)
+              write(*,*) 'regionupper'
+          case (-1)
+              write(*,*) 'regionlower'
+          case (0)
+              write(*,*) 'regionmain'
+      end select
+
+Output:
+ regionupper
+
+******************************************************
+Test #3:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2)
+      integer :: regioncrack
+      posnold = [0.0_dp,-1.0_dp]
+      posnnew = [1.0_dp,0.0_dp]
+      regioncrack = getEscapedRegionCrack(posnold,posnnew)
+      select case (regioncrack)
+          case (1)
+              write(*,*) 'regionupper'
+          case (-1)
+              write(*,*) 'regionlower'
+          case (0)
+              write(*,*) 'regionmain'
+      end select
+
+Output:
+ regionmain
+
+******************************************************
+Test #4:
+ 
+Code:
+
+      real(dp) :: posnold(2), posnnew(2)
+      integer :: regioncrack
+      posnold = [0.0_dp,-1.0_dp]
+      posnnew = [-1.0_dp,0.0_dp]
+      regioncrack = getEscapedRegionCrack(posnold,posnnew)
+      select case (regioncrack)
+          case (1)
+              write(*,*) 'regionupper'
+          case (-1)
+              write(*,*) 'regionlower'
+          case (0)
+              write(*,*) 'regionmain'
+      end select
+
+Output:
+ regionlower
+
+******************************************************   

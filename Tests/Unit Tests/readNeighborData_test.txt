@@ -1,0 +1,23 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initMaterialData('example_materials_test')
+call initPotentialData('example_potentials_test')
+call initMiscData('example_misc_test')
+call readNeighborData('example_neighbors_test')
+write(*,*) neighbors%skin
+write(*,*) neighbors%Lz
+write(*,*) neighbors%images
+write(*,*) neighbors%delay
+write(*,*) neighbors%checkdisp
+
+Output:
+  0.50000000000000000     
+   1.0000000000000000     
+           0
+           5
+ T
+******************************************************

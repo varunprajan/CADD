@@ -1,0 +1,38 @@
+Note: Checked output using numpy
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: E(2,2), Ecomp(2,2)
+real(dp) :: norm
+
+E = 0.0_dp
+E(2,1) = 0.01_dp
+E(1,2) = 0.01_dp
+Ecomp = 0.0_dp
+norm = getDetectionElementNorm(E,Ecomp)
+write(*,*) norm
+
+Output:
+   2.0000000000000001E-004    
+   
+******************************************************
+Test #2: "Translational" invariance
+ 
+Code:
+
+real(dp) :: E(2,2), Ecomp(2,2)
+real(dp) :: norm
+
+E = 1.0_dp
+E(2,1) = E(2,1) + 0.01_dp
+E(1,2) = E(1,2) + 0.01_dp
+Ecomp = 1.0_dp
+norm = getDetectionElementNorm(E,Ecomp)
+write(*,*) norm
+
+Output:
+  2.0000000000000036E-004
+
+******************************************************

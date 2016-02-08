@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readMaterialData('example_materials_test')
+call writeMaterialData('example_materials_out_test')
+
+Output: See file --- essentially identical to example_materials_test
+******************************************************   

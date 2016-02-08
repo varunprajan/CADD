@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readDislObsData('simple_dd_obstacles')
+call writeDislObsData('simple_dd_obstacles_out')
+
+Output: See file --- essentially identical to simple_dd_obstacles
+****************************************************** 

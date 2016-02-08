@@ -1,0 +1,43 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test')
+write(*,*) groups(3)%members
+write(*,*) groups(4)%nmembers
+write(*,*) groups(3)%gname
+write(*,*) groups(4)%members
+write(*,*) groups(3)%maskatoms
+write(*,*) groups(4)%maskall
+write(*,*) groups(4)%maskfenodes
+write(*,*) groups(1)%maskatoms
+write(*,*) groups(1)%members
+
+Output:
+           2           3           4           5           9
+           3
+ group1              
+           1           7           9
+ T T T T F F F
+ T F F F F F T F T
+ T F F F T
+ T T T T T T T
+           1           2           3           4           5           6           7           8           9
+******************************************************
+Test #2: No groups
+
+Code:
+
+call initNodeData('example_nodes_test')
+call initGroupData('example_groups_test2')
+write(*,*) ngroups
+write(*,*) groups(1)%maskatoms
+write(*,*) groups(1)%members
+
+Output:
+           2
+ T T T T T T T
+           1           2           3           4           5           6           7           8           9
+******************************************************

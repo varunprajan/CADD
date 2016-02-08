@@ -1,0 +1,22 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call readDislData('simple_dd_disl')
+call activateDislocations()
+call writeDislData('simple_dd_disl_out')
+
+Output: See file --- essentially identical to simple_dd_disl
+****************************************************** 
+Test #2:
+ 
+Code:
+
+call readDislData('simple_dd_disl')
+call activateDislocations()
+disl(1)%list(6)%active = .false.
+call writeDislData('simple_dd_disl_out2')
+
+Output: See file - disl #6 is not written to file
+****************************************************** 

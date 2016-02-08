@@ -1,0 +1,86 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+logical :: check
+real(dp) :: pt1(2), pt2(2)
+real(dp) :: vert1(2), vert2(2)
+vert1 = [-0.6_dp,-0.6_dp]
+vert2 = [1.4_dp,1.4_dp]
+pt1 = [1.0_dp,0.0_dp]
+pt2 = [0.0_dp,1.0_dp]
+check = checkSameSide(pt1,pt2,vert1,vert2)
+write(*,*) check
+
+Output:
+ F  
+****************************************************** 
+Test #2:
+ 
+Code:
+
+logical :: check
+real(dp) :: pt1(2), pt2(2)
+real(dp) :: vert1(2), vert2(2)
+vert1 = [-0.6_dp,-0.6_dp]
+vert2 = [1.4_dp,1.4_dp]
+pt1 = [0.0_dp,1.0_dp]
+pt2 = [1.0_dp,0.0_dp]
+check = checkSameSide(pt1,pt2,vert1,vert2)
+write(*,*) check
+
+Output:
+ F  
+****************************************************** 
+Test #3:
+ 
+Code:
+
+logical :: check
+real(dp) :: pt1(2), pt2(2)
+real(dp) :: vert1(2), vert2(2)
+vert1 = [-0.6_dp,-0.6_dp]
+vert2 = [1.4_dp,1.4_dp]
+pt1 = [2.0_dp,1.0_dp]
+pt2 = [1.0_dp,0.0_dp]
+check = checkSameSide(pt1,pt2,vert1,vert2)
+write(*,*) check
+
+Output:
+ T  
+****************************************************** 
+Test #4:
+ 
+Code:
+
+logical :: check
+real(dp) :: pt1(2), pt2(2)
+real(dp) :: vert1(2), vert2(2)
+vert1 = [-0.6_dp,-0.6_dp]
+vert2 = [1.4_dp,1.4_dp]
+pt1 = [0.0_dp,1.0_dp]
+pt2 = [0.0_dp,0.1_dp]
+check = checkSameSide(pt1,pt2,vert1,vert2)
+write(*,*) check
+
+Output:
+ T  
+******************************************************
+Test #5:
+ 
+Code:
+
+logical :: check
+real(dp) :: pt1(2), pt2(2)
+real(dp) :: vert1(2), vert2(2)
+vert1 = [1.4_dp,1.4_dp]
+vert2 = [-0.6_dp,-0.6_dp]
+pt1 = [0.0_dp,1.0_dp]
+pt2 = [0.0_dp,0.1_dp]
+check = checkSameSide(pt1,pt2,vert1,vert2)
+write(*,*) check
+
+Output:
+ T  
+******************************************************

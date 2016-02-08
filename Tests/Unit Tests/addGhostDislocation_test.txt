@@ -1,0 +1,57 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i, j
+call readGhostDislData('simple_dd_ghostdisl')
+call addGhostDislocation(3.4_dp,3.4_dp,1,1,0,1)
+write(*,*) 'Posn'
+do i = 1, ghostdisl(1)%nghostdisl
+write(*,*) (ghostdisl(1)%list(i)%posn(j), j = 1,2)
+end do    
+write(*,*) 'Branch cut'
+do i = 1, ghostdisl(1)%nghostdisl
+write(*,*) ghostdisl(1)%list(i)%cut
+end do
+
+Output:
+ Posn
+  0.50000000000000000       0.50000000000000000     
+   2.5000000000000000        2.5000000000000000     
+   3.3999999999999999        3.3999999999999999     
+ Branch cut
+           0
+           1
+           0
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: i, j
+call readGhostDislData('simple_dd_ghostdisl')
+call addGhostDislocation(3.4_dp,3.4_dp,1,1,0,1)
+call addGhostDislocation(3.8_dp,3.8_dp,2,-1,1,1)
+write(*,*) 'Posn'
+do i = 1, ghostdisl(1)%nghostdisl
+write(*,*) (ghostdisl(1)%list(i)%posn(j), j = 1,2)
+end do    
+write(*,*) 'Branch cut'
+do i = 1, ghostdisl(1)%nghostdisl
+write(*,*) ghostdisl(1)%list(i)%cut
+end do
+
+Output:
+ Posn
+  0.50000000000000000       0.50000000000000000     
+   2.5000000000000000        2.5000000000000000     
+   3.3999999999999999        3.3999999999999999     
+   3.7999999999999998        3.7999999999999998     
+ Branch cut
+           0
+           1
+           0
+           1
+
+******************************************************

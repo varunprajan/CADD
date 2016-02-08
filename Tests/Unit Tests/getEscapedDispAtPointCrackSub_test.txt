@@ -1,0 +1,190 @@
+******************************************************
+Test #1: Region 0
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = 2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,0,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   2.5000000000000000        0.0000000000000000     
+
+******************************************************
+Test #2: Region 0
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = -2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,0,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   2.5000000000000000        0.0000000000000000     
+
+
+******************************************************
+Test #3: Region 0
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = -0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = -2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,0,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   -2.5000000000000000        0.0000000000000000     
+
+
+******************************************************
+Test #4: Region 0
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = 50.0_dp
+      dyn = -0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = -2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,0,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   0.0000000000000000        0.0000000000000000     
+
+
+******************************************************
+Test #5: Region 1
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = 2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,1,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   2.5000000000000000        0.0000000000000000     
+
+******************************************************
+Test #6: Region 1
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = -2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,1,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   -2.5000000000000000        0.0000000000000000     
+
+
+******************************************************
+Test #7: Region -1
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = 2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,1,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   2.5000000000000000        0.0000000000000000     
+
+******************************************************
+Test #8: Region -1
+ 
+Code:
+
+      real(dp) :: dxn, dyn
+      integer :: bsgn
+      real(dp) :: burgers
+      real(dp) :: uxn, uyn
+      real(dp) :: ydislo, yo
+      dxn = -50.0_dp
+      dyn = 0.5_dp
+      burgers = 5.0_dp
+      bsgn = 1
+      ydislo = 50.0_dp
+      yo = -2.0_dp
+      call getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
+     &                                   bsgn,burgers,1,uxn,uyn)
+      write(*,*) uxn, uyn
+
+Output:
+   -2.5000000000000000        0.0000000000000000     
+
+
+******************************************************

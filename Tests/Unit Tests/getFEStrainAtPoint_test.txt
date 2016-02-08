@@ -1,0 +1,103 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: strain(3), stress(3)
+real(dp), allocatable :: rgauss(:), sgauss(:), wgauss(:)
+integer :: i
+integer :: mnum
+integer :: eltypenum
+real(dp) :: C(3,3)
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+call getGauss_CPE4_2d(rgauss,sgauss,wgauss)
+mnum = fematerials%list(1)
+C = materials(mnum)%elconst
+eltypenum = getElTypeNum('CPE4')
+do i = 1, 4
+  strain = getFEStrainAtPoint(1,eltypenum,1,rgauss(i),sgauss(i))
+  stress = matmul(C,strain)
+  strain(3) = strain(3)/2.0_dp ! tensor notation
+  write(*,*) 'Integration point', i
+  write(*,*) 'Strain', strain
+  write(*,*) 'Stress', stress
+end do
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+ Integration point           1
+ Strain  0.23418171245198971       -6.8663349198616441E-002   1.8965232242008324E-003
+ Stress   6.7247322113720234       0.29908004976983354        4.0239713630114742E-002
+ Integration point           2
+ Strain  0.24487349203274006       -6.8663349198616441E-002   2.7029053339826668E-002
+ Stress   7.0650134241478364       0.41250712069510426       0.57349224739709581     
+ Integration point           3
+ Strain  0.23418171245198971       -1.8398288967364784E-002   7.2424130145760136E-003
+ Stress   7.2579847451390043        1.8988376510707761       0.15366678455538571     
+ Integration point           4
+ Strain  0.24487349203274006       -1.8398288967364784E-002   3.2374943130201846E-002
+ Stress   7.5982659579148173        2.0122647219960470       0.68691931832236675   
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: strain(3), stress(3)
+real(dp), allocatable :: rgauss(:), sgauss(:), wgauss(:)
+integer :: i
+integer :: mnum
+integer :: eltypenum
+real(dp) :: C(3,3)
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+call getGauss_CPE4_2d(rgauss,sgauss,wgauss)
+mnum = fematerials%list(1)
+C = materials(mnum)%elconst
+eltypenum = getElTypeNum('CPE4')
+do i = 1, 4
+  strain = getFEStrainAtPoint(1,eltypenum,7,rgauss(i),sgauss(i))
+  stress = matmul(C,strain)
+  strain(3) = strain(3)/2.0_dp ! tensor notation
+  write(*,*) 'Integration point', i
+  write(*,*) 'Strain', strain
+  write(*,*) 'Stress', stress
+end do
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+ Integration point           1
+ Strain  0.25313614468547191       -8.4773160634189729E-002   6.4205880873467432E-004
+ Stress   7.1570782421406793       -1.2553801117810221E-002   1.3622961357651149E-002
+ Integration point           2
+ Strain  0.25375684489008293       -8.4773160634189729E-002   1.2772272369751734E-004
+ Stress   7.1768329159814588       -5.9689098375502580E-003   2.7099725223834734E-003
+ Integration point           3
+ Strain  0.25313614468547191       -8.5801832804263942E-002   9.5240891104023508E-004
+ Stress   7.1461652533054130       -4.5292767623610036E-002   2.0207852637912169E-002
+ Integration point           4
+ Strain  0.25375684489008293       -8.5801832804263942E-002   4.3807282600307807E-004
+ Stress   7.1659199271461924       -3.8707876343350073E-002   9.2948638026444930E-003
+******************************************************

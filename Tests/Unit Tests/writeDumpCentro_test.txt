@@ -1,0 +1,19 @@
+******************************************************
+Test #1:
+
+Code:
+
+      integer :: iunit
+      character(len=:), allocatable :: dumpfile
+      
+      allocate(compute%centro%res(7))
+      compute%centro%res = [1.0_dp,3.0_dp,5.0_dp,
+     &                      piconst,piconst,-0.2_dp,-0.1_dp]
+      misc%simname = 'test_compute'
+      dumpfile = getDumpFilename()
+      open(newunit=iunit,file=dumpfile)
+      call writeDumpCentro(iunit) 
+
+Output: See test_compute.0.dump
+
+ ******************************************************

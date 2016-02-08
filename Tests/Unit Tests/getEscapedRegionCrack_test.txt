@@ -1,0 +1,106 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: region
+      real(dp) :: posnold(2), posnnew(2)
+      
+      posnold = [0.0_dp,1.0_dp]
+      posnnew = [-1.0_dp,0.0_dp]
+      region = getEscapedRegionCrack(posnold,posnnew)
+      select case (region)
+          case (1)
+              write(*,*) 'Upper'
+          case (-1)
+              write(*,*) 'Lower'
+          case (0)
+              write(*,*) 'Main body'
+      end select
+
+Output:  Upper
+******************************************************
+Test #2:
+ 
+Code:
+
+      integer :: region
+      real(dp) :: posnold(2), posnnew(2)
+      
+      posnold = [0.0_dp,1.0_dp]
+      posnnew = [1.0_dp,0.0_dp]
+      region = getEscapedRegionCrack(posnold,posnnew)
+      select case (region)
+          case (1)
+              write(*,*) 'Upper'
+          case (-1)
+              write(*,*) 'Lower'
+          case (0)
+              write(*,*) 'Main body'
+      end select
+
+Output:  Main body
+******************************************************
+Test #3:
+ 
+Code:
+
+      integer :: region
+      real(dp) :: posnold(2), posnnew(2)
+      
+      posnold = [0.0_dp,1.0_dp]
+      posnnew = [-1.0_dp,1.0_dp]
+      region = getEscapedRegionCrack(posnold,posnnew)
+      select case (region)
+          case (1)
+              write(*,*) 'Upper'
+          case (-1)
+              write(*,*) 'Lower'
+          case (0)
+              write(*,*) 'Main body'
+      end select
+
+Output:  Main body
+******************************************************
+Test #4:
+ 
+Code:
+
+      integer :: region
+      real(dp) :: posnold(2), posnnew(2)
+      
+      posnold = [-2.0_dp,-1.0_dp]
+      posnnew = [-1.0_dp,0.0_dp]
+      region = getEscapedRegionCrack(posnold,posnnew)
+      select case (region)
+          case (1)
+              write(*,*) 'Upper'
+          case (-1)
+              write(*,*) 'Lower'
+          case (0)
+              write(*,*) 'Main body'
+      end select
+
+Output:  Lower
+******************************************************
+Test #5:
+ 
+Code:
+
+      integer :: region
+      real(dp) :: posnold(2), posnnew(2)
+      
+      posnold = [-2.0_dp,-1.0_dp]
+      posnnew = [-1.0_dp,0.0_dp]
+      region = getEscapedRegionCrack(posnnew,posnold)
+      select case (region)
+          case (1)
+              write(*,*) 'Upper'
+          case (-1)
+              write(*,*) 'Lower'
+          case (0)
+              write(*,*) 'Main body'
+      end select
+
+Output:  Lower
+******************************************************

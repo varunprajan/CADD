@@ -1,0 +1,45 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+type(sortedplanedata) :: splane
+splane%objnum = [1,3,2,0,0]
+splane%nmax = 3
+splane%ncount = 3
+splane%relpos = [1.0_dp,0.0_dp,-1.0_dp,10.0_dp,10.0_dp]
+call sortPlane(splane)
+write(*,*) splane%objnum
+write(*,*) splane%relpos
+
+Output:
+           2           3           1           0           0
+  -1.0000000000000000        0.0000000000000000        1.0000000000000000        10.000000000000000        10.000000000000000     
+
+******************************************************
+Test #2:
+ 
+Code:
+
+type(sortedplanedata) :: splane
+splane%objnum = [1,3,2,0,0]
+splane%nmax = 3
+splane%ncount = 3
+splane%relpos = [1.0_dp,0.0_dp,-1.0_dp,10.0_dp,10.0_dp]
+call sortPlane(splane)
+splane%objnum(2) = 0
+splane%relpos(2) = huge(dp)
+splane%ncount = splane%ncount - 1
+call sortPlane(splane)
+write(*,*) splane%objnum
+write(*,*) splane%relpos
+write(*,*) 'ncount', splane%ncount
+write(*,*) 'nmax', splane%nmax
+
+Output:
+           2           1           0           0           0
+  -1.0000000000000000        1.0000000000000000        2147483647.0000000        10.000000000000000        10.000000000000000     
+ ncount           2
+ nmax           2
+
+******************************************************   

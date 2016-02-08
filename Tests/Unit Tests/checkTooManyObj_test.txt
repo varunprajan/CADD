@@ -1,0 +1,20 @@
+******************************************************
+Test #1: Error
+ 
+Code:
+
+call checkTooManyObj(41,40)
+
+Output:
+ Number of objects on a single plane
+ is too large.
+******************************************************
+Test #2: No error
+ 
+Code:
+
+call checkTooManyObj(41,100)
+
+Output:
+
+******************************************************

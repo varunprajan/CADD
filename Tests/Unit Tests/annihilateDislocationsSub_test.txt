@@ -1,0 +1,163 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i, mnumfe, dislnum, isys, iplane, nmax
+
+mnumfe = 1
+isys = 1
+iplane = 1
+dislnum = 1
+call initDD()
+materials(1)%rcore = 0.0_dp
+
+write(*,*) 'Before'
+write(*,*) 'Dislocations, active'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) i, disl(mnumfe)%list(i)%active
+end do
+write(*,*) 'Image dislocations, cut'
+do i = 1, imagedisl(mnumfe)%nimagedisl
+  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
+end do
+write(*,*) 'resort',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+write(*,*) 'nmax', nmax
+write(*,*) 'ncount',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+
+
+call annihilateDislocationsSub(mnumfe,isys,
+&    disl(mnumfe)%splanes(isys)%splane(iplane),1,2)
+
+write(*,*) 'After'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) i, disl(mnumfe)%list(i)%active
+end do
+write(*,*) 'Image dislocations, cut'
+do i = 1, imagedisl(mnumfe)%nimagedisl
+  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
+end do
+write(*,*) 'resort',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+write(*,*) 'nmax', nmax
+write(*,*) 'ncount',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+
+Output:
+ Before
+ Dislocations, active
+           1 T
+           2 T
+           3 T
+           4 T
+           5 T
+           6 T
+           7 T
+           8 T
+ Image dislocations, cut
+ resort F
+ nmax           8
+ ncount           8
+  0.50000000000000000       0.75000000000000000        1.5000000000000000        1.7500000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000     
+ After
+           1 F
+           2 F
+           3 T
+           4 T
+           5 T
+           6 T
+           7 T
+           8 T
+ Image dislocations, cut
+ resort T
+ nmax           8
+ ncount           6
+   2147483647.0000000        2147483647.0000000        1.5000000000000000        1.7500000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000     
+******************************************************
+Test #2: Opposite cuts
+
+Code:
+
+integer :: i, mnumfe, dislnum, isys, iplane, nmax
+
+mnumfe = 1
+isys = 1
+iplane = 1
+dislnum = 1
+call initDD()
+materials(1)%rcore = 0.0_dp
+
+write(*,*) 'Before'
+write(*,*) 'Dislocations, active'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) i, disl(mnumfe)%list(i)%active
+end do
+write(*,*) 'Image dislocations, cut'
+do i = 1, imagedisl(mnumfe)%nimagedisl
+  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
+end do
+write(*,*) 'resort',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+write(*,*) 'nmax', nmax
+write(*,*) 'ncount',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+
+
+call annihilateDislocationsSub(mnumfe,isys,
+&    disl(mnumfe)%splanes(isys)%splane(iplane),7,8)
+
+write(*,*) 'After'
+do i = 1, disl(mnumfe)%ndisl
+  write(*,*) i, disl(mnumfe)%list(i)%active
+end do
+write(*,*) 'Image dislocations, cut'
+do i = 1, imagedisl(mnumfe)%nimagedisl
+  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
+end do
+write(*,*) 'resort',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+write(*,*) 'nmax', nmax
+write(*,*) 'ncount',
+&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+
+Output:
+ Before
+ Dislocations, active
+           1 T
+           2 T
+           3 T
+           4 T
+           5 T
+           6 T
+           7 T
+           8 T
+ Image dislocations, cut
+ resort F
+ nmax           8
+ ncount           8
+  0.50000000000000000       0.75000000000000000        1.5000000000000000        1.7500000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000     
+ After
+           1 T
+           2 T
+           3 T
+           4 T
+           5 T
+           6 T
+ Image dislocations, cut
+           1           1
+           2           0
+ resort T
+ nmax           6
+ ncount           6
+  0.50000000000000000       0.75000000000000000        1.5000000000000000        1.7500000000000000        2.5000000000000000        3.2500000000000000     
+******************************************************

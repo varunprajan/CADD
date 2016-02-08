@@ -1,0 +1,56 @@
+******************************************************
+Test #1: No dislocations
+ 
+Code:
+
+integer :: neqnsnormal, neqnstot
+integer :: nentriesnormal, nentriestot
+integer :: eltypenum
+integer :: j
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+call countEqns(1,neqnsnormal,nentriesnormal,
+&                            neqnstot,nentriestot)
+call initAssembly()
+assembly(1)%rhs = 0.0_dp
+eltypenum = getElTypeNum('CPE4')
+call getDislForceRHS(1,eltypenum)
+do j = 1, neqnsnormal
+  write(*,*) assembly(1)%rhs(j)
+end do
+
+Output:
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000     
+   0.0000000000000000 
+******************************************************

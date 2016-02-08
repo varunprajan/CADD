@@ -1,0 +1,75 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: posn(4,2)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+posn(1,:) = [-1.0_dp, -1.0_dp]
+posn(2,:) = [1.0_dp, -1.0_dp]
+posn(3,:) = [1.0_dp, 1.0_dp]
+posn(4,:) = [-1.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+J = getJ_CPE4(posn,0.0_dp,0.0_dp)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintRealMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+
+ J
+   1.0000000000000000        0.0000000000000000     
+   0.0000000000000000        1.0000000000000000     
+ detJ    1.0000000000000000     
+   
+
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: posn(4,2)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+posn(1,:) = [-1.0_dp, -1.0_dp]
+posn(2,:) = [3.0_dp, -1.0_dp]
+posn(3,:) = [3.0_dp, 1.0_dp]
+posn(4,:) = [-1.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+J = getJ_CPE4(posn,0.0_dp,0.0_dp)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintRealMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+
+ J
+   2.0000000000000000        0.0000000000000000     
+   0.0000000000000000        1.0000000000000000     
+ detJ    2.0000000000000000     
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: posn(4,2)
+real(dp) :: J(2,2)
+real(dp) :: detJ
+posn(1,:) = [-1.0_dp, -1.0_dp]
+posn(2,:) = [3.0_dp, -1.0_dp]
+posn(3,:) = [5.0_dp, 1.0_dp]
+posn(4,:) = [1.0_dp, 1.0_dp]
+call initMaterialData('example_materials_test')
+J = getJ_CPE4(posn,0.0_dp,0.0_dp)
+detJ = J(1,1)*J(2,2) - J(1,2)*J(2,1)
+call prettyPrintRealMat(J,'J')
+write(*,*) 'detJ ', detJ
+
+Output:
+
+ J
+   2.0000000000000000        0.0000000000000000     
+   1.0000000000000000        1.0000000000000000     
+ detJ    2.0000000000000000    
+****************************************************** 

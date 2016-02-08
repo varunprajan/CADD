@@ -1,0 +1,40 @@
+******************************************************
+Test #1: All group
+ 
+Code:
+
+integer :: gnum
+misc%simname = 'atomistic_2'
+call initAtomistic()
+gnum = getGroupNum(normaldamping%gname)
+write(*,*) gnum
+
+Output:
+ 1
+******************************************************
+Test #2: Test trim
+ 
+Code:
+
+integer :: gnum
+misc%simname = 'atomistic_2'
+call initAtomistic()
+gnum = getGroupNum('temp ')
+write(*,*) gnum
+
+Output:
+ 2
+******************************************************
+Test #3: Group doesn't exist
+ 
+Code:
+
+integer :: gnum
+misc%simname = 'atomistic_2'
+call initAtomistic()
+gnum = getGroupNum(' temp ')
+write(*,*) gnum
+
+Output:
+ No group with name  temp  was found.
+******************************************************

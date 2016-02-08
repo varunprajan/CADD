@@ -1,0 +1,105 @@
+******************************************************
+Test #1: Dislocation at minus 60
+ 
+Code:
+
+      real(dp) :: burgers
+      real(dp) :: burgersvec(2), trig(2)
+      real(dp) :: thetaactual, thetaguess
+      integer :: isys, bsgn
+      
+      call initSimulation('detect_test_1','cadd')
+      burgers = detection%burgers
+      thetaactual = -piconst/3.0_dp
+      burgersvec = burgers*[cos(thetaactual),sin(thetaactual)]
+      call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
+      trig = slipsys(1)%trig(:,isys)
+      thetaguess = atan2(trig(2),trig(1))
+      write(*,*) 'thetaactual', thetaactual
+      write(*,*) 'thetaguess', thetaguess
+      write(*,*) 'bsgn', bsgn
+
+Output:
+
+ thetaactual  -1.0471975511965976     
+ thetaguess  -1.0471975511965976     
+ bsgn           1
+******************************************************
+Test #2: Dislocation at plus 60
+ 
+Code:
+
+      real(dp) :: burgers
+      real(dp) :: burgersvec(2), trig(2)
+      real(dp) :: thetaactual, thetaguess
+      integer :: isys, bsgn
+      
+      call initSimulation('detect_test_1','cadd')
+      burgers = detection%burgers
+      thetaactual = piconst/3.0_dp
+      burgersvec = burgers*[cos(thetaactual),sin(thetaactual)]
+      call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
+      trig = slipsys(1)%trig(:,isys)
+      thetaguess = atan2(trig(2),trig(1))
+      write(*,*) 'thetaactual', thetaactual
+      write(*,*) 'thetaguess', thetaguess
+      write(*,*) 'bsgn', bsgn
+
+Output:
+
+ thetaactual   1.0471975511965976     
+ thetaguess   1.0471975511965976     
+ bsgn           1
+******************************************************
+Test #3: Dislocation at 0
+ 
+Code:
+
+      real(dp) :: burgers
+      real(dp) :: burgersvec(2), trig(2)
+      real(dp) :: thetaactual, thetaguess
+      integer :: isys, bsgn
+      
+      call initSimulation('detect_test_1','cadd')
+      burgers = detection%burgers
+      thetaactual = 0.0_dp
+      burgersvec = burgers*[cos(thetaactual),sin(thetaactual)]
+      call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
+      trig = slipsys(1)%trig(:,isys)
+      thetaguess = atan2(trig(2),trig(1))
+      write(*,*) 'thetaactual', thetaactual
+      write(*,*) 'thetaguess', thetaguess
+      write(*,*) 'bsgn', bsgn
+
+Output:
+
+ thetaactual   0.0000000000000000     
+ thetaguess   0.0000000000000000     
+ bsgn           1
+******************************************************
+Test #4: Dislocation at plus 60, sign reversed
+ 
+Code:
+
+      real(dp) :: burgers
+      real(dp) :: burgersvec(2), trig(2)
+      real(dp) :: thetaactual, thetaguess
+      integer :: isys, bsgn
+      
+      call initSimulation('detect_test_1','cadd')
+      burgers = detection%burgers
+      thetaactual = piconst/3.0_dp
+      burgersvec = -burgers*[cos(thetaactual),sin(thetaactual)]
+      call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
+      trig = slipsys(1)%trig(:,isys)
+      thetaguess = atan2(trig(2),trig(1))
+      write(*,*) 'thetaactual', thetaactual
+      write(*,*) 'thetaguess', thetaguess
+      write(*,*) 'bsgn', bsgn
+
+Output:
+
+ thetaactual   1.0471975511965976     
+ thetaguess   1.0471975511965976     
+ bsgn          -1
+******************************************************

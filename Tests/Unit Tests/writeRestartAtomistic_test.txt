@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initSimulation('atomistic_2','atomistic')
+      call writeRestartAtomistic()
+
+Output: See restart files and comparison in Atomistic_2.ipynb
+******************************************************

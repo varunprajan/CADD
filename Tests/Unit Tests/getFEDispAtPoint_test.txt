@@ -1,0 +1,163 @@
+******************************************************
+Test #1: At node
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: elnum
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+elnum = getElTypeNum('CPE4')
+disp = getFEDispAtPoint(1,elnum,4,1.0_dp,-1.0_dp)
+write(*,*) disp
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+   1.0000000000000000        8.4310835638286064E-002
+******************************************************
+Test #2: At node
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: elnum
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+elnum = getElTypeNum('CPE4')
+disp = getFEDispAtPoint(1,elnum,1,1.0_dp,1.0_dp)
+write(*,*) disp
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+  0.23026824951377733       -4.1333914110205913E-016
+******************************************************
+Test #3: At node (different element)
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: elnum
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+elnum = getElTypeNum('CPE4')
+disp = getFEDispAtPoint(1,elnum,6,-1.0_dp,-1.0_dp)
+write(*,*) disp
+
+Output: (Compare with output from Allan Bower's program: FEM_results_input_quad4.txt)
+  0.23026824951377733       -4.1333914110205913E-016
+******************************************************
+Test #4: Not at node
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: elnum
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+elnum = getElTypeNum('CPE4')
+disp = getFEDispAtPoint(1,elnum,4,0.0_dp,1.0_dp)
+write(*,*) disp
+
+Output:
+  0.87351944573431994       -1.8362376858617379E-015
+******************************************************
+Test #5: Same position, different element
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: elnum
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+elnum = getElTypeNum('CPE4')
+disp = getFEDispAtPoint(1,elnum,8,0.0_dp,-1.0_dp)
+write(*,*) disp
+
+Output:
+  0.87351944573431994       -1.8362376858617379E-015
+******************************************************
+Test #6: Center of element
+ 
+Code:
+
+real(dp) :: disp(2)
+integer :: elnum
+call initNodeData('simplefe_nodes')
+call initMaterialData('simplefe_materials')
+call initFELibrary()
+call initFEElementData('simplefe_feelements')
+call initDislData('simplefe_disl')
+nodes%posn(1,5) = nodes%posn(1,5) + 1.0_dp
+nodes%posn(4,5) = nodes%posn(4,5) + 1.0_dp
+nodes%posn(1,10) = nodes%posn(1,10) + 1.0_dp
+nodes%posn(4,10) = nodes%posn(4,10) + 1.0_dp
+nodes%posn(1,15) = nodes%posn(1,15) + 1.0_dp
+nodes%posn(4,15) = nodes%posn(4,15) + 1.0_dp
+call initAssembly()
+call assembleAndFactorAll()
+call solveAll()
+elnum = getElTypeNum('CPE4')
+disp = getFEDispAtPoint(1,elnum,4,0.0_dp,0.0_dp)
+write(*,*) disp
+
+Output: (Direct computation, using average of four nodes)
+  0.87343237904881033       4.2176869031518044E-002
+******************************************************

@@ -1,0 +1,47 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: dislposold(2), trig(2), dislposnew(2)
+      real(dp) :: dispnorm, burgers
+      integer :: bsgn, bcut
+      real(dp) :: xmin, xmax, ymin, ymax
+      
+C     initialize simulation, reset timestep, output dump
+      call initSimulation('atomistic_3','atomistic')
+      misc%incrementcurr = 0
+      call writeDump_ptr()
+      
+C     displace dislocation
+      dislposold = [3.9_dp,17.0_dp] ! by inspection of old dump file
+      trig = [cos(piconst/3.0_dp),sin(piconst/3.0_dp)]
+      dispnorm = 15.0_dp
+      dislposnew = dislposold + dispnorm*trig ! move outside box
+      burgers = 2.0_dp**(1/6)
+      bsgn = 1
+      bcut = 0
+      write(*,*) 'new disl. position', dislposnew
+      
+      xmin = min(dislposnew(1),dislposold(1)) - boxfudge*burgers
+      xmax = max(dislposnew(1),dislposold(1)) + boxfudge*burgers
+      ymin = min(dislposnew(2),dislposold(2)) - boxfudge*burgers
+      ymax = max(dislposnew(2),dislposold(2)) + boxfudge*burgers
+      write(*,*) 'box', xmin, xmax, ymin, ymax
+      call getAtomsInBoxGroupTemp(xmin,xmax,ymin,ymax)  
+      
+C     move dislocation by adding dipole displacements
+      call imposeDipoleDispOnAtoms(dislposnew,dislposold,
+     &                             bsgn,bcut,trig(1),trig(2),'temp')
+     
+C     write dump
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
+Output: (See dump files)
+ Updated neighbors
+ Updated neighbors
+ new disl. position   11.400000000000002        29.990381056766580     
+ box  -6.0999999999999996        21.400000000000002        7.0000000000000000        39.990381056766580     
+ Updated neighbors
+******************************************************

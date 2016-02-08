@@ -1,0 +1,40 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: avec(1), bvec(1)
+avec = [0.0_dp]
+bvec = [1.2_dp]
+res = getDist(avec,bvec,1)
+write(*,*) res
+
+Output:    1.2000000000000000
+******************************************************
+Test #2:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: avec(2), bvec(2)
+avec = [1.0_dp,0.0_dp]
+bvec = [2.0_dp,1.0_dp]
+res = getDist(avec,bvec,2)
+write(*,*) res
+
+Output: 1.4142135623730951
+******************************************************
+Test #3:
+ 
+Code:
+
+real(dp) :: res
+real(dp) :: avec(3), bvec(3)
+avec = [0.5_dp, 0.6_dp, 0.7_dp]
+bvec = [5.0_dp, 6.0_dp, 7.0_dp]
+res = getDist(avec,bvec,3)
+write(*,*) res
+
+Output:    9.4392796335313651  
+******************************************************

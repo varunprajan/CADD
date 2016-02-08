@@ -1,0 +1,12 @@
+******************************************************
+Test #1: 
+ 
+Code:
+
+      call initComputeData('example_compute_test')
+      call writeComputeData('example_compute_out_test')
+
+Output: See file --- essentially identical to example_compute_test
+
+******************************************************  
+     

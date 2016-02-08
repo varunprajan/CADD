@@ -1,0 +1,101 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: mnumfe, isys, iplane, obsnum
+logical :: between
+real(dp) :: pold, pnew, pobs
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+pold = 0.0_dp
+pnew = -1.0_dp
+call isObstacleBetween(pold,pnew,
+&                 obstacles(mnumfe)%splanes(isys)%splane(iplane),
+&                      between,obsnum,pobs)
+write(*,*) 'Between', between
+write(*,*) 'Obstacle number', obsnum
+write(*,*) 'Obstacle position', pobs  
+
+Output:
+ Between F
+ Obstacle number           1
+ Obstacle position   1.2500000000000000       
+******************************************************
+Test #2:
+ 
+Code:
+
+integer :: mnumfe, isys, iplane, obsnum
+logical :: between
+real(dp) :: pold, pnew, pobs
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+pold = 0.0_dp
+pnew = 2.0_dp
+call isObstacleBetween(pold,pnew,
+&                 obstacles(mnumfe)%splanes(isys)%splane(iplane),
+&                      between,obsnum,pobs)
+write(*,*) 'Between', between
+write(*,*) 'Obstacle number', obsnum
+write(*,*) 'Obstacle position', pobs  
+
+Output:
+ Between T
+ Obstacle number           1
+ Obstacle position   1.2500000000000000        
+******************************************************
+Test #3:
+ 
+Code:
+
+integer :: mnumfe, isys, iplane, obsnum
+logical :: between
+real(dp) :: pold, pnew, pobs
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+pold = 0.0_dp
+pnew = 3.0_dp
+call isObstacleBetween(pold,pnew,
+&                 obstacles(mnumfe)%splanes(isys)%splane(iplane),
+&                      between,obsnum,pobs)
+write(*,*) 'Between', between
+write(*,*) 'Obstacle number', obsnum
+write(*,*) 'Obstacle position', pobs  
+
+Output:
+ Between T
+ Obstacle number           1
+ Obstacle position   1.2500000000000000        
+******************************************************
+Test #4:
+ 
+Code:
+
+integer :: mnumfe, isys, iplane, obsnum
+logical :: between
+real(dp) :: pold, pnew, pobs
+mnumfe = 1
+isys = 1
+iplane = 1
+call initDD()
+pold = 3.0_dp
+pnew = 0.0_dp
+call isObstacleBetween(pold,pnew,
+&                 obstacles(mnumfe)%splanes(isys)%splane(iplane),
+&                      between,obsnum,pobs)
+write(*,*) 'Between', between
+write(*,*) 'Obstacle number', obsnum
+write(*,*) 'Obstacle position', pobs  
+
+Output:
+ Between T
+ Obstacle number           2
+ Obstacle position   2.7500000000000000     
+******************************************************

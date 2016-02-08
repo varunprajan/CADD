@@ -1,0 +1,11 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+call initMaterialData('example_materials_test2')
+call initInteractionData('example_interactions_test')
+call writeInteractionData('example_interactions_out_test')
+
+Output: See file --- essentially identical to example_interactions_test  
+******************************************************

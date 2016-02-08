@@ -1,0 +1,82 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i
+      integer :: eltypenum
+      real(dp) :: u
+      real(dp) :: stress(3)
+      real(dp) :: gamma, y, tau, mu
+      
+      ! note: lfactfac = 3.0_dp, lifactfac = 3.0_dp
+      
+      ! simple_fe_pad
+      call initSimulation()
+      
+      ! write dump
+      call writeDump_ptr()
+      
+      ! displace boundary nodes in x-direction
+      gamma = 0.01_dp
+      do i = 1, 13, 3
+          y = nodes%posn(2,i)
+          u = gamma*y
+          nodes%posn(1,i) = nodes%posn(1,i) + u
+          nodes%posn(4,i) = nodes%posn(4,i) + u
+      end do
+      
+      do i = 3, 15, 3
+          y = nodes%posn(2,i)
+          u = gamma*y
+          nodes%posn(1,i) = nodes%posn(1,i) + u
+          nodes%posn(4,i) = nodes%posn(4,i) + u
+      end do
+      
+      do i = 2, 14, 12
+          y = nodes%posn(2,i)
+          u = gamma*y
+          nodes%posn(1,i) = nodes%posn(1,i) + u
+          nodes%posn(4,i) = nodes%posn(4,i) + u
+      end do
+      
+      ! solve
+      call solveAll_ptr()
+      
+      ! report stresses
+      write(*,*) 'Stresses'
+      eltypenum = feelements(1)%eltypenum
+      do i = 1, size(feelements(1)%connect,2)
+          stress = getFEStressAtPoint(1,i,0.0_dp,0.0_dp)
+          write(*,*) stress          
+      end do
+      
+      ! update pad
+      call updatePad()
+      
+      ! write dump
+      misc%incrementcurr = misc%incrementcurr + 1
+      call writeDump_ptr()
+      
+      ! stress check
+      mu = materials(1)%mu
+      tau = mu*gamma
+      write(*,*) 'tau'
+      write(*,*) tau
+      
+Output:
+*** Warning message from subroutine MA57AD ***
+        57 off-diagonal duplicate entries found
+ Stresses
+  -4.5409546260069233E-017  -6.2615223442086873E-017  0.10608811196359370     
+   5.6050630165462395E-017   2.0925059820145572E-017  0.10608811196359375     
+  -3.8833781098369801E-017   3.0725487381132215E-017  0.10608811196359373     
+   6.7817064361696844E-017  -9.1002468267392683E-017  0.10608811196359373     
+  -2.9766157401384622E-016  -1.5685056866033050E-016  0.10608811196359375     
+   2.0931094753624347E-016   1.8625235058000556E-016  0.10608811196359363     
+  -2.8476211049504521E-016   2.9074652572314150E-017  0.10608811196359384     
+   2.1430396129546112E-016   5.4004561181416921E-017  0.10608811196359386     
+ tau
+  0.10608811196359375     
+
+******************************************************

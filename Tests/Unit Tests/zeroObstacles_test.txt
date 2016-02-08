@@ -1,0 +1,20 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+integer :: i
+call initSlipSysData('simple_dd_slipsys')
+call readDislObsData('simple_dd_obstacles')
+call zeroObstacles()
+do i = 1, size(obstacles(1)%list)
+    write(*,*) obstacles(1)%list(i)%active
+    write(*,*) obstacles(1)%list(i)%computed
+end do
+
+Output:
+ F
+ F
+ F
+ F 
+******************************************************

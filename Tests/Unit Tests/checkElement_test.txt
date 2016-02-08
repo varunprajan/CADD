@@ -1,0 +1,40 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+logical :: check
+real(dp) :: r, s
+integer :: i
+r = 0.5_dp
+s = -1.1_dp
+do i = 1, 4
+  check = checkElement(i,'CPE4',r,s)
+  write(*,*) check
+end do 
+
+Output:
+ F
+ T
+ T
+ T
+****************************************************** 
+Test #2:
+ 
+Code:
+
+logical :: check
+real(dp) :: r, s
+integer :: i
+r = 0.5_dp
+s = 0.49_dp
+do i = 1, 3
+  check = checkElement(i,'CPE3',r,s)
+  write(*,*) check
+end do 
+
+Output:
+ T
+ T
+ T
+****************************************************** 

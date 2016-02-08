@@ -1,0 +1,39 @@
+******************************************************
+Test #1:
+
+Code:
+
+integer :: i
+
+call initDD()
+call initDislIdentData()
+
+write(*,*) 'Lattice'
+write(*,*) identsimple%lattice
+write(*,*) 'Burgers'
+write(*,*) identsimple%burgers
+write(*,*) 'Ideal vectors'
+do i = 1, size(identsimple%ideal,2)
+  write(*,*) i
+  write(*,*) identsimple%ideal(:,i)
+end do
+
+Output:
+ Lattice
+ hex                 
+ Burgers
+   1.1224600000000000     
+ Ideal vectors
+           1
+   1.1224600000000000        0.0000000000000000     
+           2
+  0.56123000000000012       0.97207887473188093     
+           3
+ -0.56122999999999978       0.97207887473188104     
+           4
+  -1.1224600000000000        1.3745716479114655E-016
+           5
+ -0.56123000000000045      -0.97207887473188070     
+           6
+  0.56123000000000012      -0.97207887473188093
+******************************************************

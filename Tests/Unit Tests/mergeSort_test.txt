@@ -1,0 +1,67 @@
+******************************************************
+Test #1: Base case
+ 
+Code:
+
+integer :: vec(1)
+vec = [4]
+call mergeSort(vec,1)
+write(*,*) vec 
+
+Output:            4
+******************************************************
+Test #2: Base case
+ 
+Code:
+
+integer :: vec(2)
+vec = [1,4]
+call mergeSort(vec,2)
+write(*,*) vec 
+
+Output:           1           4
+******************************************************
+Test #3: Base case
+ 
+Code:
+
+integer :: vec(2)
+vec = [4,1]
+call mergeSort(vec,2)
+write(*,*) vec 
+
+Output:           1           4
+******************************************************
+Test #4: Sorted list
+ 
+Code:
+
+integer :: vec(5)
+vec = [1,2,3,4,5]
+call mergeSort(vec,5)
+write(*,*) vec 
+
+Output:         1           2           3           4           5
+******************************************************
+Test #5:
+ 
+Code:
+
+integer :: vec(5)
+vec = [1,5,4,3,2]
+call mergeSort(vec,5)
+write(*,*) vec 
+
+Output:         1           2           3           4           5
+******************************************************
+Test #6: Duplicates
+ 
+Code:
+
+integer :: vec(5)
+vec = [1,5,1,3,2]
+call mergeSort(vec,5)
+write(*,*) vec 
+
+Output:           1           1           2           3           5
+******************************************************

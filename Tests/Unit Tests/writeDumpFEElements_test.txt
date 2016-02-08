@@ -1,0 +1,23 @@
+******************************************************
+Test #1:
+
+Code:
+
+      integer :: iunit
+      character(len=:), allocatable :: dumpfile
+      
+      nmaterials = 1
+      allocate(feelements(nmaterials))
+      allocate(feelements(1)%connect(3,4))
+      feelements(1)%connect(:,1) = [12,34,23]
+      feelements(1)%connect(:,2) = [1,2,3]
+      feelements(1)%connect(:,3) = [3,2,5]
+      feelements(1)%connect(:,4) = [5,12,23]
+      misc%simname = 'test_nodes_elements'
+      dumpfile = getDumpFilename()
+      open(newunit=iunit,file=dumpfile)
+      call writeDumpFEElements(iunit) 
+
+Output: See test_nodes_disp.0.dump
+
+ ******************************************************

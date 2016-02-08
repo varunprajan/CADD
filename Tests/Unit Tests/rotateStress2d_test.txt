@@ -1,0 +1,111 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: s11o, s22o, tauo
+real(dp) :: s11n, s22n, taun
+s11o = 1.0_dp
+s22o = 2.0_dp
+tauo = 0.0_dp
+theta = -piconst/4.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateStress2d(cost,sint,s11o,s22o,tauo,s11n,s22n,taun)
+write(*,*) 'Old: ', s11o, s22o, tauo
+write(*,*) 'New: ', s11n, s22n, taun
+
+Output:
+
+ Old:    1.0000000000000000        2.0000000000000000        0.0000000000000000     
+ New:    1.5000000000000000        1.5000000000000000      -0.50000000000000000     
+******************************************************
+Test #2: Equibiaxial stresses
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: s11o, s22o, tauo
+real(dp) :: s11n, s22n, taun
+s11o = 1.0_dp
+s22o = 1.0_dp
+tauo = 0.0_dp
+theta = -piconst/4.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateStress2d(cost,sint,s11o,s22o,tauo,s11n,s22n,taun)
+write(*,*) 'Old: ', s11o, s22o, tauo
+write(*,*) 'New: ', s11n, s22n, taun
+
+Output:
+
+ Old:    1.0000000000000000        1.0000000000000000        0.0000000000000000     
+ New:    1.0000000000000000        1.0000000000000000        0.0000000000000000    
+******************************************************
+Test #3: Rotate by 90
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: s11o, s22o, tauo
+real(dp) :: s11n, s22n, taun
+s11o = 1.0_dp
+s22o = 2.0_dp
+tauo = 0.0_dp
+theta = piconst/2.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateStress2d(cost,sint,s11o,s22o,tauo,s11n,s22n,taun)
+write(*,*) 'Old: ', s11o, s22o, tauo
+write(*,*) 'New: ', s11n, s22n, taun
+
+Output:
+
+ Old:    1.0000000000000000        2.0000000000000000        0.0000000000000000     
+ New:    2.0000000000000000        1.0000000000000000        6.1230317691118863E-017    
+******************************************************
+Test #4: Rotate by 90, with shear
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: s11o, s22o, tauo
+real(dp) :: s11n, s22n, taun
+s11o = 1.0_dp
+s22o = 2.0_dp
+tauo = 1.0_dp
+theta = piconst/2.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateStress2d(cost,sint,s11o,s22o,tauo,s11n,s22n,taun)
+write(*,*) 'Old: ', s11o, s22o, tauo
+write(*,*) 'New: ', s11n, s22n, taun
+
+Output:
+
+ Old:    1.0000000000000000        2.0000000000000000        1.0000000000000000     
+ New:    2.0000000000000000        1.0000000000000000      -0.99999999999999989    
+******************************************************
+ Test #5: General rotation
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: s11o, s22o, tauo
+real(dp) :: s11n, s22n, taun
+s11o = 2.0_dp
+s22o = 7.0_dp
+tauo = 5.0_dp
+theta = piconst/3.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateStress2d(cost,sint,s11o,s22o,tauo,s11n,s22n,taun)
+write(*,*) 'Old: ', s11o, s22o, tauo
+write(*,*) 'New: ', s11n, s22n, taun
+
+Output:
+
+ Old:    2.0000000000000000        7.0000000000000000        5.0000000000000000     
+ New:    10.080127018922193       -1.0801270189221928      -0.33493649053890184
+****************************************************** 

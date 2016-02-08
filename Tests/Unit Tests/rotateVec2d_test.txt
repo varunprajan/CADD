@@ -1,0 +1,86 @@
+******************************************************
+Test #1: zero rotation
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: xo, yo
+real(dp) :: xn, yn
+xo = 1.0_dp
+yo = 0.0_dp
+theta = 0.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateVec2d(cost,sint,xo,yo,xn,yn)
+write(*,*) 'Old: ', xo, yo
+write(*,*) 'New: ', xn, yn
+
+Output:
+
+ Old:    1.0000000000000000        0.0000000000000000     
+ New:    1.0000000000000000        0.0000000000000000 
+******************************************************
+Test #2: Positive rotation
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: xo, yo
+real(dp) :: xn, yn
+xo = 1.0_dp
+yo = 0.0_dp
+theta = piconst/4.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateVec2d(cost,sint,xo,yo,xn,yn)
+write(*,*) 'Old: ', xo, yo
+write(*,*) 'New: ', xn, yn
+
+Output: 
+
+ Old:    1.0000000000000000        0.0000000000000000     
+ New:   0.70710678118654757      -0.70710678118654746
+******************************************************
+Test #3: Negative rotation
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: xo, yo
+real(dp) :: xn, yn
+xo = 1.0_dp
+yo = 0.0_dp
+theta = -piconst/4.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateVec2d(cost,sint,xo,yo,xn,yn)
+write(*,*) 'Old: ', xo, yo
+write(*,*) 'New: ', xn, yn
+
+Output: 
+
+ Old:    1.0000000000000000        0.0000000000000000     
+ New:   0.70710678118654757       0.70710678118654746      
+******************************************************
+Test #4: Different start point
+ 
+Code:
+
+real(dp) :: theta, cost, sint
+real(dp) :: xo, yo
+real(dp) :: xn, yn
+xo = sqrt(2.0_dp)/2.0_dp
+yo = -sqrt(2.0_dp)/2.0_dp
+theta = -piconst/4.0_dp
+cost = cos(theta)
+sint = sin(theta)
+call rotateVec2d(cost,sint,xo,yo,xn,yn)
+write(*,*) 'Old: ', xo, yo
+write(*,*) 'New: ', xn, yn
+
+Output: 
+
+ Old:   0.70710678118654757      -0.70710678118654757     
+ New:    1.0000000000000000       -7.8496237287950521E-017
+******************************************************
+ 
