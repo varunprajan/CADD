@@ -6,6 +6,8 @@ Performs concurrent multi-scale mechanics simulations in 2D, by implementing the
 
 ## Layout
 
+1) Fortran. The fortran source code is in the folder "Fortran". THe files with prefix "mod_" are module files I have written myself. The files without prefix "mod_" are program files I have written myself, or routines from the Harwell Subroutine Library for linear algebra. I have used MA57, which implements the multifrontal method for solving Ax = b where A is sparse, symmetric, and not necessarily positive definite. Some of the files
+
 
 ## Notes on code philosophy and goals
 
