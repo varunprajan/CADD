@@ -40,7 +40,10 @@ C     those in material i for a point (x,y) in material i.
       public :: getTildeDispAtPointAll, getTildeStressatPointAll,
      &            getPKTildeStressAll, getDispAtPointSub,
      &            getStressAtPointSub, adjustDxnDyn,
-     &            getDispAtPoint, getStressAtPoint
+     &            getDispAtPoint, getStressAtPoint,
+     &          getGhostStressAtPointAll, getRealStressAtPointAll,
+     &          getLatentStressAtPointAll, getLatentStressOnSourceAll,
+     &          getTildeStressOnSourceAll
       
       contains
 ************************************************************************
@@ -56,7 +59,7 @@ C     Outputs: disp --- tilde displacement at point (vector, length 2)
 
 C     Purpose: Get displacement field from all dislocations (real, escaped, latent, gost)
 C              *associated with fe material*
-C              at point of interest (tilde field --- does not account for finite boundaries)
+C              at point of interest (to get total displacement, FE contribution is also required)
       
       implicit none
       
@@ -87,7 +90,7 @@ C     Outputs: stress --- tilde stress at point (vector, length 3 --- sxx, syy, 
 
 C     Purpose: Get stress field from all dislocations (real, latent)
 C              *associated with fe material*
-C              at point of interest (tilde field --- does not account for finite boundaries)
+C              at point of interest (to get total stress, FE contribution is also required)
       
       implicit none
       
@@ -115,8 +118,8 @@ C             mnumfe --- fe material in which point lies
 C     Outputs: stress --- Peach-Koehler stress at point (vector, length 3 --- sxx, syy, sxy)
 
 C     Purpose: Get contribution of all dislocations (real, latent) 
-*              *associated with fe material*
-C              to Peach-Koehler stress (total PK stress also includes FE contribution)
+C              *associated with fe material*
+C              to Peach-Koehler stress (to get total PK stress, FE contribution is also required)
 
 C     Notes: See expression in parentheses in Equation 12 in vdG and Needleman, MSMSE, 1995.
       
@@ -139,6 +142,42 @@ C     local variables
       stress = stress + getGhostStressAtPointAll(posn,mnumfe)
       
       end function getPKTildeStressAll
+************************************************************************
+      function getTildeStressOnSourceAll(sourcenum,mnumfe)
+     &                                                   result(stress)
+      
+C     Function: getTildeStressOnSourceAll
+
+C     Inputs: sourcenum --- number of source for which stress is sought
+C             mnumfe --- fe material in which point lies
+
+C     Outputs: stress --- tilde stress at point (vector, length 3 --- sxx, syy, sxy)
+
+C     Purpose: Get contribution of all dislocations (real, latent) 
+C              *associated with fe material*
+C              to stress on source (to get total source stress, FE contribution is also required)
+
+C     Notes: See expression in parentheses in Equation 12 in vdG and Needleman, MSMSE, 1995.
+      
+      implicit none
+      
+C     input variables
+      integer :: sourcenum
+      integer :: mnumfe
+      
+C     output variables
+      real(dp) :: stress(3)
+      
+C     local variables
+      real(dp) :: posn(2)
+      
+      posn = sources(mnumfe)%list(sourcenum)%posn
+      stress = 0.0_dp
+      stress = stress + getRealStressAtPointAll(posn,mnumfe)
+      stress = stress + getLatentStressOnSourceAll(sourcenum,mnumfe)
+      stress = stress + getGhostStressAtPointAll(posn,mnumfe)
+      
+      end function getTildeStressOnSourceAll
 ************************************************************************
       function getRealDispAtPointAll(posn,mnumfe) result(disp)
 
@@ -460,9 +499,12 @@ C     local variables
           sint = slipsys(mnumfe)%trig(2,isys)
           tnuc = sources(mnumfe)%list(i)%tnuc
           bfudge = time/tnuc
+          bfudge = 1.0_dp ! FIX
           lnuc = sources(mnumfe)%list(i)%lnuc
+          write(*,*) 'lnuc', lnuc ! FIX
           tauprev = sources(mnumfe)%list(i)%tauprev
           dpos = sign((0.5_dp*lnuc*bfudge)*[cost,sint],tauprev) ! flip dipole if tau is negative
+          write(*,*) 'dpos', dpos ! FIX
           stressnew = getStressAtPoint(posn,sourcepos+dpos,
      &                             cost,sint,+1,mnum,bfudge)
           stressnew2 = getStressAtPoint(posn,sourcepos-dpos,
@@ -472,6 +514,65 @@ C     local variables
       end do
       
       end function getLatentStressAtPointAll
+************************************************************************
+      function getLatentStressOnSourceAll(sourcenum,mnumfe)
+     &                                                   result(stress)
+      
+C     Function: getLatentStressOnSourceAll
+
+C     Inputs: sourcenum --- number of source
+C             mnumfe --- fe material in which point lies 
+
+C     Outputs: stress --- stress at point (vector, 3 by 1)
+
+C     Purpose: Get stress on source at point from *all* latent dislocations in materials (from sources)
+C     *except* latent dislocations from source itself (basically, no "self" stress)
+      
+C     input variables
+      integer :: sourcenum
+      integer :: mnumfe
+      
+C     output variables
+      real(dp) :: stress(3)
+      
+C     local variables
+      integer :: i
+      integer :: mnum
+      real(dp) :: time
+      real(dp) :: posn(2), sourcepos(2), dpos(2)
+      integer :: isys
+      real(dp) :: cost, sint
+      real(dp) :: tnuc, lnuc
+      real(dp) :: tauprev
+      real(dp) :: bfudge
+      real(dp) :: stressnew(3), stressnew2(3)
+      
+      stress = 0.0_dp
+      posn = sources(mnumfe)%list(i)%posn
+      mnum = fematerials%list(mnumfe)
+      do i = 1, size(sources(mnumfe)%list)
+          if (i /= sourcenum) then ! no "self"-stress
+          time = sources(mnumfe)%list(i)%time
+          if (time > tolconst) then ! source is active
+              sourcepos = sources(mnumfe)%list(i)%posn
+              isys = sources(mnumfe)%list(i)%slipsys
+              cost = slipsys(mnumfe)%trig(1,isys)
+              sint = slipsys(mnumfe)%trig(2,isys)
+              tnuc = sources(mnumfe)%list(i)%tnuc
+              bfudge = time/tnuc
+              lnuc = sources(mnumfe)%list(i)%lnuc
+              tauprev = sources(mnumfe)%list(i)%tauprev
+              dpos = sign((0.5_dp*lnuc*bfudge)*[cost,sint],tauprev) ! flip dipole if tau is negative
+              stressnew = getStressAtPoint(posn,sourcepos+dpos,
+     &                                 cost,sint,+1,mnum,bfudge)
+              stressnew2 = getStressAtPoint(posn,sourcepos-dpos,
+     &                                  cost,sint,-1,mnum,bfudge)
+              stress = stress + stressnew + stressnew2
+          end if
+          end if
+      end do
+      
+      end function getLatentStressOnSourceAll
 ************************************************************************
       function getDispAtPoint(posn,dislpos,cost,sint,bsgn,bcut,
      &                       mnum,bfudge) result(disp)

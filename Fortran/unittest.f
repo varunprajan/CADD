@@ -2,7 +2,7 @@
 
       use mod_types, only: dp
       use mod_utils, only: prettyPrintMat, writeMat, prettyPrintVec
-      use mod_math, only: rotateVec2d, rotateStress2d,
+      use mod_math, only: rotateVec2d, rotateStress2d, linspace,
      &    piconst, invertmat2, getUnitNormalRHR, getDuplicates,
      &    getIntersectionTwoLines, getUniqueInts, normalizeVec,
      &    linearInterp, searchSortedBinary, searchSortedBrute,
@@ -136,12 +136,9 @@
      
       implicit none
       
-      integer :: i
+      real(dp) :: xvec(11)
       
-      call initSimulation('source_with_obstacles','dd')
-      do i = 1, 2
-          write(*,*) obstacles(1)%list(i)%localpos
-      end do
-      write(*,*) sources(1)%list(1)%localpos
+      xvec = linspace(4.5_dp,6.5_dp,11)
+      write(*,*) xvec
             
       end program

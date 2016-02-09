@@ -21,7 +21,7 @@ C     of attaching const to the end of any parameters (e.g. pi -> piconst)
      &          searchSortedSpecial, isMultiple, getDeterminant2,
      &          checkSameSide, projectVec, getPerpDistance,
      &          findPointBetween, getCircumradiusSqForTriangle,
-     &          logicalToInt, intToLogical
+     &          logicalToInt, intToLogical, linspace
       
       real(dp), parameter :: tolconst = 1.0e-10_dp
       real(dp), parameter :: piconst = 3.14159265358979323846_dp
@@ -29,6 +29,33 @@ C     of attaching const to the end of any parameters (e.g. pi -> piconst)
       real(dp), parameter :: tolconst2 = 1.0e-6_dp
       
       contains
+************************************************************************
+      function linspace(xstart,xend,n) result(xvec)
+      
+C     input variables
+      real(dp) :: xstart
+      real(dp) :: xend
+      integer :: n
+      
+C     output variables
+      real(dp) :: xvec(n)
+      
+C     local variables
+      integer :: i
+      real(dp) :: fac, fac2
+      
+      if (n <= 1) then
+          write(*,*) 'Number of points must be 2 or larger'
+          stop
+      end if
+          
+      fac = 1.0_dp/(n-1)
+      do i = 1, n
+          fac2 = fac*(i-1)
+          xvec(i) = xstart*(1.0_dp - fac2) + xend*fac2
+      end do
+      
+      end function linspace
 ************************************************************************
       function logicalToInt(bool) result(res)
       

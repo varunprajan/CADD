@@ -15,7 +15,8 @@
       use mod_materials, only: materials
       use mod_fe_elements, only: fematerials, interfaceedges
       use mod_fe_main_2d, only: getFEStressAtPoint
-      use mod_disl_fields2, only: getTildeStressAtPointAll
+      use mod_disl_fields2, only: getTildeStressAtPointAll,
+     &   getTildeStressOnSourceAll
       use mod_math, only: findPointBetween, tolconst, sameSign
       implicit none
       
@@ -737,7 +738,7 @@ C     local variables
       
       do i = 1, size(sources)
           do j = 1, size(sources(i)%list)
-              tau = getResolvedStressOnSource(i,sources(i)%list(j))
+              tau = getResolvedStressOnSource(i,j)
               call updateSource(dt,tau,i,sources(i)%list(j))
           end do
       end do
@@ -836,12 +837,12 @@ C     local variables
      
       end subroutine createDipole
 ************************************************************************
-      function getResolvedStressOnSource(mnumfe,source) result(tau)
+      function getResolvedStressOnSource(mnumfe,sourcenum) result(tau)
 
 C     Function: getResolvedStressOnSource
 
 C     Inputs: mnumfe --- fe material number
-C             source --- dislocation source (type sourcet)
+C             source --- number of dislocation source
 
 C     Outputs: tau --- resolved shear stress on source
 
@@ -849,7 +850,7 @@ C     Outputs: tau --- resolved shear stress on source
 
 C     input variables
       integer :: mnumfe
-      type(sourcet) :: source
+      integer :: sourcenum
       
 C     output variables
       real(dp) :: tau
@@ -857,10 +858,12 @@ C     output variables
 C     local variables
       real(dp) :: r, s
       real(dp) :: stresstilde(3), stresshat(3), stress(3)
+      type(sourcet) :: source
       
+      source = sources(mnumfe)%list(sourcenum)
       r = source%localpos(1)
       s = source%localpos(2)
-      stresstilde = getTildeStressAtPointAll(source%posn,mnumfe)
+      stresstilde = getTildeStressOnSourceAll(sourcenum,mnumfe) ! exclude self-stress from latent dislocations associated with source itself
       stresshat = getFEStressAtPoint(mnumfe,source%element,r,s)
       stress = stresshat + stresstilde
       tau = resolveStress(mnumfe,source%slipsys,stress)
