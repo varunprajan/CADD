@@ -3,50 +3,51 @@ Test #1: No annihilation
  
 Code:
 
-integer :: i, mnumfe, dislnum, isys, iplane, nmax
+      integer :: i, nmax
+      integer :: mnumfe, isys, iplane, dislnum
+      
+      mnumfe = 1
+      isys = 1
+      iplane = 1
+      dislnum = 1
+      call initSimulation('simple2_dd','dd')
+      materials(1)%rcoresq = 0.0_dp
+      
+      write(*,*) 'Before'
+      write(*,*) 'Dislocations, active'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Escaped dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
 
-mnumfe = 1
-isys = 1
-iplane = 1
-dislnum = 1
-call initDD() ! simple2_dd
-materials(1)%rcore = 0.0_dp
-
-write(*,*) 'Before'
-write(*,*) 'Dislocations, active'
-do i = 1, disl(mnumfe)%ndisl
-  write(*,*) i, disl(mnumfe)%list(i)%active
-end do
-write(*,*) 'Image dislocations, cut'
-do i = 1, imagedisl(mnumfe)%nimagedisl
-  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
-end do
-write(*,*) 'resort',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
-nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
-write(*,*) 'nmax', nmax
-write(*,*) 'ncount',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
-write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
-
-call insertionSortPlaneWithCrossing(mnumfe,isys,
-&    disl(mnumfe)%splanes(isys)%splane(iplane))
-
-write(*,*) 'After'
-do i = 1, disl(mnumfe)%ndisl
-  write(*,*) i, disl(mnumfe)%list(i)%active
-end do
-write(*,*) 'Image dislocations, cut'
-do i = 1, imagedisl(mnumfe)%nimagedisl
-  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
-end do
-write(*,*) 'resort',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
-nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
-write(*,*) 'nmax', nmax
-write(*,*) 'ncount',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
-write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+      call insertionSortPlaneWithCrossing(mnumfe,isys,
+     &    disl(mnumfe)%splanes(isys)%splane(iplane))
+      
+      write(*,*) 'After'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Image dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
 
 Output:
  Before
@@ -83,52 +84,53 @@ Test #2: One annihilation
 
 Code:
 
-integer :: i, mnumfe, dislnum, isys, iplane, nmax
+      integer :: i, nmax
+      integer :: mnumfe, isys, iplane, dislnum
+      
+      mnumfe = 1
+      isys = 1
+      iplane = 1
+      dislnum = 1
+      call initSimulation('simple2_dd','dd')
+      materials(1)%rcoresq = 0.0_dp
+      
+      disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1) = 1.25_dp
+      
+      write(*,*) 'Before'
+      write(*,*) 'Dislocations, active'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Escaped dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
 
-mnumfe = 1
-isys = 1
-iplane = 1
-dislnum = 1
-call initDD() ! simple2_dd
-materials(1)%rcore = 0.0_dp
-
-disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1) = 1.25_dp
-
-write(*,*) 'Before'
-write(*,*) 'Dislocations, active'
-do i = 1, disl(mnumfe)%ndisl
-  write(*,*) i, disl(mnumfe)%list(i)%active
-end do
-write(*,*) 'Image dislocations, cut'
-do i = 1, imagedisl(mnumfe)%nimagedisl
-  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
-end do
-write(*,*) 'resort',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
-nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
-write(*,*) 'nmax', nmax
-write(*,*) 'ncount',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
-write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
-
-call insertionSortPlaneWithCrossing(mnumfe,isys,
-&    disl(mnumfe)%splanes(isys)%splane(iplane))
-
-write(*,*) 'After'
-do i = 1, disl(mnumfe)%ndisl
-  write(*,*) i, disl(mnumfe)%list(i)%active
-end do
-write(*,*) 'Image dislocations, cut'
-do i = 1, imagedisl(mnumfe)%nimagedisl
-  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
-end do
-write(*,*) 'resort',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
-nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
-write(*,*) 'nmax', nmax
-write(*,*) 'ncount',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
-write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+      call insertionSortPlaneWithCrossing(mnumfe,isys,
+     &    disl(mnumfe)%splanes(isys)%splane(iplane))
+      
+      write(*,*) 'After'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Image dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
 
 Output:
  Before
@@ -141,7 +143,7 @@ Output:
            6 T
            7 T
            8 T
- Image dislocations, cut
+ Escaped dislocations, cut
  resort F
  nmax           8
  ncount           8
@@ -157,9 +159,9 @@ Output:
            8 T
  Image dislocations, cut
  resort T
- nmax           6
+ nmax           8
  ncount           6
-   1.5000000000000000        1.7500000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000            
+   1.5000000000000000        1.7500000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000        2147483647.0000000        2147483647.0000000               
 ******************************************************
 Test #3: Same sign crossing
 
@@ -223,7 +225,7 @@ Output:
            6 T
            7 T
            8 T
- Image dislocations, cut
+ Escaped dislocations, cut
  resort F
  nmax           8
  ncount           8
@@ -241,7 +243,7 @@ Output:
  resort F
  nmax           8
  ncount           8
-  0.50000000000000000       0.75000000000000000        1.7500000000000000        2.0000000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000             
+  0.50000000000000000       0.75000000000000000        1.7500000000000000        2.0000000000000000        2.5000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000                 
 ******************************************************
 Test #4: Same sign long crossing
 
@@ -256,7 +258,7 @@ dislnum = 1
 call initDD() ! simple2_dd
 materials(1)%rcore = 0.0_dp
 
-disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(3) = 2.0_dp
+disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(3) = 3.0_dp
 
 write(*,*) 'Before'
 write(*,*) 'Dislocations, active'
@@ -305,7 +307,7 @@ Output:
            6 T
            7 T
            8 T
- Image dislocations, cut
+ Escaped dislocations, cut
  resort F
  nmax           8
  ncount           8
@@ -323,59 +325,60 @@ Output:
  resort F
  nmax           8
  ncount           8
-  0.50000000000000000       0.75000000000000000        1.7500000000000000        2.5000000000000000        3.0000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000                 
+  0.50000000000000000       0.75000000000000000        1.7500000000000000        2.5000000000000000        3.0000000000000000        3.2500000000000000        3.5000000000000000        3.7500000000000000                     
 ******************************************************
 Test #5: Two annihilations
 
 Code:
 
-integer :: i, mnumfe, dislnum, isys, iplane, nmax
+      integer :: i, nmax
+      integer :: mnumfe, isys, iplane, dislnum
+      
+      mnumfe = 1
+      isys = 1
+      iplane = 1
+      dislnum = 1
+      call initSimulation('simple2_dd','dd')
+      materials(1)%rcoresq = 0.0_dp
+      
+      disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(5) = 4.0_dp
+      disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(7) = 4.2_dp
+      
+      write(*,*) 'Before'
+      write(*,*) 'Dislocations, active'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Escaped dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
 
-mnumfe = 1
-isys = 1
-iplane = 1
-dislnum = 1
-call initDD() ! simple2_dd
-materials(1)%rcore = 0.0_dp
-
-disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(5) = 4.0_dp
-disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(7) = 4.2_dp
-
-write(*,*) 'Before'
-write(*,*) 'Dislocations, active'
-do i = 1, disl(mnumfe)%ndisl
-  write(*,*) i, disl(mnumfe)%list(i)%active
-end do
-write(*,*) 'Image dislocations, cut'
-do i = 1, imagedisl(mnumfe)%nimagedisl
-  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
-end do
-write(*,*) 'resort',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
-nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
-write(*,*) 'nmax', nmax
-write(*,*) 'ncount',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
-write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
-
-call insertionSortPlaneWithCrossing(mnumfe,isys,
-&    disl(mnumfe)%splanes(isys)%splane(iplane))
-
-write(*,*) 'After'
-do i = 1, disl(mnumfe)%ndisl
-  write(*,*) i, disl(mnumfe)%list(i)%active
-end do
-write(*,*) 'Image dislocations, cut'
-do i = 1, imagedisl(mnumfe)%nimagedisl
-  write(*,*) i, imagedisl(mnumfe)%list(i)%cut
-end do
-write(*,*) 'resort',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
-nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
-write(*,*) 'nmax', nmax
-write(*,*) 'ncount',
-&         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
-write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+      call insertionSortPlaneWithCrossing(mnumfe,isys,
+     &    disl(mnumfe)%splanes(isys)%splane(iplane))
+      
+      write(*,*) 'After'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Image dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
 
 Output:
  Before
@@ -388,7 +391,7 @@ Output:
            6 T
            7 T
            8 T
- Image dislocations, cut
+ Escaped dislocations, cut
  resort F
  nmax           8
  ncount           8
@@ -398,16 +401,62 @@ Output:
            2 T
            3 T
            4 T
-           5 F
-           6 F
-           7 F
-           8 T
  Image dislocations, cut
-           1           0
-           2           1
+           1           1
+           2           0
  resort T
- nmax           4
+ nmax           8
  ncount           4
-  0.50000000000000000       0.75000000000000000        1.5000000000000000        1.7500000000000000     
-               
+  0.50000000000000000       0.75000000000000000        1.5000000000000000        1.7500000000000000        2147483647.0000000        2147483647.0000000        2147483647.0000000        2147483647.0000000     
+            
+******************************************************
+Test #6: New test
+
+      integer :: i
+      type(sortedplanedata) :: splane
+      integer :: nmax
+      integer :: bsgn
+      
+      call initSimulation('source_with_obstacles','dd')
+      do i = 1, 8
+          if (mod(i,2)==0) then
+              bsgn = -1
+          else
+              bsgn = 1
+          end if
+          if (i == 7) then
+              bsgn = -1
+          end if
+          call addDislocation(1,1,-100.0_dp,0.0_dp,1,bsgn,0)
+      end do
+      call deleteDislocation(1,1,1,1) ! delete 1st and 8th
+      call deleteDislocation(1,1,1,8)
+      disl(1)%splanes(1)%splane(1)%objnum(1:6) = [6,2,4,7,5,3]
+      disl(1)%splanes(1)%splane(1)%relpos(1:6) = [-99.0_dp, -98.0_dp,
+     &                              -87.0_dp,-64.0_dp,71.0_dp,-83.0_dp]
+      disl(1)%splanes(1)%splane(1)%nmax = 6
+      disl(1)%splanes(1)%splane(1)%ncount = 6
+      
+      write(*,*) 'Before'
+      splane = disl(1)%splanes(1)%splane(1)
+      nmax = splane%nmax
+      write(*,*) splane%relpos(1:nmax)
+      write(*,*) splane%objnum(1:nmax)
+      
+      call insertionSortPlanewithCrossing(1,1,
+     &                                    disl(1)%splanes(1)%splane(1))
+
+      write(*,*) 'After'
+      splane = disl(1)%splanes(1)%splane(1)
+      nmax = splane%nmax
+      write(*,*) splane%relpos(1:nmax)
+      write(*,*) splane%objnum(1:nmax)
+      
+Output:
+ Before
+  -99.000000000000000       -98.000000000000000       -87.000000000000000       -64.000000000000000        71.000000000000000       -83.000000000000000     
+           6           2           4           7           5           3
+ After
+  -99.000000000000000       -98.000000000000000       -87.000000000000000        2147483647.0000000        2147483647.0000000        71.000000000000000     
+           6           2           4           7           3           5
 ******************************************************

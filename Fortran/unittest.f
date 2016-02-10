@@ -136,9 +136,50 @@
      
       implicit none
       
-      integer :: vec(8)
+      integer :: i, nmax
+      integer :: mnumfe, isys, iplane, dislnum
       
-      vec = [2,8,6,4,1,5,7,1]
-      write(*,*) (count(vec==5)>1)
+      mnumfe = 1
+      isys = 1
+      iplane = 1
+      dislnum = 1
+      call initSimulation('simple2_dd','dd')
+      materials(1)%rcoresq = 0.0_dp
+      
+      write(*,*) 'Before'
+      write(*,*) 'Dislocations, active'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Escaped dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
+
+      call insertionSortPlaneWithCrossing(mnumfe,isys,
+     &    disl(mnumfe)%splanes(isys)%splane(iplane))
+      
+      write(*,*) 'After'
+      do i = 1, disl(mnumfe)%ndisl
+        write(*,*) i, disl(mnumfe)%list(i)%active
+      end do
+      write(*,*) 'Image dislocations, cut'
+      do i = 1, escapeddisl(mnumfe)%nescapeddisl
+        write(*,*) i, escapeddisl(mnumfe)%list(i)%cut
+      end do
+      write(*,*) 'resort',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%resort
+      nmax = disl(mnumfe)%splanes(isys)%splane(iplane)%nmax
+      write(*,*) 'nmax', nmax
+      write(*,*) 'ncount',
+     &         disl(mnumfe)%splanes(isys)%splane(iplane)%ncount
+      write(*,*)disl(mnumfe)%splanes(isys)%splane(iplane)%relpos(1:nmax)
             
       end program

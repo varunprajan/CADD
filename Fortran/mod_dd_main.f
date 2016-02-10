@@ -210,15 +210,15 @@ C     local variables
           mnum = fematerials%list(i)
           lannih = materials(mnum)%lannih
           do j = 1, size(disl(i)%splanes)
-              do k = 1, size(disl(i)%splanes(j)%splane)
+              do k = 1, size(disl(i)%splanes(j)%splane)                  
                   call enforceObstacles(i,j,k,
-     &                                  disl(i)%splanes(j)%splane(k))
-                  call updateDislRelpos(i,disl(i)%splanes(j)%splane(k))
+     &                                  disl(i)%splanes(j)%splane(k))     
+                  call updateDislRelpos(i,disl(i)%splanes(j)%splane(k))                  
                   call insertionSortPlaneWithCrossing(i,j,
-     &                                     disl(i)%splanes(j)%splane(k))
+     &                                     disl(i)%splanes(j)%splane(k))     
                   call annihilateDislocations(i,j,
-     &                              disl(i)%splanes(j)%splane(k),lannih)
-                  call updateDislPos(i,j,k)
+     &                              disl(i)%splanes(j)%splane(k),lannih)     
+                  call updateDislPos(i,j,k)                  
               end do
           end do 
       end do
@@ -290,20 +290,6 @@ C     local variables
                   end if
                   disl(mnumfe)%list(dislnum)%disp = dispnew
               end if
-          end if
-          if (abs(relposnew) > 100.0_dp) then
-          if (.not.between) then ! FIX
-              write(*,*) 'Something went wrong'
-              write(*,*) 'relposold', relposold
-              write(*,*) 'relposobs', relposobs
-              write(*,*) 'relposnew', relposnew
-              write(*,*) 'between', between
-              write(*,*) splane%objnum
-              write(*,*) splane%relpos
-              write(*,*) splane%nmax
-              write(*,*) splane%ncount
-              stop
-          end if
           end if
       end do
       
@@ -412,6 +398,7 @@ C     local variables
       integer :: dislnumtemp, dislnumother
       integer :: bsgntemp, bsgnother
       logical :: activetemp, activeother
+      logical :: deleted
       
       splane%resort = .false. ! presumably, the list will be sorted at the end; however, if we annihilate, this is not so (taken care of in deleteDislocationSub2)
       do i = 2, splane%nmax
@@ -420,6 +407,7 @@ C     local variables
           dislnumtemp = splane%objnum(i)
           activetemp = disl(mnumfe)%list(dislnumtemp)%active
           bsgntemp = disl(mnumfe)%list(dislnumtemp)%sgn
+          deleted = .false.
           do while (j >= 1) 
               if (splane%relpos(j) <= relpostemp) then ! could combine with do while statement, but Fortran does not support short-circuiting
                   exit
@@ -430,19 +418,24 @@ C             need to swap; check for crossing of disl. of opposite signs
               if (activetemp.and.activeother) then
                   bsgnother = disl(mnumfe)%list(dislnumother)%sgn
                   if (bsgntemp /= bsgnother) then ! opposite sign dislocations, need to annihilate
+                      deleted = .true.
+C                     place dislocation back before annihilating
+                      splane%relpos(j+1) = relpostemp
+                      splane%objnum(j+1) = dislnumtemp
                       call annihilateDislocationsSub(mnumfe,isys,
-     &                                               splane,i,j)
-                      relpostemp = huge(dp) ! now, position of disl. i is at infinity
+     &                                               splane,j,j+1)
+                      exit
                   end if
               end if
               splane%relpos(j+1) = splane%relpos(j)
               splane%objnum(j+1) = splane%objnum(j)
               j = j - 1
           end do
-          splane%relpos(j+1) = relpostemp
-          splane%objnum(j+1) = dislnumtemp
+          if (.not.deleted) then ! if dislocation wasn't deleted, place it back
+              splane%relpos(j+1) = relpostemp
+              splane%objnum(j+1) = dislnumtemp
+          end if
       end do
-      splane%nmax = splane%ncount
       
       end subroutine insertionSortPlaneWithCrossing
 ************************************************************************
@@ -647,8 +640,6 @@ C     then, figure out if dislocation is still in mesh
       
       if (badflip) then ! not in mesh
           write(*,*) 'badflip', badflip ! FIX
-          write(*,*) dislposold ! FIX
-          write(*,*) dislposnew ! FIX
 C         Two possibilities:
 C         1) Crossed back to atomistic region
 C         2) Left mesh, leaving a slip step (associated with escaped dislocation)
