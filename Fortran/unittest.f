@@ -136,9 +136,9 @@
      
       implicit none
       
-      real(dp) :: xvec(11)
+      integer :: vec(8)
       
-      xvec = linspace(4.5_dp,6.5_dp,11)
-      write(*,*) xvec
+      vec = [2,8,6,4,1,5,7,1]
+      write(*,*) (count(vec==5)>1)
             
       end program

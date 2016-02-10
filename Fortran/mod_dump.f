@@ -11,6 +11,7 @@ C     For the latter, have to distinguish between atomistic simtypes and not.
       use mod_fe_elements, only: feelements
       use mod_compute, only: compute, getCentroAtoms
       use mod_utils, only: writeMatTranspose, writeVec
+      use mod_slip_sys, only: slipsys
       
       implicit none
       
@@ -299,6 +300,7 @@ C     input variables
       call writeDumpDisl(iunit)
       call writeDumpSources(iunit)
       call writeDumpObstacles(iunit)
+      call writeDumpSlipSys(iunit)
       
       end subroutine writeDumpDDChunk
 ************************************************************************
@@ -490,12 +492,9 @@ C     input variables
       
 C     local variables
       integer :: i, j, k
-      integer :: nmaterials
-      
-      nmaterials = size(disl)
       
       write(iunit,*) 'dislocation_positions:'
-      do k = 1, nmaterials ! material number is not important
+      do k = 1, size(disl) ! material number is not important
           do i = 1, disl(k)%ndisl
               if (disl(k)%list(i)%active) then
                   write(iunit,*) (disl(k)%list(i)%posn(j), j=1,2)
@@ -505,7 +504,7 @@ C     local variables
       write(iunit,*) 'end'    
       
       write(iunit,*) 'dislocation_attributes:'
-      do k = 1, nmaterials ! material number is not important
+      do k = 1, size(disl) ! material number is not important
           do i = 1, disl(k)%ndisl
               if (disl(k)%list(i)%active) then
                   write(iunit,*) disl(k)%list(i)%slipsys,
@@ -534,12 +533,9 @@ C     input variables
       
 C     local variables
       integer :: i, j, k
-      integer :: nmaterials
-
-      nmaterials = size(sources)
       
       write(iunit,*) 'source_positions:'
-      do k = 1, nmaterials ! material number is not important
+      do k = 1, size(sources) ! material number is not important
           do i = 1, size(sources(k)%list)
               write(iunit,*) (sources(k)%list(i)%posn(j), j=1,2)    
           end do
@@ -565,12 +561,9 @@ C     input variables
       
 C     local variables
       integer :: i, j, k
-      integer :: nmaterials
-
-      nmaterials = size(obstacles)
       
       write(iunit,*) 'obstacle_positions:'
-      do k = 1, nmaterials ! material number is not important
+      do k = 1, size(obstacles) ! material number is not important
           do i = 1, size(obstacles(k)%list)
               write(iunit,*) (obstacles(k)%list(i)%posn(j), j=1,2)    
           end do
@@ -578,6 +571,32 @@ C     local variables
       write(iunit,*) 'end'
       
       end subroutine writeDumpObstacles
+************************************************************************
+      subroutine writeDumpSlipSys(iunit)
+      
+C     Subroutine: writeDumpObstacles
+
+C     Inputs: iunit --- integer file specifier
+
+C     Outputs: None
+
+C     Purpose: Write slip system angles      
+      
+      implicit none
+
+C     input variables
+      integer :: iunit
+      
+C     local variables
+      integer :: i
+
+      write(iunit,*) 'slipsys_angles:'
+      do i = 1, size(slipsys) ! material number is not important
+          call writeVec(iunit,slipsys(i)%theta)
+      end do
+      write(iunit,*) 'end'
+      
+      end subroutine writeDumpSlipSys
 ************************************************************************
       subroutine writeDumpCompute(iunit)
       

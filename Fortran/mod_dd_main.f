@@ -15,8 +15,8 @@
       use mod_materials, only: materials
       use mod_fe_elements, only: fematerials, interfaceedges
       use mod_fe_main_2d, only: getFEStressAtPoint
-      use mod_disl_fields2, only: getTildeStressAtPointAll,
-     &   getTildeStressOnSourceAll
+      use mod_disl_fields2, only: getPKTildeStressAll,
+     &   getTildeStressOnSourceAll, getTildeStressAtPointAll
       use mod_math, only: findPointBetween, tolconst, sameSign
       implicit none
       
@@ -150,8 +150,7 @@ C     local variables
       real(dp) :: stress(3), stresstilde(3), stresshat(3)
       real(dp) :: tau
       real(dp) :: r, s
-      real(dp) :: burgers, disldrag, bfacabs, bsgndp
-      real(dp) :: dislpos(2)
+      real(dp) :: burgers, disldrag, bfacabs, disp
       integer :: bsgn
 
       mnum = fematerials%list(mnumfe)
@@ -161,18 +160,20 @@ C     local variables
       
       do i = 1, disl(mnumfe)%ndisl
       if (disl(mnumfe)%list(i)%active) then ! loop over active dislocations
-          dislpos = disl(mnumfe)%list(i)%posn
           isys = disl(mnumfe)%list(i)%slipsys
           bsgn = disl(mnumfe)%list(i)%sgn
           element = disl(mnumfe)%list(i)%element
           r = disl(mnumfe)%list(i)%localpos(1)
           s = disl(mnumfe)%list(i)%localpos(2)
-          stresstilde = getTildeStressAtPointAll(dislpos,mnumfe)
+          stresstilde = getPKTildeStressAll(i,mnumfe)
           stresshat = getFEStressAtPoint(mnumfe,element,r,s)
           stress = stresshat + stresstilde
           tau = resolveStress(mnumfe,isys,stress)
-          bsgndp = real(bsgn,dp)
-          disl(mnumfe)%list(i)%disp = sign(tau*bfacabs*dt,bsgndp)
+          disp = tau*bfacabs*dt
+          if (bsgn < 0) then
+              disp = -disp
+          end if
+          disl(mnumfe)%list(i)%disp = disp
       end if    
       end do
       
@@ -256,7 +257,7 @@ C     local variables
       integer :: dislnum
       real(dp) :: tau, taucr
       real(dp) :: disp, dispnew
-      real(dp) :: relposold, relposnew, relposobs
+      real(dp) :: relposold, relposnew, relposobs, relposdiff
       logical :: between
       integer :: obsnum
       logical :: active
@@ -281,9 +282,28 @@ C     local variables
                   obstacles(mnumfe)%list(obsnum)%active = active
               end if
               if (active) then ! obstacle is active, adjust disp
-                  dispnew = obsfudge*(relposobs - relposold)
+                  relposdiff = relposobs - relposold
+                  if (abs(relposdiff) < tolconst) then
+                      dispnew = 0.0_dp ! if dislocation is very close to obstacle, don't move it
+                  else
+                      dispnew = obsfudge*relposdiff ! otherwise, move it fractionally closer
+                  end if
                   disl(mnumfe)%list(dislnum)%disp = dispnew
               end if
+          end if
+          if (abs(relposnew) > 100.0_dp) then
+          if (.not.between) then ! FIX
+              write(*,*) 'Something went wrong'
+              write(*,*) 'relposold', relposold
+              write(*,*) 'relposobs', relposobs
+              write(*,*) 'relposnew', relposnew
+              write(*,*) 'between', between
+              write(*,*) splane%objnum
+              write(*,*) splane%relpos
+              write(*,*) splane%nmax
+              write(*,*) splane%ncount
+              stop
+          end if
           end if
       end do
       
@@ -436,8 +456,8 @@ C             lannih --- critical distance for annihilation of disl. of opposite
 
 C     In/out: splane --- sorted plane structure containing dislocations
 
-C     Purpose: After re-sorting dislocations, annihilate any remaining
-C     opposite signed pairs within lannih of each other
+C     Purpose: Annihilate any remaining
+C     opposite signed pairs within lannih of each other (plane must already be sorted)
       
 C     input variables
       integer :: mnumfe
@@ -455,6 +475,9 @@ C     local variables
       integer :: bsgn1, bsgn2
       integer :: nmax
       
+      type(sortedplanedata) :: splane2
+      splane2 = splane
+      
       nmax = splane%nmax
       if (nmax > 1) then ! strictly unnecessary, but may save time
           counter = 1
@@ -466,18 +489,17 @@ C     local variables
               dislnum2 = splane%objnum(counter)
               relpos2 = splane%relpos(counter)
               bsgn2 = disl(mnumfe)%list(dislnum2)%sgn
-              if (bsgn2 /= bsgn1) then
-                  delete = ((relpos2 - relpos1) < lannih) 
-                  if (delete) then
-                      call annihilateDislocationsSub(mnumfe,isys,splane,
-     &                                               counter-1,counter)
-                  end if
-              end if
+              delete = ((bsgn1 /= bsgn2).and.            ! dislocations have to be of opposite sign
+     &                  ((relpos2 - relpos1) < lannih)) ! and sufficiently close together
               if (delete) then
+                  call annihilateDislocationsSub(mnumfe,isys,splane,
+     &                                           counter-1,counter)
                   counter = counter + 1
-                  dislnum1 = splane%objnum(counter)
-                  relpos1 = splane%relpos(counter)
-                  bsgn1 = disl(mnumfe)%list(dislnum1)%sgn
+                  if (counter < nmax) then
+                      dislnum1 = splane%objnum(counter)
+                      relpos1 = splane%relpos(counter)
+                      bsgn1 = disl(mnumfe)%list(dislnum1)%sgn
+                  end if                  
               else    
                   dislnum1 = dislnum2
                   relpos1 = relpos2
@@ -485,6 +507,7 @@ C     local variables
               end if
           end do
       end if
+      
       
       end subroutine annihilateDislocations
 ************************************************************************
@@ -517,7 +540,7 @@ C     local variables
       real(dp) :: p1(2), p2(2)
 
       dislnum1 = splane%objnum(iobj1)
-      dislnum2 = splane%objnum(iobj2)
+      dislnum2 = splane%objnum(iobj2)      
       bcut1 = disl(mnumfe)%list(dislnum1)%cut
       bcut2 = disl(mnumfe)%list(dislnum2)%cut
       if (bcut1 /= bcut2) then ! create a slip step of magnitude b along entire plane
@@ -623,6 +646,9 @@ C     then, figure out if dislocation is still in mesh
      &                        mnumfenew,element,r,s,badflip)
       
       if (badflip) then ! not in mesh
+          write(*,*) 'badflip', badflip ! FIX
+          write(*,*) dislposold ! FIX
+          write(*,*) dislposnew ! FIX
 C         Two possibilities:
 C         1) Crossed back to atomistic region
 C         2) Left mesh, leaving a slip step (associated with escaped dislocation)
@@ -760,6 +786,8 @@ C     Outputs: None
 C     Purpose: Update timer for individual source, popping dislocation dipole
 C     if t > tnuc
 
+      implicit none
+
 C     input variables
       real(dp) :: dt
       real(dp) :: tau
@@ -813,6 +841,8 @@ C     Outputs: None
 C     Purpose: Create dislocation dipole corresponding to source, local shear stress
 C     (dipole separation depends on material properties for material mnumfe)
 
+      implicit none
+
 C     input variables
       integer :: mnumfe
       type(sourcet) :: source
@@ -827,9 +857,12 @@ C     local variables
       isys = source%slipsys
       element = source%element
       dpos = invResolveDisp(mnumfe,isys,0.5_dp*source%lnuc)
-      dpos = sign(dpos,tau) ! flip dislocations if tau is negative
+      if (tau < 0.0_dp) then ! flip dislocations if tau is negative
+          dpos = -dpos
+      end if
       posnpos = posn + dpos
-      posnneg = posn - dpos
+      posnneg = posn - dpos  
+      
       call addDislocation(mnumfe,element,
      &          posnpos(1),posnpos(2),isys,1,0)
       call addDislocation(mnumfe,element,

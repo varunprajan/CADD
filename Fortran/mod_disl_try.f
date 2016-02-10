@@ -777,6 +777,7 @@ C     local variables
               allocate(splanes(j)%splane(k)%relpos(nmaxobj))
               splanes(j)%splane(k)%ncount = 0
               splanes(j)%splane(k)%nmax = 0
+              splanes(j)%splane(k)%objnum = 0
               splanes(j)%splane(k)%resort = .true.
           end do
       end do
@@ -1152,7 +1153,6 @@ C     input variables
 C     local variables
       integer :: dislnum
       
-      write(*,*) mnumfe, isys, iplane, iobj
       dislnum = disl(mnumfe)%splanes(isys)%splane(iplane)%objnum(iobj)
       call deleteDislocationSub(mnumfe,dislnum)
       call deleteDislocationSub2(mnumfe,

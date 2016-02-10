@@ -447,7 +447,10 @@ C     local variables
           bfudge = time/tnuc
           lnuc = sources(mnumfe)%list(i)%lnuc
           tauprev = sources(mnumfe)%list(i)%tauprev
-          dpos = sign((0.5_dp*lnuc*bfudge)*[cost,sint],tauprev) ! flip dipole if tau is negative
+          dpos = (0.5_dp*lnuc*bfudge)*[cost,sint]
+          if (tauprev < 0.0_dp) then ! flip dipole if tau is negative
+              dpos = -dpos
+          end if
           dispnew = getDispAtPoint(posn,sourcepos+dpos,
      &                             cost,sint,+1,0,mnum,bfudge)
           dispnew2 = getDispAtPoint(posn,sourcepos-dpos,
@@ -499,12 +502,12 @@ C     local variables
           sint = slipsys(mnumfe)%trig(2,isys)
           tnuc = sources(mnumfe)%list(i)%tnuc
           bfudge = time/tnuc
-          bfudge = 1.0_dp ! FIX
           lnuc = sources(mnumfe)%list(i)%lnuc
-          write(*,*) 'lnuc', lnuc ! FIX
           tauprev = sources(mnumfe)%list(i)%tauprev
-          dpos = sign((0.5_dp*lnuc*bfudge)*[cost,sint],tauprev) ! flip dipole if tau is negative
-          write(*,*) 'dpos', dpos ! FIX
+          dpos = (0.5_dp*lnuc*bfudge)*[cost,sint]
+          if (tauprev < 0.0_dp) then ! flip dipole if tau is negative
+              dpos = -dpos
+          end if
           stressnew = getStressAtPoint(posn,sourcepos+dpos,
      &                             cost,sint,+1,mnum,bfudge)
           stressnew2 = getStressAtPoint(posn,sourcepos-dpos,
@@ -548,7 +551,7 @@ C     local variables
       real(dp) :: stressnew(3), stressnew2(3)
       
       stress = 0.0_dp
-      posn = sources(mnumfe)%list(i)%posn
+      posn = sources(mnumfe)%list(sourcenum)%posn
       mnum = fematerials%list(mnumfe)
       do i = 1, size(sources(mnumfe)%list)
           if (i /= sourcenum) then ! no "self"-stress
@@ -562,7 +565,10 @@ C     local variables
               bfudge = time/tnuc
               lnuc = sources(mnumfe)%list(i)%lnuc
               tauprev = sources(mnumfe)%list(i)%tauprev
-              dpos = sign((0.5_dp*lnuc*bfudge)*[cost,sint],tauprev) ! flip dipole if tau is negative
+              dpos = (0.5_dp*lnuc*bfudge)*[cost,sint]
+              if (tauprev < 0.0_dp) then ! flip dipole if tau is negative
+                  dpos = -dpos
+              end if
               stressnew = getStressAtPoint(posn,sourcepos+dpos,
      &                                 cost,sint,+1,mnum,bfudge)
               stressnew2 = getStressAtPoint(posn,sourcepos-dpos,
