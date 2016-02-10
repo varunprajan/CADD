@@ -16,7 +16,7 @@ C     etc. Blah.
       
       private
       public :: initDislData, writeDislData, disl, readDislData,
-     &          addDislocation, 
+     &          addDislocation, sortPlaneCheck,
      &          deleteDislocation, checkTooManyDisl, dislt,
      &          initDislObsData, processDislObsData,
      &          writeDislObsData, initDislSourceData,
@@ -930,14 +930,31 @@ C     local variables
       
       do j = 1, size(splanes)
           do k = 1, size(splanes(j)%splane)
-              if (splanes(j)%splane(k)%resort) then
-                  call sortPlane(splanes(j)%splane(k))
-                  splanes(j)%splane(k)%resort = .false.
-              end if
+              call sortPlaneCheck(splanes(j)%splane(k))
           end do
       end do
       
       end subroutine sortPlanes
+************************************************************************
+      subroutine sortPlaneCheck(splane)
+      
+C     Subroutine: sortPlaneCheck()
+
+C     In/Out: splane --- sorted plane structure
+
+C     Purpose: If plane needs to be resorted, resort it using sortPlane
+           
+      implicit none
+      
+C     in/out variables
+      type(sortedplanedata) :: splane
+      
+      if (splane%resort) then
+          call sortPlane(splane)
+          splane%resort = .false.
+      end if
+      
+      end subroutine sortPlaneCheck
 ************************************************************************
       subroutine sortPlane(splane)
       

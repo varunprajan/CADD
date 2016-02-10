@@ -2,11 +2,10 @@
 
       use mod_types, only: dp
       use mod_disl_try, only: disl, deleteDislocationSub, 
-     &                        obstaclet, sortedplanedata,
-     &                        deleteDislocationSub2, addDislocation,
-     &                        deleteDislocation, zeroObstacles,
-     &                        obstacles, zeroDislDisp, sources,
-     &                        addDislocation, sortDislPlanes, sourcet
+     & sortPlaneCheck, obstaclet, sortedplanedata,
+     & deleteDislocationSub2, addDislocation, deleteDislocation,
+     & zeroObstacles, obstacles, zeroDislDisp, sources,
+     & addDislocation, sortDislPlanes, sourcet
       use mod_disl_escaped, only: addEscapedDislocation
       use mod_mesh_find, only: findInAllWithGuess
       use mod_disl_detect_pass, only: 
@@ -344,6 +343,10 @@ C     In/out: splane --- sorted plane structure containing dislocations
 
 C     Purpose: Update relative positions of dislocations on slip plane
 C     using the (adjusted) displacements
+
+C     Notes/TODO: Is active check necessary, since splane has alreayd been sorted?
+
+      implicit none
       
 C     input variables
       integer :: mnumfe
@@ -359,7 +362,7 @@ C     local variables
       do i = 1, splane%nmax
           dislnum = splane%objnum(i)
           disp = disl(mnumfe)%list(dislnum)%disp
-          if (disl(mnumfe)%list(dislnum)%active) then
+          if (disl(mnumfe)%list(dislnum)%active) then 
               splane%relpos(i) = splane%relpos(i) + disp
           end if    
       end do
@@ -383,7 +386,7 @@ C     of opposite sign that cross each other
 C     Notes/TODO: Crossing of dislocations of same sign is ignored.
 C     Is this correct?
 
-C     Notes/TODO: Need to check that nmax actually equals ncount
+C     Notes: Checking active is necessary since disl. can be deactivated via deletino
       
       implicit none
       
@@ -423,7 +426,7 @@ C                     place dislocation back before annihilating
                       splane%relpos(j+1) = relpostemp
                       splane%objnum(j+1) = dislnumtemp
                       call annihilateDislocationsSub(mnumfe,isys,
-     &                                               splane,j,j+1)
+     &                                               splane,j,j+1)     
                       exit
                   end if
               end if
@@ -436,6 +439,9 @@ C                     place dislocation back before annihilating
               splane%objnum(j+1) = dislnumtemp
           end if
       end do
+      
+      call sortPlaneCheck(splane) ! resort plane, if resort = .true.
+                                  ! (this is necessary for logic in annihilateDislocations)
       
       end subroutine insertionSortPlaneWithCrossing
 ************************************************************************
@@ -468,9 +474,6 @@ C     local variables
       integer :: bsgn1, bsgn2
       integer :: nmax
       
-      type(sortedplanedata) :: splane2
-      splane2 = splane
-      
       nmax = splane%nmax
       if (nmax > 1) then ! strictly unnecessary, but may save time
           counter = 1
@@ -492,7 +495,7 @@ C     local variables
                       dislnum1 = splane%objnum(counter)
                       relpos1 = splane%relpos(counter)
                       bsgn1 = disl(mnumfe)%list(dislnum1)%sgn
-                  end if                  
+                  end if
               else    
                   dislnum1 = dislnum2
                   relpos1 = relpos2
@@ -564,6 +567,8 @@ C             iplane --- index of slip plane within slip system
 
 C     Purpose: Update disl. position (x, y) and associated attributes (localpos, element, etc.)
 C     using (adjusted) disl. displacement along slip plane, for *all* dislocations
+
+      implicit none
 
 C     input variables
       integer :: mnumfe
