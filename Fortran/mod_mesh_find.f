@@ -311,7 +311,7 @@ C     local variables
       real(dp) :: norm
       real(dp) :: rold, sold
 
-      norm = huge(dp)
+      norm = huge(0.0_dp)
       do i = 1, 10
           if (norm < normconst) then
               return
@@ -493,7 +493,7 @@ C     local variables
       real(dp) :: pt(2)
       
       pt = [xp,yp]
-      distsq = huge(dp)
+      distsq = huge(0.0_dp)
       do j = 1, size(feelements(mnumfe)%nodelist)
           node = feelements(mnumfe)%nodelist(j)
 C         could use undeformed positions,

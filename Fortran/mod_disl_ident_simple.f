@@ -139,7 +139,7 @@ C     local variables
       integer :: i
       real(dp) :: idealvectry(2)
       
-      bestnorm = huge(dp)
+      bestnorm = huge(0.0_dp)
       do i = 1, size(identsimple%ideal,2)
           idealvectry = identsimple%ideal(:,i)
           norm = sum((vec - idealvectry)**2)

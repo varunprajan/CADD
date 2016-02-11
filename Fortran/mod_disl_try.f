@@ -12,6 +12,7 @@ C     etc. Blah.
      &                         findInOneMat
       use mod_slip_sys, only: getSlipPlane, slipsys
       use mod_materials, only: getNucleationLength
+      use mod_disl_misc, only: dislmisc
       implicit none
       
       private
@@ -112,16 +113,6 @@ C     module variables
       type(disldata), allocatable :: disl(:)
       type(obstacledata), allocatable :: obstacles(:)
       type(sourcedata), allocatable :: sources(:)
-
-C     HARD-CODED CONSTANTS
-C     max dislocations in one material
-      integer, parameter :: nmaxdisl = 1000
-C     max dislocations in a slip plane
-      integer, parameter :: nmaxdislslip = 40
-C     max obstacles in a slip plane
-      integer, parameter :: nmaxobsslip = 20
-C     max sources in a slip plane
-      integer, parameter :: nmaxsrcslip = 20
       
       contains
 ************************************************************************
@@ -226,7 +217,7 @@ C     local variables
       allocate(disl(nfematerials))
 C     this should be identical to nfematerials from mod_fe_elements!
       do i = 1, nfematerials
-          allocate(disl(i)%list(nmaxdisl))
+          allocate(disl(i)%list(dislmisc%nmaxdisl(i)))
 
           read(iunit,*) m          
           do j = 1, m
@@ -693,7 +684,8 @@ C     local variables
       integer :: i
       
       do i = 1, size(disl)
-          call initSortedPlanes(i,disl(i)%splanes,nmaxdislslip)
+          call initSortedPlanes(i,disl(i)%splanes,
+     &                          dislmisc%nmaxdislslip(i))
       end do
       
       end subroutine initDislSortedPlanes
@@ -716,7 +708,8 @@ C     local variables
       integer :: i
       
       do i = 1, size(obstacles)
-          call initSortedPlanes(i,obstacles(i)%splanes,nmaxobsslip)
+          call initSortedPlanes(i,obstacles(i)%splanes,
+     &                          dislmisc%nmaxobsslip(i))
       end do
       
       end subroutine initObsSortedPlanes
@@ -738,7 +731,8 @@ C     local variables
       integer :: i
       
       do i = 1, size(sources)
-          call initSortedPlanes(i,sources(i)%splanes,nmaxsrcslip)
+          call initSortedPlanes(i,sources(i)%splanes,
+     &                          dislmisc%nmaxsrcslip(i))
       end do
       
       end subroutine initSourcesSortedPlanes
@@ -1102,16 +1096,18 @@ C     output variables
       
 C     local variables
       integer :: i
+      integer :: nmax
 
-      dislnum = nmaxdisl + 1
-      do i = 1, nmaxdisl
+      nmax = size(disl(mnumfe)%list)
+      dislnum = nmax + 1
+      do i = 1, nmax
           if (.not.disl(mnumfe)%list(i)%active) then
               dislnum = i
               return
           end if
       end do
       
-      call checkTooManyDisl(dislnum,nmaxdisl,'disl')
+      call checkTooManyDisl(dislnum,nmax,'disl')
       
       end subroutine findEmptyDislSlot
 ************************************************************************
@@ -1226,7 +1222,7 @@ C     local variables
       integer :: i
       integer :: dislnum
       
-      splane%relpos(iobj) = huge(dp) ! this ensures it will appear at end of list
+      splane%relpos(iobj) = huge(0.0_dp) ! this ensures it will appear at end of list
 C     don't delete objnum, since we might loop over object later...
       splane%ncount = splane%ncount - 1
       splane%resort = .true.

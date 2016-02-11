@@ -4,7 +4,7 @@ C     Purpose: Reads/writes/stores information about dislocations that have
 C     escaped from continuum (but not into atomistic region), leaving a slip step.
 C     Also gives dislocation fields.
 
-C	  Newer note/TODO: A paper by Romero et al., MSMSE, 2008 discusses how to
+C     Newer note/TODO: A paper by Romero et al., MSMSE, 2008 discusses how to
 C     implement the escaped fields properly. But, their computational approach
 C     is somewhat involved, and the approach discussed below seems to work satisfactorily
 C     for a crack specimen.
@@ -60,6 +60,7 @@ C     because the sample was convex (a rectangle)
       use mod_fe_elements, only: fematerials
       use mod_misc, only: misc
       use mod_nodes, only: getXYBounds
+      use mod_disl_misc, only: dislmisc
       implicit none
       
       private
@@ -97,13 +98,12 @@ C     module variables
       type(escapeddisldata), allocatable :: escapeddisl(:)
       type(boxdata) :: box
 
-C     HARD-CODED CONSTANTS      
-C     max escaped dislocations
-      integer, parameter :: nmaxescapeddisl = 2000
+C     HARD-CODED CONSTANTS
+C     region numbers
       integer, parameter :: regionmainbody = 0
       integer, parameter :: regionuppercrack = 1
       integer, parameter :: regionlowercrack = -1
-      real(dp), parameter :: maxlenfac = 2.0_dp
+      real(dp), parameter :: maxlenfac = 2.0_dp ! see getEscapedPos
       
       contains
 ************************************************************************
@@ -143,9 +143,9 @@ C     Purpose: Read escaped dislocation data (positions, etc.) from file,
 C     initialize/allocate structures/arrays
 
 C     Notes: Dislocation array is allocated with # of rows equal to
-C     nmaxescapeddisl, which is a hard-coded constant. If nescapeddisl > nmaxescapeddisl,
+C     , which is a hard-coded constant. If nescapeddisl > ,
 C     an error is thrown. An alternative is to reallocate the array
-C     every time nescapeddisl > nmaxescapeddisl...
+C     every time nescapeddisl > ...
 
       implicit none
       
@@ -165,7 +165,7 @@ C     local variables
       
 C     this should be identical to nfematerials from mod_fe_elements!
       do i = 1, nfematerials
-          allocate(escapeddisl(i)%list(nmaxescapeddisl))
+          allocate(escapeddisl(i)%list(dislmisc%nmaxescapeddisl(i)))
 
           read(iunit,*) m          
           do j = 1, m
@@ -339,10 +339,12 @@ C     input variables
       
 C     local variables
       real(dp) :: escapedpos(2)
+      integer :: nmax
       
       ! dislocation number
       dislnum = escapeddisl(mnumfe)%nescapeddisl + 1
-      call checkTooManyDisl(dislnum,nmaxescapeddisl,'escapeddisl')
+      nmax = size(escapeddisl(mnumfe)%list)
+      call checkTooManyDisl(dislnum,nmax,'escapeddisl')
       
       ! place dislocation at infinity
       escapedpos = getEscapedPos(posnold,posnnew)

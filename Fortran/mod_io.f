@@ -14,6 +14,7 @@ C     from/to files. Can be used to write "dump" or "restart" files.
       use mod_interactions, only: initInteractionData,
      &                            writeInteractionData
       use mod_neighbors, only: initNeighborData, writeNeighborData
+      use mod_disl_misc, only: initDislMiscData, writeDislMiscData
       use mod_disl_try, only: initDislData, writeDislData, disl,
      & initDislSourceData, writeDislSourceData, 
      & initDislObsData, writeDislObsData, sources, obstacles
@@ -60,6 +61,7 @@ C     module variables
       character(len=*), parameter :: suffixpotentials = '_potentials'
       character(len=*), parameter :: suffixmisc = '_misc'
       character(len=*), parameter :: suffixslipsys = '_slipsys'
+      character(len=*), parameter :: suffixdislmisc = '_dislmisc'
       character(len=*), parameter :: suffixdisl = '_disl'
       character(len=*), parameter :: suffixghostdisl = '_ghostdisl'
       character(len=*), parameter :: suffixescapeddisl = '_escapeddisl'
@@ -382,6 +384,7 @@ C     input variables
       character(len=*) :: pref
       
       call initSlipSysData(pref//suffixslipsys)
+      call initDislMiscData(pref//suffixdislmisc)
       call initDislData(pref//suffixdisl)
       call initDislSourceData(pref//suffixdislsource)
       call initDislObsData(pref//suffixdislobs)
@@ -671,6 +674,7 @@ C     input variables
       character(len=*) :: suff
       
       call writeSlipSysData(pref//suffixslipsys//suff)
+      call writeDislMiscData(pref//suffixdislmisc//suff)
       call writeDislData(pref//suffixdisl//suff)
       call writeDislSourceData(pref//suffixdislsource//suff)
       call writeDislObsData(pref//suffixdislobs//suff)

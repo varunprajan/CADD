@@ -280,7 +280,7 @@ C     get n shortest (n closest neighbors) by sorting
 C     allocate, initialize temp (stores intermediate results)
       ntemp = n*(n-1)/2
       allocate(temp(ntemp))
-      temp = huge(dp) ! see sort, below
+      temp = huge(0.0_dp) ! see sort, below
       
 C     loop over pairs of rvecs
       counter = 0

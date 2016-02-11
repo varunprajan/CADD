@@ -35,6 +35,7 @@ C     The only purpose is to cancel/compensate for the singular parts of the sol
 
       use mod_types, only: dp
       use mod_disl_try, only: checkTooManyDisl
+      use mod_disl_misc, only: dislmisc
       implicit none
       
       private
@@ -58,10 +59,6 @@ C     processed
 
 C     module variables      
       type(ghostdisldata), allocatable :: ghostdisl(:)
-
-C     HARD-CODED CONSTANTS      
-C     max ghost dislocations
-      integer, parameter :: nmaxghostdisl = 100
       
       contains
 ************************************************************************
@@ -123,7 +120,7 @@ C     local variables
       
 C     this should be identical to nfematerials from mod_fe_elements!
       do i = 1, nfematerials
-          allocate(ghostdisl(i)%list(nmaxghostdisl))
+          allocate(ghostdisl(i)%list(dislmisc%nmaxghostdisl(i)))
 
           read(iunit,*) m          
           do j = 1, m
@@ -236,9 +233,11 @@ C     input variables
       integer :: bsgn, bcut
       integer :: mnumfe
       integer :: dislnum
+      integer :: nmax
       
       dislnum = ghostdisl(mnumfe)%nghostdisl + 1
-      call checkTooManyDisl(dislnum,nmaxghostdisl,'ghostdisl')
+      nmax = size(ghostdisl(mnumfe)%list)
+      call checkTooManyDisl(dislnum,nmax,'ghostdisl')
       ghostdisl(mnumfe)%list(dislnum)%cut = bcut
       ghostdisl(mnumfe)%list(dislnum)%posn(1) = x
       ghostdisl(mnumfe)%list(dislnum)%posn(2) = y

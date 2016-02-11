@@ -1,6 +1,7 @@
       module mod_dd_main
 
       use mod_types, only: dp
+      use mod_disl_misc, only: dislmisc
       use mod_disl_try, only: disl, deleteDislocationSub, 
      & sortPlaneCheck, obstaclet, sortedplanedata,
      & deleteDislocationSub2, addDislocation, deleteDislocation,
@@ -149,12 +150,14 @@ C     local variables
       real(dp) :: stress(3), stresstilde(3), stresshat(3)
       real(dp) :: tau
       real(dp) :: r, s
-      real(dp) :: burgers, disldrag, bfacabs, disp
+      real(dp) :: burgers, disldrag, bfacabs
+      real(dp) :: vmax
       integer :: bsgn
 
       mnum = fematerials%list(mnumfe)
       burgers = materials(mnum)%burgers
       disldrag = materials(mnum)%disldrag
+      vmax = materials(mnum)%vmax
       bfacabs = burgers/disldrag
       
       do i = 1, disl(mnumfe)%ndisl
@@ -168,15 +171,56 @@ C     local variables
           stresshat = getFEStressAtPoint(mnumfe,element,r,s)
           stress = stresshat + stresstilde
           tau = resolveStress(mnumfe,isys,stress)
-          disp = tau*bfacabs*dt
-          if (bsgn < 0) then
-              disp = -disp
-          end if
-          disl(mnumfe)%list(i)%disp = disp
+          disl(mnumfe)%list(i)%disp = dispFromTau(tau,bfacabs,
+     &                                            bsgn,dt,vmax)
       end if    
       end do
       
       end subroutine dispfromPKOneMat
+************************************************************************
+      function dispFromTau(tau,bfacabs,bsgn,dt,vmax) result(disp)
+      
+C     Function: dispFromTau
+
+C     Inputs: tau --- resolved shear stress on dislocation
+              bfacabs --- mobility coefficient (= 
+
+C     In/out: splane --- sorted plane structure, disl(mnumfe)%splanes(isys)%splane(iplane)
+
+C     Outputs: None
+
+C     Purpose: Adjust displacements of dislocations on a particular slip plane
+C              to avoid crossing active obstacles
+
+C     Notes: We could avoid passing in splane, but then we'd have to write disl(mnumfe)%splanes(isys)%splane(iplane)
+C     in front of everything (local copy is not possible as well, since we have to update global/module variable)      
+      
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: tau
+      real(dp) :: bfacabs
+      integer :: bsgn
+      real(dp) :: dt
+      real(dp) :: vmax
+      
+C     output variables
+      real(dp) :: disp
+      
+C     local variables
+      real(dp) :: v0
+      
+      v0 = tau*bfacabs
+      if (abs(v0) > vmax) then ! cap dislocation velocity
+          v0 = sign(vmax,v0)
+      end if    
+      disp = v0*dt
+      if (bsgn < 0) then
+          disp = -disp
+      end if
+      
+      end function dispfromTau
 ************************************************************************
       subroutine updateDislocations()
       
@@ -216,7 +260,7 @@ C     local variables
                   call insertionSortPlaneWithCrossing(i,j,
      &                                     disl(i)%splanes(j)%splane(k))     
                   call annihilateDislocations(i,j,
-     &                              disl(i)%splanes(j)%splane(k),lannih)     
+     &                              disl(i)%splanes(j)%splane(k),lannih)
                   call updateDislPos(i,j,k)                  
               end do
           end do 
@@ -401,7 +445,7 @@ C     local variables
       integer :: dislnumtemp, dislnumother
       integer :: bsgntemp, bsgnother
       logical :: activetemp, activeother
-      logical :: deleted
+      logical :: placedback
       
       splane%resort = .false. ! presumably, the list will be sorted at the end; however, if we annihilate, this is not so (taken care of in deleteDislocationSub2)
       do i = 2, splane%nmax
@@ -410,7 +454,7 @@ C     local variables
           dislnumtemp = splane%objnum(i)
           activetemp = disl(mnumfe)%list(dislnumtemp)%active
           bsgntemp = disl(mnumfe)%list(dislnumtemp)%sgn
-          deleted = .false.
+          placedback = .false.
           do while (j >= 1) 
               if (splane%relpos(j) <= relpostemp) then ! could combine with do while statement, but Fortran does not support short-circuiting
                   exit
@@ -421,10 +465,10 @@ C             need to swap; check for crossing of disl. of opposite signs
               if (activetemp.and.activeother) then
                   bsgnother = disl(mnumfe)%list(dislnumother)%sgn
                   if (bsgntemp /= bsgnother) then ! opposite sign dislocations, need to annihilate
-                      deleted = .true.
 C                     place dislocation back before annihilating
                       splane%relpos(j+1) = relpostemp
                       splane%objnum(j+1) = dislnumtemp
+                      placedback = .true.
                       call annihilateDislocationsSub(mnumfe,isys,
      &                                               splane,j,j+1)     
                       exit
@@ -434,14 +478,14 @@ C                     place dislocation back before annihilating
               splane%objnum(j+1) = splane%objnum(j)
               j = j - 1
           end do
-          if (.not.deleted) then ! if dislocation wasn't deleted, place it back
+          if (.not.placedback) then ! if dislocation wasn't deleted, place it back
               splane%relpos(j+1) = relpostemp
               splane%objnum(j+1) = dislnumtemp
           end if
       end do
       
       call sortPlaneCheck(splane) ! resort plane, if resort = .true.
-                                  ! (this is necessary for logic in annihilateDislocations)
+                                  ! (this is necessary before annihilateDislocations can be used)
       
       end subroutine insertionSortPlaneWithCrossing
 ************************************************************************
@@ -457,6 +501,8 @@ C     In/out: splane --- sorted plane structure containing dislocations
 
 C     Purpose: Annihilate any remaining
 C     opposite signed pairs within lannih of each other (plane must already be sorted)
+      
+      implicit none
       
 C     input variables
       integer :: mnumfe
@@ -485,7 +531,7 @@ C     local variables
               dislnum2 = splane%objnum(counter)
               relpos2 = splane%relpos(counter)
               bsgn2 = disl(mnumfe)%list(dislnum2)%sgn
-              delete = ((bsgn1 /= bsgn2).and.            ! dislocations have to be of opposite sign
+              delete = ((bsgn1 /= bsgn2).and.           ! dislocations have to be of opposite sign
      &                  ((relpos2 - relpos1) < lannih)) ! and sufficiently close together
               if (delete) then
                   call annihilateDislocationsSub(mnumfe,isys,splane,
@@ -503,7 +549,6 @@ C     local variables
               end if
           end do
       end if
-      
       
       end subroutine annihilateDislocations
 ************************************************************************

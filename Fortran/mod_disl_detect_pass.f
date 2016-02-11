@@ -430,7 +430,7 @@ C     local variables
       real(dp) :: bestnorm, norm
       integer :: i
       
-      bestnorm = huge(dp)
+      bestnorm = huge(0.0_dp)
       do i = 1, size(detection%comp)
           norm = maxval(
      &            abs((burgersvec - detection%comp(i)%burgersvec)))
