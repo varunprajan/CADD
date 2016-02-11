@@ -138,7 +138,7 @@
      
       implicit none
       
-      call readDislMiscData('example_dislmisc')
-      call writeDislMiscData('example_dislmisc_out')
+      call readDislMiscData('example_dislmisc_test')
+      call writeDislMiscData('example_dislmisc_out_test')
             
       end program

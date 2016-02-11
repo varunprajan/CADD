@@ -1,0 +1,11 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call readDislMiscData('example_dislmisc_test')
+      call writeDislMiscData('example_dislmisc_out_test')
+
+Output:
+ See file --- essentially identical to example_dislmisc
+******************************************************

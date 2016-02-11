@@ -1,0 +1,14 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call readDislMiscData('example_dislmisc_test')
+      write(*,*) dislmisc%gradientcorrection
+      write(*,*) dislmisc%nmaxdislslip
+
+Output:
+ T
+          40
+
+******************************************************
