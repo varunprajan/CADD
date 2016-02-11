@@ -157,7 +157,7 @@ C     local variables
       mnum = fematerials%list(mnumfe)
       burgers = materials(mnum)%burgers
       disldrag = materials(mnum)%disldrag
-      vmax = materials(mnum)%vmax
+      vmax = materials(mnum)%dislvmax
       bfacabs = burgers/disldrag
       
       do i = 1, disl(mnumfe)%ndisl
@@ -183,18 +183,15 @@ C     local variables
 C     Function: dispFromTau
 
 C     Inputs: tau --- resolved shear stress on dislocation
-              bfacabs --- mobility coefficient (= 
+C             bfacabs --- = b/B, b = burgers, B = mobility/drag coefficient
+C             bsgn --- sign of dislocation (+1 or -1)
+C             dt --- time increment for DD update
+C             vmax --- max dislocation velocity
 
-C     In/out: splane --- sorted plane structure, disl(mnumfe)%splanes(isys)%splane(iplane)
+C     Outputs: disp --- dislocation displacement along slip plane
 
-C     Outputs: None
-
-C     Purpose: Adjust displacements of dislocations on a particular slip plane
-C              to avoid crossing active obstacles
-
-C     Notes: We could avoid passing in splane, but then we'd have to write disl(mnumfe)%splanes(isys)%splane(iplane)
-C     in front of everything (local copy is not possible as well, since we have to update global/module variable)      
-      
+C     Purpose: Compute dislocation displacement using resolved shear stress,
+C     tau, on dislocation      
       
       implicit none
       

@@ -13,9 +13,6 @@ files_interactions: input.interactions
 # neighbors
 files_neighbors: input.neighbors
 
-# disl misc
-files_dislmisc: input.dislmisc
-
 # dislocations
 files_disl:
 input.dislmat1

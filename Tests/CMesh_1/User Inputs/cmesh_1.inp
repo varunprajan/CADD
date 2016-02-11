@@ -31,9 +31,6 @@ files_slipsys:
 input.slipsysmat1
 end
 
-# disl misc
-files_dislmisc: input.dislmisc
-
 # nodes
 files_nodes: input.nodes
 

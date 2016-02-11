@@ -23,6 +23,7 @@ C     constants for dislocation fields --- p_i, etc.).
 C     read-in
       real(dp) :: burgers
       real(dp) :: disldrag
+      real(dp) :: dislvmax
       real(dp), allocatable :: elconst(:,:)
       real(dp) :: lannih
       character(len=20) :: lattice
@@ -94,6 +95,7 @@ C     local variables
 C         read
           read(iunit,*) materials(i)%burgers
           read(iunit,*) materials(i)%disldrag
+          read(iunit,*) materials(i)%dislvmax
           call readMatSize(iunit,materials(i)%elconst)
           read(iunit,*) materials(i)%lannih
           read(iunit,*) materials(i)%lattice
@@ -163,6 +165,7 @@ C     local variables
       do i = 1, nmaterials
           write(iunit,*) materials(i)%burgers
           write(iunit,*) materials(i)%disldrag
+          write(iunit,*) materials(i)%dislvmax
           call writeMatSize(iunit,materials(i)%elconst)
           write(iunit,*) materials(i)%lannih
           write(iunit,*) materials(i)%lattice

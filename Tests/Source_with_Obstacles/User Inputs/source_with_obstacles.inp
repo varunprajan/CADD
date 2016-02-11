@@ -1,9 +1,6 @@
 # misc
 files_misc: input.misc
 
-# disl misc
-files_dislmisc: input.dislmisc
-
 # dislocations
 files_disl:
 input.dislmat1
