@@ -104,13 +104,16 @@
      & identifyLargeTri, getTriCenter, getTriNodes
       use mod_disl_ident_simple, only: initDislIdentData,
      & computeCircuits, identsimple, getIdealVector
-      use mod_dd_main, only: runDDStep, dispfromPK, dispfromPKOneMat,
+      use mod_dd_main, only: runDDStep,
      & updateDislocations, enforceObstacles, isObstacleBetween,
      & getResolvedStressOnObstacle, updateDislRelPos,
      & insertionSortPlaneWithCrossing, annihilateDislocations,
      & annihilateDislocationsSub, updateDislPos, updateDislPosSub,
      & updateSources, getResolvedStressOnSource, updateSource,
      & createDipole, updateDislPosSub_ptr
+      use mod_dd_integrate, only: dispFromPKOneMat, dispFromPK,
+     & dispFromPKOneMatVCorr, velFromTau, velFromTauCorr,
+     & getResolvedStressOnDisl, dispFromVel
       use mod_disl_escaped, only: escapeddisl, initEscapedDislData,
      &  readEscapedDislData, box, getMaxLen,
      &  processEscapedDislData, writeEscapedDislData, 
@@ -138,7 +141,12 @@
      
       implicit none
       
-      call readDislMiscData('example_dislmisc_test')
-      call writeDislMiscData('example_dislmisc_out_test')
+      real(dp) :: v, dt, vmax, disp
+      
+      v = -100.0_dp
+      dt = 0.05_dp
+      vmax = 50.0_dp
+      disp = dispFromVel(v,dt,vmax)
+      write(*,*) disp
             
       end program

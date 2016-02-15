@@ -1,4 +1,8 @@
       module mod_dd_main
+      
+C     Purpose: Collection of routines for running a single DD step:
+C     updates dislocation positions, enforces obstacles, annihilates
+C     opposite signed dislocations that cross, etc.
 
       use mod_types, only: dp
       use mod_disl_misc, only: dislmisc
@@ -15,13 +19,14 @@
       use mod_materials, only: materials
       use mod_fe_elements, only: fematerials, interfaceedges
       use mod_fe_main_2d, only: getFEStressAtPoint
-      use mod_disl_fields2, only: getPKTildeStressAll,
-     &   getTildeStressOnSourceAll, getTildeStressAtPointAll
+      use mod_disl_fields2, only: getTildeStressOnSourceAll,
+     &  getTildeStressAtPointAll
       use mod_math, only: findPointBetween, tolconst, sameSign
+      use mod_dd_integrate, only: dispFromPK, assignDispFromPKOneMat
       implicit none
       
       private
-      public :: runDDStep, dispfromPK, dispfromPKOneMat,
+      public :: runDDStep,
      & updateDislocations, enforceObstacles, isObstacleBetween,
      & getResolvedStressOnObstacle, getResolvedStressOnSource, 
      & insertionSortPlaneWithCrossing, annihilateDislocations,
@@ -44,7 +49,8 @@ C     Inputs: simtype --- simulation type: atomistic, fe, dd, cadd_nodisl, or ca
 
 C     Outputs: None
 
-C     Purpose: Assign pointer for subroutines depending on simulation type
+C     Purpose: Assign pointer for subroutines used in DD simulations
+C     These may depend on simulation type
 C     (e.g. updating dislocation position is different in dd and cadd simulations,
 C     since in the former there is no atomistic domain to pass the dislocation into)
       
@@ -63,13 +69,15 @@ C     input variables
           case default
               write(*,*) 'Simulation type has not yet been defined'
               stop
-      end select      
+      end select
+      
+      call assignDispFromPKOneMat(dislmisc%gradientcorrection)
       
       end subroutine assignDD
 ************************************************************************
       subroutine runDDStep(dt)
 
-C     Subroutine: dispFromPK
+C     Subroutine: runDDStep
 
 C     Inputs: dt --- time increment for DD update
 
@@ -98,126 +106,6 @@ C     input variables
       call zeroDislDisp()
       
       end subroutine runDDStep
-************************************************************************
-      subroutine dispFromPK(dt)
-
-C     Subroutine: dispFromPK
-
-C     Inputs: dt --- time increment for DD update
-
-C     Outputs: None
-
-C     Purpose: Computes dislocation displacements for all materials
-      
-      implicit none
-      
-C     input variables
-      real(dp) :: dt
-      
-C     local variables
-      integer :: i
-      
-      do i = 1, size(disl)
-          call dispFromPKOneMat(i,dt)
-      end do
-      
-      end subroutine dispFromPK
-************************************************************************
-      subroutine dispFromPKOneMat(mnumfe,dt)
-
-C     Subroutine: dispFromPKOneMat
-
-C     Inputs: mnumfe --- material in which to update dislocation positions
-C             dt --- time increment for DD update
-
-C     Outputs: None
-
-C     Purpose: Compute dislocation displacements for one material
-C              using Peach-Koehler force and mobility law. Uses hat and
-C              tilde stresses to determine Peach-Koehler force.
-      
-      implicit none
-      
-C     input variables
-      integer :: mnumfe
-      real(dp) :: dt
-      
-C     local variables
-      integer :: i
-      integer :: isys
-      integer :: mnum
-      integer :: element
-      real(dp) :: stress(3), stresstilde(3), stresshat(3)
-      real(dp) :: tau
-      real(dp) :: r, s
-      real(dp) :: burgers, disldrag, bfacabs
-      real(dp) :: vmax
-      integer :: bsgn
-
-      mnum = fematerials%list(mnumfe)
-      burgers = materials(mnum)%burgers
-      disldrag = materials(mnum)%disldrag
-      vmax = materials(mnum)%dislvmax
-      bfacabs = burgers/disldrag
-      
-      do i = 1, disl(mnumfe)%ndisl
-      if (disl(mnumfe)%list(i)%active) then ! loop over active dislocations
-          isys = disl(mnumfe)%list(i)%slipsys
-          bsgn = disl(mnumfe)%list(i)%sgn
-          element = disl(mnumfe)%list(i)%element
-          r = disl(mnumfe)%list(i)%localpos(1)
-          s = disl(mnumfe)%list(i)%localpos(2)
-          stresstilde = getPKTildeStressAll(i,mnumfe)
-          stresshat = getFEStressAtPoint(mnumfe,element,r,s)
-          stress = stresshat + stresstilde
-          tau = resolveStress(mnumfe,isys,stress)
-          disl(mnumfe)%list(i)%disp = dispFromTau(tau,bfacabs,
-     &                                            bsgn,dt,vmax)
-      end if    
-      end do
-      
-      end subroutine dispfromPKOneMat
-************************************************************************
-      function dispFromTau(tau,bfacabs,bsgn,dt,vmax) result(disp)
-      
-C     Function: dispFromTau
-
-C     Inputs: tau --- resolved shear stress on dislocation
-C             bfacabs --- = b/B, b = burgers, B = mobility/drag coefficient
-C             bsgn --- sign of dislocation (+1 or -1)
-C             dt --- time increment for DD update
-C             vmax --- max dislocation velocity
-
-C     Outputs: disp --- dislocation displacement along slip plane
-
-C     Purpose: Compute dislocation displacement using resolved shear stress,
-C     tau, on dislocation      
-      
-      implicit none
-      
-C     input variables
-      real(dp) :: tau
-      real(dp) :: bfacabs
-      integer :: bsgn
-      real(dp) :: dt
-      real(dp) :: vmax
-      
-C     output variables
-      real(dp) :: disp
-      
-C     local variables
-      real(dp) :: v0
-      
-      v0 = tau*bfacabs
-      if (abs(v0) > vmax) then ! cap dislocation velocity
-          v0 = sign(vmax,v0)
-      end if    
-      disp = v0*dt
-      if (bsgn < 0) then
-          disp = -disp
-      end if
-      
-      end function dispfromTau
 ************************************************************************
       subroutine updateDislocations()
       
@@ -577,6 +465,7 @@ C     local variables
       integer :: bsgn1, bsgn2
       real(dp) :: p1(2), p2(2)
 
+      write(*,*) 'Annihilated dislocations!'
       dislnum1 = splane%objnum(iobj1)
       dislnum2 = splane%objnum(iobj2)      
       bcut1 = disl(mnumfe)%list(dislnum1)%cut

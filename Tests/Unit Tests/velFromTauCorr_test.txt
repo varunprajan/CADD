@@ -1,0 +1,49 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: tau, dtauds, bfac, dt, v      
+      
+      tau = 23.0_dp
+      bfac = 1.5_dp
+      dt = 5.0_dp
+      dtauds = 0.0_dp
+      v = velFromTauCorr(tau,dtauds,bfac,dt)
+      write(*,*) v
+
+Output:
+   34.500000000000000    
+******************************************************
+Test #2:
+ 
+Code:
+
+      real(dp) :: tau, dtauds, bfac, dt, v      
+      
+      tau = 20.0_dp
+      bfac = 1.0_dp
+      dt = 5.0_dp
+      dtauds = 0.02_dp
+      v = velFromTauCorr(tau,dtauds,bfac,dt)
+      write(*,*) v
+
+Output:
+   22.222222222222221    
+******************************************************
+Test #3: Opposite signs for v0 and vcorr
+ 
+Code:
+
+      real(dp) :: tau, dtauds, bfac, dt, v      
+      
+      tau = 20.0_dp
+      bfac = 1.0_dp
+      dt = 5.0_dp
+      dtauds = 1.0_dp
+      v = velFromTauCorr(tau,dtauds,bfac,dt)
+      write(*,*) v
+
+Output: (Checked by hand)
+   7.5000000000000000   
+******************************************************

@@ -1,0 +1,46 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: v, dt, vmax, disp
+      
+      v = 100.0_dp
+      dt = 0.05_dp
+      vmax = 200.0_dp
+      disp = dispFromVel(v,dt,vmax)
+      write(*,*) disp
+
+Output:
+   5.0000000000000000  
+******************************************************
+Test #2: vmax
+ 
+Code:
+
+      real(dp) :: v, dt, vmax, disp
+      
+      v = 100.0_dp
+      dt = 0.05_dp
+      vmax = 50.0_dp
+      disp = dispFromVel(v,dt,vmax)
+      write(*,*) disp
+
+Output:
+   2.5000000000000000     
+******************************************************
+Test #4: -v, vmax
+ 
+Code:
+
+      real(dp) :: v, dt, vmax, disp
+      
+      v = -100.0_dp
+      dt = 0.05_dp
+      vmax = 50.0_dp
+      disp = dispFromVel(v,dt,vmax)
+      write(*,*) disp
+
+Output:
+  -2.5000000000000000     
+******************************************************
