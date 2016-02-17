@@ -131,10 +131,32 @@ C              velocity correction method described in Chakravarthy and Curtin, 
 
 C     Long note: There are several problems.
 
-C     1) Seemingly incorrect integration algorithm
-C     2) Does this actually fix stability? (Probably not)
-C     3) No correction to FE fields
-C     4) Lots of stuff in code not described in paper (underrelaxation)
+C     1) It's completely unclear to me whether the algorithm presented in the paper
+C     actually fixes the stability problem identify for the forward-Euler method
+C     *in general*. (Granted, it works well in the specific example of the dislocation pile-up)
+C     The method is not truly an implicit method (like backward-Euler), so I'm
+C     not sure why it would be unconditionally stable. Looking at the literature on
+C     integration algorithms, it's difficult to even say what type of algorithm
+C     this is (semi-implicit, perhaps?).
+C     
+C     2) Even if the algorithm can be mathematically proven to fix the stability issue,
+C     it appears to be written down incorrectly. If the gradients are used
+C     to correct the dislocation velocity, the entire *matrix* (Ndisl by Ndisl)
+C     should be used: the change in position of the ith disloctaion affects
+C     not only the force on it, but also the force on every other dislocation
+C     These "cross" terms don't seem to be taken into account. Instead,
+C     it is (tacitly) assumed that their affect is negligible, so the 
+C     matrix of gradients (the Jacobian) is diagonal. Otherwise,
+C     one has to use something like: v(x(t+dt)) = F/B*[I - 1/B*dF_i/dx_j*dt]^{-1}, where I is the identity
+
+C     3) Similarly, the FE fields (hat fields) are also dependent on the dislocation position
+C     (for quadrilateral elements). I believe this is ignored in the original code
+C     (presumably, because these fields vary slowly), and I have ignored it as well.
+
+C     4) There seems to be a lot of stuff in the code that's not described
+C     in the paper. For instance, the algorithm in velFromTauCorr,
+C     the underrelaxation (which is a complete mess, and may not even
+C     be used any more, etc.)
       
       implicit none
       
