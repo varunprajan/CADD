@@ -1,0 +1,1180 @@
+List of Modules/Functions, Status of Testing/Documentation
+
+Left:
+mod_disl_fields --- not sure how to check collective fields, but individual fields appear correct.
+                    maybe look at dislocation dipole?
+mod_poten_pair --- need to check forces from images!
+mod_io -- awaits realistic configuration
+mod_mesh_find/mod_disl --- some multi-material tests haven't yet been done
+    
+Note: simple2_dd was used to check most of mod_dd_main
+
+Fix test:
+    annihilateDislocations (counter issue)
+    createDipole (sign issue)
+
+mod_dd_integrate
+    Doc:
+    assignDispFromPKOneMat
+        Doc: Done!
+        Test: Awaits DD simulation...
+    dispfromPK
+        Doc: Done!
+        Test: Awaits DD simulation...
+    dispfromPKOneMat
+        Doc: Done!
+        Test: Awaits DD simulation...
+    dispfromPKOneMatVCorr
+        Doc: (Need to write long note)
+        Test: Awaits DD simulation...
+    getResolvedStressOnDisl
+        Doc: Done!
+        Test: Awaits DD simulation?
+    velFromTau
+        Doc: Done!
+        Test: Done!
+    velFromTauCorr
+        Doc: Done!
+        Test: Done!
+    dispFromVel
+        Doc: Done!
+        Test: Done!
+
+Check:
+    mod_utils
+            
+            
+Awaits DD:
+    mod_dd_main
+        Various
+    mod_disl_detect_pass
+        Various
+    mod_disl_fields
+        Various
+    mod_fe_main_2d
+        Various
+    mod_mesh_find
+        Various
+        
+
+mod_compute
+    initComputeData
+        Doc: Done!
+        Test: Done!
+    readComputeData
+        Doc: Done!
+        Test: Done!
+    readComputeDataSub
+        Doc: Done!
+        Test: Implicitly through readComputeData
+    processComputeData
+        Doc: Done!
+        Test: Not needed
+    writeComputeData
+        Doc: Done!
+        Test: Done!
+    writeComputeDataSub
+        Doc: Done!
+        Test: Implicitly through readComputeData
+    getCentroAtoms
+        Doc: Done!
+        Test: Half done (Implicitly, through atomistic_2)...awaits CADD simulation
+    getCentroAtom
+        Doc: Done!
+        Test: Done!   
+mod_damping
+    Doc: Done!
+    initDampingData
+        Doc: Done!
+        Test: Not needed
+    readDampingData
+        Doc: Done!
+        Test: Done!
+    readDampingDataSub
+        Doc: Done!
+        Test: Implicitly, through readDampingData/readDetectionData
+    writeDampingData
+        Doc: Done!
+        Test: Done!
+    writeDampingDataSub
+        Doc: Done!
+        Test: Implicitly, through writeDampingData/writeDetectionData
+    getDampingForcesAll
+        Doc: Done!
+        Test: Done!
+    getDampingForce
+        Doc: Done!
+        Test: Done!
+mod_dd_main
+    Doc: Done!
+    assignDD
+        Doc: Done!
+        Test: Half done implicitly, through rmesh/cmesh_1; awaits CADD simulation...
+    runDDStep
+        Doc: Done!
+        Test: Awaits DD simulation
+    updateDislocations
+        Doc: Done!
+        Test: Awaits DD simulation...
+    enforceObstacles
+        Doc: Done!
+        Test: Done!
+    isObstacleBetween
+        Doc: Done!
+        Test: Done!
+    updateDislRelpos
+        Doc: Done!
+        Test: Done!
+    insertionSortPlaneWithCrossing
+        Doc: Done!
+        Test: Done!
+    annihilateDislocations
+        Doc: Done!
+        Test: Done!
+    annihilateDislocationsSub
+        Doc: Done!
+        Test: Done!
+    updateDislPos
+        Doc: Done!
+        Test: Done! (also see rmesh for badflip = True)
+    updateDislPosSub
+        Doc: Done!
+        Test: Half done...awaits CADD simulation
+    updateDislPosSub
+        Doc: Done!
+        Test: Done! (also see rmesh for badflip = True)
+    updateSources
+        Doc: Done!
+        Test: Awaits DD simulation...
+    updateSource
+        Doc: Done!
+        Test: Done!
+    createDipole
+        Doc: Done!
+        Test: Done!
+    getResolvedStressOnSource
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getResolvedStressOnObstacle
+        Doc: Done!
+        Test: Awaits DD simulation...
+mod_delaunay
+    genDelaunay
+        Doc: Done!
+        Test: Done!
+    getTriNodes
+        Doc: Done!
+        Test: Test!
+    getTriCenter
+        Doc: Done!
+        Test: Done!
+    identifyLargeTri
+        Doc: Done!
+        Test: (Implicitly, through genDelaunay)
+    dtris2, etc.
+        Doc: Done!
+        Test: (Assuming this is correct)
+mod_disl_detect_pass
+    Doc: Done!
+    initDetectionData
+        Doc: Done!
+        Test: Done!
+    readDetectionData
+        Doc: Done!
+        Test: Done!
+    processDetectionData
+        Doc: Done!
+        Test: Done!
+    writeDetectionData
+        Doc: Done!
+        Test: Done!
+    assignDetectionPoints
+        Doc: Done!
+        Test: Done!
+    insideAnnulus
+        Doc: Done!
+        Test: Done!
+    insideRectAnnulus
+        Doc: Done!
+        Test: Done!
+    assignInsideDetectionBand
+        Doc: Done!
+        Test: (Implicitly tested using assignDetectionPoints)
+    assignBranchCut
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    getDislPropsFromBurgersVec
+        Doc: Done!
+        Test: Done!
+    detectAndPassDislocations
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    passAtomisticToContinuum
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    passContinuumToAtomistic
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    findInterfaceIntersectionDeformed
+        Doc: Done!
+        Test: Done!
+    findInterfaceIntersectionUndeformed
+        Doc: Done!
+        Test: Done!
+    findInterfaceIntersectionSub
+        Doc: Done!
+        Test: Implicitly, through findInterfaceIntersectionDeformed/findInterfaceIntersectionUndeformed
+    errorInterface
+        Doc: Done!
+        Test: Not needed.
+    updateAtomsPassing
+        Doc: Done!
+        Test: Done!
+    imposeDipoleDispOnAtoms
+        Doc: Done!
+        Test: Done!
+mod_disl_escaped
+    initDislEscapedData
+        Doc: Done!
+        Test: Implicitly, through rmesh/cmesh_1/cmesh_2
+    readDislEscapedData
+        Doc: Done!
+        Test: Done!
+    processEscapedDislData
+        Doc: Done!
+        Test: Implicitly, through rmesh/cmesh_1/cmesh_2
+    getMaxLen
+        Doc: Done!
+        Test: Done!
+    writeEscapedDislData
+        Doc: Done!
+        Test: Done!
+    addEscapedDislocation
+        Doc: Done!
+        Test: Done!
+    getEscapedPos
+        Doc: Done!
+        Test: Done!
+    getEscapedRegion
+        Doc: Done!
+        Test: Not needed
+    getEscapedRegionCrack
+        Doc: Done!
+        Test: Done!
+    getEscapedDispAtPointAll
+        Doc: Done!
+        Test: Implicitly, through rmesh/cmesh_1/cmesh_2
+    getEscapedDispAtPoint
+        Doc: Done!
+        Test: Implicitly, through rmesh/cmesh_1/cmesh_2
+    getEscapedDispAtPointSub
+        Doc: Done!
+        Test: Done!
+    getEscapedDispAtPointCrack
+        Doc: Done!
+        Test: Implicitly, through cmesh_1/cmesh_2
+    getEscapedDispAtPointCrackSub
+        Doc: Done!
+        Test: Implicitly, through cmesh_1/cmesh_2
+mod_disl_fields2
+    getTildeDispAtPointAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getTildeStressAtPointAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getPKTildeStressAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getTildeStressOnSourceAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getRealDispAtPointAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getRealStressAtPointAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getRealPKStressAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getGhostDispAtPointAll
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    getGhostStressAtPointAll
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    getGhostPKStressAll
+        Doc: Done!
+        Test: Awaits CADD simulation...
+    getLatentDispAtPointAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getLatentStressAtPointAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getLatentStressOnSourceAll
+        Doc: Done!
+        Test: Awaits DD simulation...
+    getDispAtPoint
+        Doc: Done!
+        Test: Done!
+    getStressAtPoint
+        Doc: Done!
+        Test: Done!
+    adjustDxnDyn
+        Doc: Done!
+        Test: Done!
+    getDispAtPointSub
+        Doc: Done!
+        Test: Done!
+    getStressAtPointSub
+        Doc: Done!
+        Test: Done!
+mod_disl_ghost
+    initGhostDislData
+        Doc: Done!
+        Test: Not needed
+    readGhostDislData
+        Doc: Done!
+        Test: Done!
+    writeGhostDislData
+        Doc: Done!
+        Test: Done!
+    addGhostDislocation
+        Doc: Done
+        Test: Done!
+mod_disl_ident_simple
+    Doc: Done!
+    initDislIdentData
+        Doc: Done!
+        Test: Done!
+    computeCircuits
+        Doc: Done!
+        Test: Done!
+    getIdealVector
+        Doc: Done!
+        Test: Done!
+mod_disl_misc
+    initDislMiscData
+        Doc: Done!
+        Test: N/A
+    readDislMiscData
+        Doc: Done!
+        Test: Done!
+    writeDislMiscData
+        Doc: Done!
+        Test: Done!
+mod_disl_try
+    Doc: Done!
+    initDislData
+        Doc: Done!
+        Test: Not needed
+    initDislSourceData
+        Doc: Done!
+        Test: Not needed
+    initDislObsData
+        Doc: Done!
+        Test: Not needed
+    readDislData
+        Doc: Done!
+        Test: Done
+    readDislSourceData
+        Doc: Done!
+        Test: Done!
+    readDislObsData
+        Doc: Done!
+        Test: Done!
+    processDislData
+        Doc: Done!
+        Test: Done!
+    processDislSourceData
+        Doc: Done!
+        Test: Done!
+    processDislObsData
+        Doc: Done!
+        Test: Done!
+    activateDislocations
+        Doc: Done!
+        Test: Done!
+    zeroDislDisp
+        Doc: Done!
+        Test: Done!
+    setupSources
+        Doc: Done!
+        Test: Done!
+    assignNucleationLength
+        Doc: Done!
+        Test: Done!
+    zeroObstacles
+        Doc: Done!
+        Test: Done!
+    assignDislLocalPos
+        Doc: Done!
+        Test: Done!
+    assignSourcesLocalPos
+        Doc: Done!
+        Test: Done!
+    assignObsLocalPos
+        Doc: Done!
+        Test: Done!
+    checkImproperAssignment
+        Doc: Done!
+        Test: N/A
+    initDislSortedPlanes
+        Doc: Done!
+        Test: Done!
+    initObsSortedPlanes
+        Doc: Done!
+        Test: Done!
+    initSourcesSortedPlanes
+        Doc: Done!
+        Test: Done!        
+    initSortedPlanes
+        Doc: Done!
+        Test: Implicitly, through initDisl/Obs/SourcesSortedPlanes
+    assignDislSortedPlanes
+        Doc: Done!
+        Test: Done!
+    assignObsSortedPlanes
+        Doc: Done!
+        Test: Done!
+    assignSourcesSortedPlanes
+        Doc: Done!
+        Test: Done!
+    sortDislPlanes
+        Doc: Done!
+        Test: Done!
+    sortObsPlanes
+        Doc: Done!
+        Test: Done!
+    sortPlanes
+        Doc: Done!
+        Test: Implicitly, through sortDisl/ObsPlanes
+    sortPlane
+        Doc: Done!
+        Test: Done!
+    addDislocation
+        Doc: Done!
+        Test: Done!
+    addDislocationSub
+        Doc: Done!
+        Test: Done!
+    findEmptyDislSlot
+        Doc: Done!
+        Test: Done!
+    addObjSub
+        Doc: Done!
+        Test: Done!
+    addImageDislocation
+        Doc: Done!
+        Test: Done!
+    deleteDislocation
+        Doc: Done!
+        Test: Done!
+    deleteDislocationSub
+        Doc: Done!
+        Test: Done!
+    deleteDislocationSub2
+        Doc: Done!
+        Test: Done!
+    checkTooManyDisl
+        Doc: Done!
+        Test: Done!
+    checkTooManyObj
+        Doc: Done!
+        Test: Done!
+    writeDislData
+        Doc: Done!
+        Test: Done!
+    countActiveDisl
+        Doc: Done!
+        Test: Done!
+    writeDislObsData
+        Doc: Done!
+        Test: Done!
+    writeDislSourceData
+        Doc: Done!
+        Test: Done!
+mod_dump
+    getDumpFilename
+        Doc: Done!
+        Test: Done!
+    writeDumpCADD
+        Doc: Done!
+        Test: Implicitly, through detect_test
+    writeDumpCADDNoDisl
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad
+    writeDumpFE
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad
+    writeDumpDD
+        Doc: Done!
+        Test: Implicitly, through rmesh
+    writeDumpAtomistic
+        Doc: Done!
+        Test: Implicitly, through atomistic_2
+    writeDumpNodesDefElementsChunk
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad
+    writeDumpNodesUndefElementsChunk
+        Doc: Done!
+        Test: Implicitly, through rmesh
+    writeDumpNodesElementsChunkSub
+        Doc: Done!
+        Test: Implicitly, through rmesh/simple_fe_pad
+    writeDumpDDChunk
+        Doc: Done!
+        Test: Done!
+    writeDumpNodesDefChunk
+        Doc: Done!
+        Test: Done!
+    writeDumpNodesUndefChunk
+        Doc: Done!
+        Test: Done!
+    writeDumpNodesDef
+        Doc: Done!
+        Test: Implicitly, through writeDumpNodesChunk
+    writeDumpNodesUndef
+        Doc: Done!
+        Test: Implicitly, through writeDumpNodesChunk
+    writeDumpNodesDisp
+        Doc: Done!
+        Test: Done!
+    writeDumpNodesTypes
+        Doc: Done!
+        Test: Implicitly, through writeDumpNodesChunk
+    writeDumpFEElements
+        Doc: Done!
+        Test: Done!
+    writeDumpDisl
+        Doc: Done!
+        Test: Implicitly, through writeDumpDDChunk
+    writeDumpSources
+        Doc: Done!
+        Test: Implicitly, through writeDumpDDChunk
+    writeDumpObstacles
+        Doc: Done!
+        Test: Implicitly, through writeDumpDDChunk
+    writeDumpCompute
+        Doc: Done!
+        Test: Implicitly, through atomistic_2
+    writeDumpCentro
+        Doc: Done!
+        Test: Done!
+mod_fe_elements
+    Doc: Done!
+    initFEElementData
+        Doc: Done!
+        Test: Done!
+    readFEElementData
+        Doc: Done!
+        Test: Done!
+    processFEElementData
+        Doc: Done!
+        Test: Done!
+    processEdges
+        Doc: Done!
+        Test: Done!
+    processInterfaceEdges
+        Doc: Done!
+        Test: Done!
+    processNodeLists
+        Doc: Done!
+        Test: Done!
+    processMaterialList
+        Doc: Done!
+        Test: Done!
+    writeFEElementData
+        Doc: Done!
+        Test: Done!
+mod_fe_el_2d
+    Doc: Done!
+    initFELibrary
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad, etc.
+    getElTypeNum
+        Doc: Done!
+        Test: Done!
+    getK_2d
+        Doc: Done!
+        Test: Done!
+    getB_2d
+        Doc: Done!
+        Test: Done!
+    getBAlt_2d
+        Doc: Done!
+        Test: Done!
+    getBSub_2d
+        Doc: Done!
+        Test: Done!
+    getJ_2d
+        Doc: Done!
+        Test: Done!
+    getdN_2d
+        Doc: Done!
+        Test: Done!
+    getdN_CPE4_2d
+        Doc: Done!
+        Test: Done!
+    getdN_CPE3_2d
+        Doc: Done!
+        Test: Done!
+    getN_2d
+        Doc: Done!
+        Test: Done!
+    getN_CPE4_2d
+        Doc: Done!
+        Test: Done!
+    getN_CPE3_2d
+        Doc: Done!
+        Test: Done!
+    getGauss_CPE4_2d
+        Doc: Done!
+        Test: N/A?
+    getGauss_CPE3_2d
+        Doc: Done!
+        Test: N/A?
+    getGaussEdge_2d
+        Doc: Done!
+        Test: Done!
+    findInElement
+        Doc: Done!
+        Test: Done!
+    findInCPE4
+        Doc: Done!
+        Test: Done!
+    findInCPE3
+        Doc: Done!
+        Test: Done!
+    checkElement
+        Doc: Done!
+        Test: Done!
+    checkCPE4
+        Doc: Done!
+        Test: Done!
+    checkCPE3
+        Doc: Done!
+        Test: Done!
+mod_fe_main_2d
+    Doc: Done!
+    solveAll
+        Doc: Done!
+        Test: One material test done...also awaits multi-material model
+    initAssembly
+        Doc: Done!
+        Test: Done!
+    assembleAndFactorAll
+        Doc: Done!
+        Test: N/A? See solveOneMat...
+    updateFENodalPosnAll
+        Doc: Done!
+        Test: N/A? See updateFENodalPosn(i)...may not work for multi-material
+    solveOneMat
+        Doc: Done!
+        Test: Done!
+    factorOneMat
+        Doc: Done!
+        Test: Not sure how to test this...
+    countEqns
+        Doc: Done!
+        Test: Done!
+    assembleKNormal
+        Doc: Done!
+        Test: Done!
+    assembleLagrange
+        Doc: Done!
+        Test: Done!
+    getDislForceRHS
+        Doc: Done!
+        Test: Half done. Awaits test with dislocations.
+    getDislForceSub
+        Doc: Done!
+        Test: Awaits model with dislocations.
+    getDispRHS
+        Doc: Done!
+        Test: Half done. Awaits test with dislocations.
+    getTotalDispAtPoint
+        Doc: Done!
+        Test: Awaits
+    getFEDispAtPoint
+        Doc: Done!
+        Test: Done!
+    getFEStressAtPoint
+        Doc: Done!
+        Test: Done!
+    getFEStrainAtPoint
+        Doc: Done!
+        Test: Done!
+    updateFENodalPosn
+        Doc: Done!
+        Test: Sort of...awaits test with dislocations!
+mod_fe_main_2d_assign
+    Doc: Done!
+    assignFE
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad, etc.
+mod_groups
+    Doc: Done!
+    initGroupData:
+        Doc: Done!
+        Test: Done!
+    readGroupData:
+        Doc: Done!
+        Test: Done!
+    processGroupData:
+        Doc: Done!
+        Test: Done!
+    getGroupNum
+        Doc: Done!
+        Test: Done!
+    genGroupMaskAtoms
+        Doc: Done!
+        Test: Done!
+    genGroupMaskFENodes
+        Doc: Done!
+        Test: Done!
+    genGroupMaskAll
+        Doc: Done!
+        Test: Done!
+    writeGroupData:
+        Doc: Done!
+        Test: Done!
+    getMaskSortedIntersect:
+        Doc: Done!
+        Test: Done!
+mod_integrate
+    Doc: Done!
+    loopVerlet:
+        Doc: Done!
+        Test: Done!...see also atomistic_1 for LAMMPS comparison
+    velocityVerlet and velocityVerletSub1 and velocityVerletSub2
+        Doc: Done!
+        Test: Done!...see also atomistic_1 for LAMMPS comparison
+mod_interactions
+    Doc: Done!
+    initInteractionData
+        Doc: Done!
+        Test: Done!
+    readInteractionData
+        Doc: Done!
+        Test: Done!
+    processInteractionData
+        Doc: Done!
+        Test: Done!
+    writeInteractionData
+        Doc: Done!
+        Test: Done!
+mod_io
+    initSimulation
+        Doc: Done!
+        Test: Implicitly...
+    assignInitAndWrite
+        Doc: Done!
+        Test: Implicitly...
+    writeOutput
+        Doc: Done!
+        Test: Implicitly, through atomistic_2
+    initCADD
+        Doc: Done!
+        Test: Implicitly, through detect_test
+    initCADDNoDisl
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad
+    initFE
+        Doc: Done!
+        Test: Implicitly, through simple_fe_pad
+    initDD
+        Doc: Done!
+        Test: Implicitly, through cmesh_1
+    initAtomistic
+        Doc: Done!
+        Test: Implicitly, through atomistic_2
+    initGeneralChunk
+        Doc: Done!
+        Test: Implicitly
+    initAtomisticChunk
+        Doc: Done!
+        Test: Implicitly
+    initFEChunk
+        Doc: Done!
+        Test: Implicitly
+    initDDChunk
+        Doc: Done!
+        Test: Implicitly
+    initCADDNoDislChunk
+        Doc: Done!
+        Test: Implicitly
+    initCADDChunk
+        Doc: Done!
+        Test: Implicitly
+    getRestartPrefSuff
+        Doc: Done!
+        Test: Done!
+    writeRestartCADD
+        Doc: Done!
+        Test: Done!
+    writeRestartCADDNoDisl
+        Doc: Done!
+        Test: Done!
+    writeRestartFE
+        Doc: Done!
+        Test:
+    writeRestartDD
+        Doc: Done!
+        Test: Done!
+    writeRestartAtomistic
+        Doc: Done!
+        Test: Done!
+    writeRestartGeneralChunk
+        Doc: Done!
+        Test: Implicitly
+    writeRestartAtomisticChunk
+        Doc: Done!
+        Test: Implicitly
+    writeRestartFEChunk
+        Doc: Done!
+        Test: Implicitly
+    writeRestartDDChunk
+        Doc: Done!
+        Test: Implicitly         
+    writeRestartCADDChunk
+        Doc: Done!
+        Test: Implicitly 
+mod_kdispfields
+    Doc: Done!
+    applyKDispIso
+        Doc: Done!
+        Test: Done!
+mod_materials
+    Doc: Done!
+    initMaterialData
+        Doc: Done!
+        Test: Done!
+    readMaterialData
+        Doc: Done!
+        Test: Done!
+    processMaterialData
+        Doc: Done!
+        Test: Done!
+    writeMaterialData
+        Done: Done!
+        Test: Done!
+    getMuNuApprox
+        Doc: Done!
+        Test: Done!
+    getNucleationLength
+        Doc: Done!
+        Test:
+mod_math
+    Doc: Done!
+    intToLogical
+        Doc: Done!
+        Test: Done!
+    logicalToInt
+        Doc: Done!
+        Test: Done!
+    getCircumradiusSqforTriangle
+        Doc: Done!
+        Test: Done!
+    sameSign
+        Doc: Done!
+        Test: Done!
+    linearInterp
+        Doc: Done!
+        Test: Done!
+    searchSortedBrute
+        Doc: Done!
+        Test: Done!
+    searchSortedBinary
+        Doc: Done!
+        Test: Done!
+    searchSortedSpecial
+        Doc: Done!
+        Test:
+    findPointBetween
+        Doc: Done!
+        Test: Done!
+    rotateVec2d
+        Doc: Done!
+        Test: Done!
+    rotateStress2d
+        Doc: Done!
+        Test: Done!
+    invertMat2
+        Doc: Done!
+        Test: Done!
+    getDeterminant2
+        Doc: Done!
+        Test: Done!
+    getUnitNormalRHR
+        Doc: Done!
+        Test: Done!
+    getIntersectionTwoLines
+        Doc: Done!
+        Test: Done!
+    getDuplicates
+        Doc: Done!
+        Test: Done!
+    getUniqueInts
+        Doc: Done!
+        Test: Done!
+    isMultiple
+        Doc: Done!
+        Test: Done!
+    checkSameSide
+        Doc: Done!
+        Test: Done!
+    getPerpDistance
+        Doc: Done!
+        Test: Done!
+    projectVec
+        Doc: Done!
+        Test: Done!
+    normalizeVec
+        Doc: Done!
+        Test: Done!
+mod_mesh_find
+    Doc: Done!
+    findInAllWithGuess
+        Doc: Done!
+        Test: Sort of...Awaits multi-material model
+    findInAllInitially
+        Doc: Done!
+        Test: Sort of...Awaits multi-material model
+    findInAllSub
+        Doc: Done!
+        Test: Awaits multi-material model
+    findInOneMatInitially
+        Doc: Done!
+        Test: Done!
+    findInOneMat
+        Doc: Done!
+        Test: Done!
+    findInOneMatSub
+        Doc: Done!
+        Test: Done!
+    getLocalCoords
+        Doc: Done!
+        Test: Done!
+    findInOneMatSubAlt
+        Doc: Done!
+        Test: Done!
+    getElGuessBrute
+        Doc: Done!
+        Test: Done!
+    getNodeGuessBrute
+        Doc: Done!
+        Test: Done!
+mod_misc
+    initMiscData
+        Doc: Done!
+        Test: Not needed
+    readMiscData
+        Doc: Done!
+        Test: Done!
+    writeMiscData
+        Doc: Done!
+        Test: Done!
+    updateMiscIncrementCurr
+        Doc: Done!
+        Test: Not needed.
+mod_neighbors:
+    Doc: Done!
+    initNeighborData
+        Doc: Done!
+        Test: Done!
+    readNeighborData
+        Doc: Done!
+        Test: Done!
+    processNeighborData
+        Doc: Done!
+        Test: Done!
+    writeNeighborData
+        Doc: Done!
+        Test: Done!
+    updateNeighIncrementCurr
+        Doc: Done!
+        Test: Not needed.
+    updateNeighborsCheck
+        Doc: Done!
+        Test: Done!
+    updateNeighborsNoCheck
+        Doc: Done!
+        Test: Implicitly through updateNeighbors
+    updatePosSinceLastCheck
+        Doc: Done!
+        Test: Done!
+    checkDisp
+        Doc: Done!
+        Test: Done!
+    genAtomBins
+        Doc: Done!
+        Test: Implicitly, through genNeighList
+    genNeighList
+        Doc: Done!
+        Test: Done!
+    getAtomsInBoxGroup
+        Doc: Done!
+        Test: Done!
+mod_nodes:
+    Doc: Done!
+    initNodeData
+        Doc: Done!
+        Test: Done!
+    readNodeData
+        Doc: Done!
+        Test: Done!
+    processNodeData
+        Doc: Done!
+        Test: Done!
+    getXYAtomBounds
+        Doc: Done!
+        Test: Done!
+    getXYBounds
+        Doc: Done!
+        Test: Done!
+    writeNodeData
+        Doc: Done!
+        Test: Done!
+mod_pad_atoms
+    Doc: Done!
+    initPad
+        Doc: Done!
+        Test: Done!
+    assignPad
+        Doc: Done!
+        Test: Done!
+    updatePad
+        Doc: Done!
+        Test: Done!
+mod_poten_assign
+    Doc: Done!
+    initPotentialStyle
+        Doc: Done!
+        Test: Implicitly, through atomistic_2
+mod_poten_pair_table
+    Doc: Done!
+    getPotForcesAllTable
+        Doc: Done!
+        Test: Done!
+    getPotForcesTable
+        Doc: Done!
+        Test: Done!
+mod_potentials
+    Doc: Done!
+    initPotentialData
+        Doc: Done!
+        Test: Done!
+    readPotentialData
+        Doc: Done!
+        Test: Done!
+    processPotentialData
+        Doc: Done!
+        Test: Implicitly, through initPotentialData
+    writePotentialData
+        Doc: Done!
+        Test: Done!
+mod_slip_sys
+    Doc: Done!
+    initSlipSysData
+        Doc: Done!
+        Test: Not needed
+    readSlipSysData
+        Doc: Done!
+        Test: Done!
+    processSlipSysData
+        Doc: Done!
+        Test: Done!
+    getSlipPlane
+        Doc: Done!
+        Test: Done!
+    invResolveDisp
+        Doc: Done!
+        Test: Done!
+    resolveStress
+        Doc: Done!
+        Test: Done!
+    writeSlipSysData
+        Doc: Done!
+        Test: Done!
+mod_sort
+    Doc: Done!
+    insertionSortPlane
+        Doc: Done!
+        Test: Done!
+    mergeSort
+        Doc: Done!
+        Test: Done!
+    mergeSub
+        Doc: Done!
+        Test: Done!
+    mergeSortReal
+        Doc: Done!
+        Test: Done!
+    mergeSubReal
+        Doc: Done!
+        Test: Done!
+    mergeSortCols
+        Doc: Done!
+        Test: Done!
+    mergeSubCols
+        Doc: Done!
+        Test: Done!
+    mergeSortColsReal
+        Doc: Done!
+        Test: Done!
+    mergeSubColsReal
+        Doc: Done!
+        Test: Done!
+mod_types
+    Doc: Done!
+mod_utils
+    Doc: Done!
+    prettyPrintRealMat
+        Doc: Done!
+        Test: Done!
+    prettyPrintIntMat
+        Doc: Done!
+        Test: Done!
+    prettyPrintRealVec
+        Doc:
+        Test:
+    prettyPrintIntVec
+        Doc:
+        Test:
+    readIntVec
+        Doc:
+        Test:
+    readRealVec
+        Doc:
+        Test:
+    readIntMat
+        Doc:
+        Test:
+    readRealMat
+        Doc:
+        Test:
+    writeIntVec
+        Doc:
+        Test:
+    writeIntVecSub
+        Doc:
+        Test:
+    writeRealVec
+        Doc:
+        Test:
+    writeIntMat
+        Doc: Done!
+        Test: Done!
+    writeIntMatSub
+        Doc:
+        Test:
+    writeRealMat
+        Doc: Done!
+        Test: Done!
+    writeRealMatSub
+        Doc:
+        Test:
+    

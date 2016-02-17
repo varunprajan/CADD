@@ -1,0 +1,48 @@
+Things to do:
+
+http://scicomp.stackexchange.com/questions/6961/f2py-with-allocatable-and-assumed-shape-arrays
+
+Algorithmic issues:
+    Issue with initial positions along crack surfaces being slightly different from 0
+        (Slip plane probably shouldn't lie on y = 0 either for crack problem)
+    Test whether dislocation can spuriously cross crack surfaces
+    Look into integration of equations of dislocation motion...velocity correction?
+    Better procedure for exiting damped dynamics loop...forces near old dislocation?
+    
+Testing:
+    Unit tests
+    Larger scale tests
+        Run small/moderate-size CADD simulation, no sources/obstacles/pre-existing dislocations
+        Run dislocation dipole in a rectangular bar (pure FEM)
+        Run moderate-size pure FE simulation
+            Check that memory requirements are not excessive...
+        Figure out clean tests for dislocation passing...
+        
+Misc:
+    Code improvement:
+        Set private and public methods
+        Code profiling --- use gprof
+        Remove hard coded constants, move to read-in parameters
+        Segregate misc data from io?
+        Label pure functions/subroutines (no side effects)
+        Label intent of arguments (in/out)
+        Use pure functions/subroutines whenever possible
+    Code functionality:
+        Implement 3D support for dislocations
+            Detection
+                (Requires triangulation)
+            Disl. fields
+                (Anisotropy?)
+        Multipole
+        Multi-material?
+
+Other notes: 
+How do positions of interface atoms get updated? - by atomistics; they are fixed for the continuum part; conversely, pad atoms are fixed for the atomistics, but their positions are unchanged when the continuum problem is solved
+
+Obsolete:
+FE difficulties:
+Lagrange multipliers for enforcing displacement boundary conditions
+(see http://www.softeng.rl.ac.uk/st/projects/felib3/Docs/html/Intro/intro-node68.html)
+Storage of sparse (symmetric) matrix (look at skysol?)
+Decomposition of (real sparse symmetric) matrix, matrix multiplication
+(http://www.hsl.rl.ac.uk/catalogue/ma62.html)

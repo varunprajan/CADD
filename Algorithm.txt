@@ -1,0 +1,87 @@
+CADD Algorithm
+
+Subcycle:
+    C 1) Atomistic step(s)
+        a)  Update neighbors, according to delay/skin/every settings
+        b)  Initialize potential and damping forces
+        c)  For every increment
+            i)  Run verlet
+            ii) Update neighbors, if necessary
+    C 2) Detect dislocations, pass outwards
+    C 3) Solve FE (involves computing boundary conditions using dislocation fields, updated atom positions)
+    C 4) Update pad atoms using FE displacements
+    C 5) Sort dislocations (needs to be done after passing)
+    C 6) Compute new dislocation positions in absence of constitutive relations (annihilation, etc.) by using PK, updating "disp" attribute for each dislocation
+         Need to decide on integration algorithm!
+    C 7) Adjust dislocation displacements if they have crossed active obstacles
+    C 7.5) Update disl. relpos
+    C 8) Resolve crossings during movement
+          Same sign -> ?
+          Opposite sign -> annihilation
+    C 9) Resolve annihilation after movement
+    C 10) Update dislocation attributes (listed below), and remove/pass escaped dislocations
+           Posn
+           Local pos
+           Element
+    C 12) Rezero dislocation disp, obstacle compute
+    C 13) Update latent disl array (time) by looping over sources, add to real dislocation array if time > time_cr
+    C 14) Write output, if necessary
+    
+DD Algorithm
+
+Subcycle:
+    C 1) Solve FE (involves computing boundary conditions using dislocation fields, updated atom positions)
+    C 2) Sort dislocations (needs to be done after passing)
+    C 3) Compute new dislocation positions in absence of constitutive relations (annihilation, etc.) by using PK, updating "disp" attribute for each dislocation
+         Need to decide on integration algorithm!
+    C 4) Adjust dislocation displacements if they have crossed active obstacles
+    C 4.5) Update disl. relpos
+    C 5) Resolve crossings during movement
+          Same sign -> ?
+          Opposite sign -> annihilation
+    C 6) Resolve annihilation after movement
+    C 7) Update dislocation attributes (listed below), and remove/pass escaped dislocations
+           Posn
+           Local pos
+           Element
+    C 8) Rezero dislocation disp, obstacle compute
+    C 9) Update latent disl array (time) by looping over sources, add to real dislocation array if time > time_cr
+    C 10) Write output, if necessary
+    
+Subcycle using functions
+    1) solveFE_ptr
+    2) runDDStep(dt)
+    3) writeDump...
+
+Parameters:
+
+1) FE timestep should be roughly 50 atomistic timesteps corresponding to true dynamics (see Qu paper)...FE timestep is related to Debye frequency. (This is much, much (10^3?) smaller than timestep used in DD only simulations.)
+2) Atomistic timestep is 0.002 for true dynamics; 0.02 for damped dynamics
+3) So, FE timestep should be roughly 0.1?
+4) Other consideration: Dislocation should not be able to cross over detection band. Max dislocation speed is cT = sqrt(mu/rho) = 3.4 in 2D. So, detection band must be at least 3.4*0.1 = 0.34 across (this is very small)
+4) Other parameters:
+
+Be careful with:
+Misc:
+    timestep = 0.02 (damped dynamics) vs. 0.002 (true dynamics)
+    increment
+Neighbors:
+    delay = 0
+    every = 0 
+    checkdisp = 1
+Damping:
+    flag = 1
+    gamma = 0.05
+FE Elements:
+    elname = CPE3 or CPE4
+Potential:
+    Need to adjust for r0 = 1
+Materials:
+    disldrag =
+    lannih = 6b?
+    burgers = 1.0
+    
+
+    
+    
+    
