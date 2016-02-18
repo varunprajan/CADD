@@ -336,7 +336,7 @@ C     numbering with nodes%fenodes
           call getUniqueInts(feelements(i)%connect,nodes%nnodes,
      &        counter,feelements(i)%nodelist,feelements(i)%nodeinvlist)
           
-          call getUniqueInts(feelements(i)%bdedges,nodes%nnodes,
+          call getUniqueInts(feelements(i)%bdedges(1:2,:),nodes%nnodes,
      &                     counter,feelements(i)%bdnodelist,invlisttemp)
           
       end do

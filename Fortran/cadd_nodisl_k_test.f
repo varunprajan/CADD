@@ -29,7 +29,7 @@
       real(dp) :: dt, disptol
       
 C     read, initialize
-      call initSimulation('cadd_nodisl_k_test','cadd_nodisl')
+      call initSimulation('cadd_nodisl_k_test_small','cadd_nodisl')
       write(*,*) 'Blah'
       
 C     material stuff
@@ -54,23 +54,23 @@ C     atomistic stuff
       dt = 0.02_dp
       disptol = 1.0e-5_dp
       
-C     apply K, equilibrate, dump
-      do i = 1, nstepsK
-          if (i == 0) then
-              KIapply = KIstart
-          else
-              KIapply = KIincr
-          end if
-          
-          KIcurr = KIstart + i*KIincr
-          write(*,*) 'Current KI', KIcurr
-          
-          call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
-          call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
-     &                               disptol)
-          call updateMiscIncrementCurr(1)
-          call writeDump_ptr()
-      end do
+CC     apply K, equilibrate, dump
+C     do i = 1, nstepsK
+C         if (i == 0) then
+C             KIapply = KIstart
+C         else
+C             KIapply = KIincr
+C         end if
+C         
+C         KIcurr = KIstart + i*KIincr
+C         write(*,*) 'Current KI', KIcurr
+C         
+C         call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
+C         call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
+C    &                               disptol)
+C         call updateMiscIncrementCurr(1)
+C         call writeDump_ptr()
+C     end do
 
       contains
 ************************************************************************

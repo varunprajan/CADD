@@ -141,13 +141,18 @@
      
       implicit none
       
-      real(dp) :: allposnnew(2,2), allposnold(2,2)
-      
-      allposnold(1,:) = [0.0_dp,4.0_dp]
-      allposnold(2,:) = [3.0_dp,5.0_dp]
-      allposnnew(1,:) = [16.0_dp,4.0_dp]
-      allposnnew(2,:) = [7.0_dp,12.0_dp]
-      
-      write(*,*) maxval(sum(abs(allposnnew-allposnold),2))
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call readFEElementData('simplefe_feelements')     
+      call processFEElementData()
+      call processEdges()
+      call processNodeLists()
+      write(*,*) 'Boundary nodes'
+      write(*,*) feelements(1)%bdnodelist
+      write(*,*) 'All nodes'
+      write(*,*) feelements(1)%nodelist
+      write(*,*) 'Inverse node list'
+      write(*,*) feelements(1)%nodeinvlist
             
       end program

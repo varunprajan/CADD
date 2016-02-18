@@ -40,10 +40,12 @@ C     processed
       
 C     module variables (local)
       type(assemblydata), allocatable :: assembly(:)
+      
+C     HARD-CODED CONSTANTS
       real(dp), parameter :: lfactfac = 1.25_dp
       real(dp), parameter :: lifactfac = 1.25_dp
-      real(dp), parameter :: lkeepfac = 1.1_dp
-      real(dp), parameter :: lworkfac = 1.1_dp
+      real(dp), parameter :: lkeepfac = 1.25_dp
+      real(dp), parameter :: lworkfac = 1.25_dp
       
       contains
 ************************************************************************ 
@@ -362,7 +364,7 @@ C             use undeformed positions
               posn(:,j) = nodes%posn(1:2,node) - nodes%posn(4:5,node)
               nodeidx = feelements(mnumfe)%nodeinvlist(node)
               dofnum(2*j-1) = 2*nodeidx - 1
-              dofnum(2*j) = 2*nodeidx
+              dofnum(2*j) = 2*nodeidx   
           end do
           K = getK_2d(posn,C,eltypenum)
           do k1 = 1, felib(eltypenum)%neldof
@@ -415,7 +417,7 @@ C         interface atom or disp. fixed
           yfixed = ((nodetype==2).or.(bcflag==2).or.(bcflag==3))
           if (xfixed) then
               ceqns = ceqns + 1
-              centries = centries + 1
+              centries = centries + 1  
               assembly(mnumfe)%rowindex(centries) = 2*nodeidx - 1
               assembly(mnumfe)%colindex(centries) = ceqns
               assembly(mnumfe)%Ksparse(centries) = 1
