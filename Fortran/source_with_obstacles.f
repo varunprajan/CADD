@@ -8,6 +8,7 @@
       use mod_materials, only: materials
       use mod_nodes, only: nodes
       use mod_groups, only: groups, allgroupname, getGroupNum
+      use mod_fe_elements, only: fematerials
       use mod_fe_main_2d, only: getFEStressAtPoint
       use mod_fe_main_2d_assign, only: solveAll_ptr
       use mod_disl_try, only: disl, dislt, addDislocation,
@@ -29,7 +30,7 @@
       integer :: ntau, nsteps
       real(dp) :: dt, dt0
       integer :: dislnum
-      integer :: mnumfe
+      integer :: mnum, mnumfe
       real(dp) :: vmax
       character(len=15) :: facsuffix, vmaxsuffix
       character(len=:), allocatable :: filename
@@ -38,12 +39,13 @@
       
       call initSimulation('source_with_obstacles','dd')
       call writeDump_ptr()
-      mnumfe = 1
  
 C     material properties
-      mu = materials(mnumfe)%mu
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
       ! materials(mnumfe)%dislvmax = 20.0_dp ! ad hoc cutoff
-      vmax = materials(mnumfe)%dislvmax
+      vmax = materials(mnum)%dislvmax
       
 C     timestep (nanoseconds)
       dt0 = 0.5_dp

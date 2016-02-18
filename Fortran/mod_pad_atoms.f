@@ -39,6 +39,8 @@ C     Purpose: Read, initialize data in "padatoms" structure, which holds
 C     information about pad atoms (atoms within FE region, whose positions
 C     are adjusted during FE/DD step, and held fixed during atomistic step)
       
+      implicit none
+      
 C     local variables
       integer :: i
       integer :: node
@@ -76,6 +78,8 @@ C     Outputs: None
 
 C     Purpose: Assign attributes to pad atom
       
+      implicit none
+      
 C     input variables
       integer :: mnumfe
       integer :: element
@@ -100,6 +104,8 @@ C     Inputs: None
 C     Outputs: None
 
 C     Purpose: Update positions of all pad atoms according to combined FE/DD displacement
+      
+      implicit none
       
 C     local variables
       integer :: i

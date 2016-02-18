@@ -15,7 +15,8 @@ C     Notes/TODO: Implement correction step!
       implicit none
       
       type dislidentsimpledata
-C     (read-in)
+C     (processed)
+      integer :: mnum
       character(len=20) :: lattice
       real(dp) :: burgers
       real(dp), allocatable :: ideal(:,:)
@@ -39,17 +40,23 @@ C     Outputs: None
       
 C     Purpose: Initialize data for "simple" identification of dislocations,
 C     by generating ideal vectors for every possible combination
-C     of slip system and dislocation sign (see Stukowski paper)  
+C     of slip system and dislocation sign (see Stukowski paper)
+
+C     Notes/TODO: Assumes detection band and adjacent FE continuum material all has same lattice, burgers vectors
+
+C     Notes/TODO: Maybe this should be merged with initDetectionData?  
       
       implicit none
       
 C     local variables
       integer :: i, nvec
+      integer :: mnum
       real(dp) :: theta
       real(dp) :: latticevec(2)
 
-      identsimple%lattice = materials(1)%lattice
-      identsimple%burgers = materials(1)%burgers
+      mnum = identsimple%mnum
+      identsimple%lattice = materials(mnum)%lattice
+      identsimple%burgers = materials(mnum)%burgers
       if (identsimple%lattice == 'hex') then
           nvec = 6
           allocate(identsimple%ideal(2,nvec))
@@ -124,9 +131,8 @@ C     Outputs: idealvec --- ideal vector (length 2)
       
 C     Purpose: Computes ideal vector most closely corresponding to actual vector,
 C     using 2-norm 
-      
-C     Notes/TODO: This computes vectors for "bad" triangles, which is unnecessary,
-C     except for those edges that neighbor good triangles.
+
+      implicit none
       
 C     input variables
       real(dp) :: vec(2)

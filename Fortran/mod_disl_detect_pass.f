@@ -16,7 +16,7 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       use mod_utils, only: readMatTransposeSize, writeMatTransposeSize,
      &                     readVecSize, writeVecSize
       use mod_delaunay, only: delaunay, getTriCenter, genDelaunay
-      use mod_disl_ident_simple, only: computeCircuits
+      use mod_disl_ident_simple, only: computeCircuits, identsimple
       use mod_utils, only: writeMat, prettyPrintMat
       use mod_math, only: getIntersectionTwoLines, normalizeVec,
      &                    piconst, tolconst
@@ -165,6 +165,11 @@ C     local variables
       
       mnumfe = detection%mnumfe
       mnum = fematerials%list(mnumfe)
+
+C     identsimple stuff
+      identsimple%mnum = mnum      
+      
+C     detection stuff
       detection%lattice = materials(mnum)%lattice
       detection%burgers = materials(mnum)%burgers
       if (detection%lattice == 'hex') then
@@ -186,6 +191,7 @@ C     local variables
      &         circumsqfachex*(detection%burgers)**2/3.0_dp ! 1/sqrt(3) is factor for circumradius for equilateral triangle
       end if
       
+C     delaunay stuff
       call assignInsideDetectionBand()
       delaunay%regen = .true.
       

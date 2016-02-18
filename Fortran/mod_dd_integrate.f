@@ -154,7 +154,7 @@ C     (for quadrilateral elements). I believe this is ignored in the original co
 C     (presumably, because these fields vary slowly), and I have ignored it as well.
 
 C     4) There seems to be a lot of stuff in the code that's not described
-C     in the paper. For instance, the algorithm in velFromTauCorr,
+C     in the paper. For instance, the algorithm in velFromTauCorr and
 C     the underrelaxation (which is a complete mess, and may not even
 C     be used any more, etc.)
       

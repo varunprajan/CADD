@@ -141,12 +141,13 @@
      
       implicit none
       
-      real(dp) :: v, dt, vmax, disp
+      real(dp) :: allposnnew(2,2), allposnold(2,2)
       
-      v = -100.0_dp
-      dt = 0.05_dp
-      vmax = 50.0_dp
-      disp = dispFromVel(v,dt,vmax)
-      write(*,*) disp
+      allposnold(1,:) = [0.0_dp,4.0_dp]
+      allposnold(2,:) = [3.0_dp,5.0_dp]
+      allposnnew(1,:) = [16.0_dp,4.0_dp]
+      allposnnew(2,:) = [7.0_dp,12.0_dp]
+      
+      write(*,*) maxval(sum(abs(allposnnew-allposnold),2))
             
       end program

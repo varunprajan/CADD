@@ -9,7 +9,7 @@ C     Possible extensions: Anisotropic K-fields
       use mod_types, only: dp
       use mod_nodes, only: nodes
       use mod_math, only: piconst
-      use mod_groups, only: groups
+      use mod_groups, only: groups, getGroupNum
       implicit none
       
       private
@@ -18,7 +18,7 @@ C     Possible extensions: Anisotropic K-fields
       contains
 
 ************************************************************************
-      subroutine applyKDispIso(KI,KII,mu,nu,xc,yc,gnum)
+      subroutine applyKDispIso(KI,KII,mu,nu,xc,yc,gname)
       
 C     Subroutine: applyKDispIso
 
@@ -28,7 +28,7 @@ C             mu - shear modulus (2d, isotropic)
 C             nu - Poisson's ratio (2d, isotropic)
 C             xc - x-coordinate of crack
 C             yc - y-coordinate of crack
-C             gnum - group number
+C             gname - group name
 C                    (displacements applied only to nodes in group)
 
 C     Outputs: None
@@ -36,12 +36,16 @@ C     Outputs: None
 C     Purpose: Apply plane strain K field to group of nodes in isotropic body.
 C     Update both positions and displacements.
       
+      implicit none
+      
 C     input variables
       real(dp) :: KI, KII
       real(dp) :: mu, nu
       real(dp) :: xc, yc
-      integer :: gnum
+      character(len=*) :: gname
       
+C     local variables
+      integer :: gnum
       integer :: i
       real(dp) :: nodepos(2)
       real(dp) :: cost, sint
@@ -56,6 +60,7 @@ C     input variables
 C     from Bower, Applied Mechanics of Solids, Chapter 9.3
 C     valid only for plane strain
       
+      gnum = getGroupNum(gname)
       prefac = sqrt(1.0_dp/(2.0_dp*piconst))/mu
       do i = 1, nodes%nnodes
 C     only do operation for atoms in group

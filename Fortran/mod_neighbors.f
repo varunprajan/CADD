@@ -147,8 +147,8 @@ C     local variables
       integer :: i
       
 C     get rhomax (used to calculate nmaxbin for building bins)
-      neighbors%rhomax = materials(1)%rho
-      do i = 2,nmaterials
+      neighbors%rhomax = 0.0_dp
+      do i = 1, nmaterials
           if (materials(i)%rho > neighbors%rhomax) then
               neighbors%rhomax = materials(i)%rho
           end if
@@ -156,8 +156,8 @@ C     get rhomax (used to calculate nmaxbin for building bins)
 
 C     get rneigh (for calculating neighbor lists)
 C     first calculate largest force cutoff, then add skin distance
-      neighbors%rneigh = potentials(1)%forcecutoff
-      do i = 2,npotentials
+      neighbors%rneigh = 0.0_dp
+      do i = 1, npotentials
           if (potentials(i)%forcecutoff > neighbors%rneigh) then
               neighbors%rneigh = potentials(i)%forcecutoff
           end if

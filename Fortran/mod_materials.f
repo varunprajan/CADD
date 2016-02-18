@@ -121,6 +121,8 @@ C     data
 
 C     Notes: Requires material data to already be read, using readMaterialData
       
+      implicit none
+      
 C     local variables
       real(dp) :: mu, nu
       integer :: i
