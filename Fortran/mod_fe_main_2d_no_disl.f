@@ -133,7 +133,7 @@ C     local variables
 ************************************************************************
       subroutine updateFENodalPosnAllNoDisl()
 
-C     Function: updateFENodalPosnAllNoDisl
+C     Subroutine: updateFENodalPosnAllNoDisl
 
 C     Inputs: None
 
@@ -141,6 +141,8 @@ C     Outputs: None
 
 C     Purpose: Loop over fe materials, updating positions and displacements
 C     of fe nodes for each
+      
+      implicit none
       
 C     local variables
       integer :: i
@@ -668,7 +670,6 @@ C     local variables
       logical :: xfixed, yfixed
       real(dp) :: udisp, vdisp
       real(dp) :: posnundef(2)
-      real(dp) :: dispdd(2)
       
       do i = 1, size(feelements(mnumfe)%nodelist)
           node = feelements(mnumfe)%nodelist(i)
@@ -679,13 +680,11 @@ C     local variables
           yfixed = ((nodetype==2).or.(bcflag==2).or.(bcflag==3))
           if (.not.xfixed) then
               udisp = assembly(mnumfe)%rhs(2*i - 1)
-              udisp = udisp + dispdd(1)
               nodes%posn(1,node) = udisp + posnundef(1)
               nodes%posn(4,node) = udisp
           end if
           if (.not.yfixed) then
               vdisp = assembly(mnumfe)%rhs(2*i)
-              vdisp = vdisp + dispdd(2)
               nodes%posn(2,node) = vdisp + posnundef(2)
               nodes%posn(5,node) = vdisp
           end if

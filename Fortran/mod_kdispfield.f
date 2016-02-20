@@ -10,6 +10,7 @@ C     Possible extensions: Anisotropic K-fields
       use mod_nodes, only: nodes
       use mod_math, only: piconst
       use mod_groups, only: groups, getGroupNum
+      use mod_utils, only: prettyPrintVec
       implicit none
       
       private
@@ -74,14 +75,9 @@ C     only do operation for atoms in group
           sint = y*invr
 C         assume -pi < theta < pi
           sinthalfsq = 0.5_dp*(1.0_dp - cost)
-          sinthalf = sqrt(sinthalfsq)
-C         since sin is odd
-          if (sint < 0.0_dp) then
-              sinthalf = -sinthalf
-          end if    
-          costhalfsq = 0.5_dp*(1.0_dp + cost)
-C         since cos is even
-          costhalf = sqrt(costhalfsq)
+          sinthalf = sign(sqrt(sinthalfsq),sint) ! since sin is odd
+          costhalfsq = 0.5_dp*(1.0_dp + cost) 
+          costhalf = sqrt(costhalfsq) ! since cos is even
 C         disp fields (again, see Bower) without prefactor
           uxInorm = KI*(1.0_dp - 2.0_dp*nu + sinthalfsq)*costhalf
           uyInorm = KI*(2.0_dp - 2.0_dp*nu - costhalfsq)*sinthalf
