@@ -12,24 +12,25 @@ Note: simple2_dd was used to check most of mod_dd_main
 Fix test:
     annihilateDislocations (counter issue)
     createDipole (sign issue)
+    processNodeLists (issue with 3rd column)
 
 mod_dd_integrate
     Doc:
     assignDispFromPKOneMat
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     dispfromPK
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     dispfromPKOneMat
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     dispfromPKOneMatVCorr
-        Doc: (Need to write long note)
-        Test: Awaits DD simulation...
+        Doc: Done!
+        Test: Implicitly, through source_with_obstacles
     getResolvedStressOnDisl
         Doc: Done!
-        Test: Awaits DD simulation?
+        Test: Implicitly, through source_with_obstacles
     velFromTau
         Doc: Done!
         Test: Done!
@@ -112,10 +113,10 @@ mod_dd_main
         Test: Half done implicitly, through rmesh/cmesh_1; awaits CADD simulation...
     runDDStep
         Doc: Done!
-        Test: Awaits DD simulation
+        Test: Implicitly, through source_with_obstacles
     updateDislocations
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     enforceObstacles
         Doc: Done!
         Test: Done!
@@ -145,7 +146,7 @@ mod_dd_main
         Test: Done! (also see rmesh for badflip = True)
     updateSources
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     updateSource
         Doc: Done!
         Test: Done!
@@ -154,10 +155,10 @@ mod_dd_main
         Test: Done!
     getResolvedStressOnSource
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getResolvedStressOnObstacle
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
 mod_delaunay
     genDelaunay
         Doc: Done!
@@ -279,25 +280,25 @@ mod_disl_escaped
 mod_disl_fields2
     getTildeDispAtPointAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getTildeStressAtPointAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getPKTildeStressAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getTildeStressOnSourceAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getRealDispAtPointAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getRealStressAtPointAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getRealPKStressAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getGhostDispAtPointAll
         Doc: Done!
         Test: Awaits CADD simulation...
@@ -309,13 +310,13 @@ mod_disl_fields2
         Test: Awaits CADD simulation...
     getLatentDispAtPointAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getLatentStressAtPointAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getLatentStressOnSourceAll
         Doc: Done!
-        Test: Awaits DD simulation...
+        Test: Implicitly, through source_with_obstacles
     getDispAtPoint
         Doc: Done!
         Test: Done!
