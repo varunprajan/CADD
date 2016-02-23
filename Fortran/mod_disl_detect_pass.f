@@ -321,7 +321,9 @@ C     params(1) --- x-coord of center of (both) circles
 C     params(2) --- y-coord of center of (both) circles
 C     params(3) --- radius**2 of inner circle
 C     params(4) --- radius**2 of outer circle      
-          
+         
+      implicit none
+         
 C     input variables
       real(dp) :: posn(2)
       
@@ -361,6 +363,8 @@ C     params(4) --- Lx/2 for outer rectangle
 C     params(5) --- Ly/2 for inner rectangle
 C     params(6) --- Ly/2 for outer rectangle     
       
+      implicit none
+      
 C     input variables
       real(dp) :: posn(2)
       
@@ -370,8 +374,6 @@ C     output variables
 C     local variables
       real(dp) :: dx, dy
       
-      ! params are: xcenter, ycenter, xinner, xouter, yinner, youter
-      ! (assumes box is symmetric about center)
       dx = abs(posn(1) - detection%params(1))
       dy = abs(posn(2) - detection%params(2))
       
@@ -840,7 +842,6 @@ C     input variables
       
 C     local variables
       real(dp) :: xmin, xmax, ymin, ymax
-      logical :: dampflag
 
 C     create group of atoms for dislocation dipole displacements
 C     we only need to get displacements correct for atoms sufficiently close to dipole...
@@ -858,7 +859,6 @@ C     add dislocation dipole displacements (subtract disp. for dislposold; add f
      &                             bsgn,bcut,cost,sint,tempgroupname)
 
 C     run damped dynamics to relax atoms (neighbor list automatically regenerated)
-      dampflag = .true.
       call loopVerlet(detection%mdnincrements,detection%mdtimestep,
      &                tempgroupname,detection%damp)
       
