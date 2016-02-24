@@ -1,19 +1,19 @@
 # misc
 files_misc: input.misc
 
-# dislocations
+# dislocations (empty)
 files_disl:
-input.dislmat1
+empty
 end
 
-# escaped dislocations
+# escaped dislocations (empty)
 files_escapeddisl:
-input.escapeddislmat1
+empty
 end
 
-# ghost dislocations
+# ghost dislocations (empty)
 files_ghostdisl:
-input.ghostdislmat1
+empty
 end
 
 # sources
