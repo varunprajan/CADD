@@ -10,43 +10,38 @@ Subcycle:
     C 2) Detect dislocations, pass outwards
     C 3) Solve FE (involves computing boundary conditions using dislocation fields, updated atom positions)
     C 4) Update pad atoms using FE displacements
-    C 5) Sort dislocations (needs to be done after passing)
-    C 6) Compute new dislocation positions in absence of constitutive relations (annihilation, etc.) by using PK, updating "disp" attribute for each dislocation
-         Need to decide on integration algorithm!
-    C 7) Adjust dislocation displacements if they have crossed active obstacles
-    C 7.5) Update disl. relpos
-    C 8) Resolve crossings during movement
-          Same sign -> ?
-          Opposite sign -> annihilation
-    C 9) Resolve annihilation after movement
-    C 10) Update dislocation attributes (listed below), and remove/pass escaped dislocations
-           Posn
-           Local pos
-           Element
-    C 12) Rezero dislocation disp, obstacle compute
-    C 13) Update latent disl array (time) by looping over sources, add to real dislocation array if time > time_cr
-    C 14) Write output, if necessary
+    C 5) Update dislocations, sources:
+        C a)  Sort dislocations on slip planes
+        C b)  Compute PK forces on dislocations, corresponding displacements (using suitable integration algorithm)
+        C c)  Adjust dislocation displacements if they cross active obstacles
+        C d)  Update positions of dislocations on slip plane
+        C e)  Annihilate opposite signed dislocations that have crossed
+        C f)  Annihilate opposite signed dislocations within Lannih of each other
+        C g)  Update dislocation attributes, and remove/pass escaped dislocations
+            Posn
+            Local pos
+            Element
+        C h)  Update sources, latent dislocations (increment timer if tau > tau_cr, pop dipole if time > time_cr)
+        C i)  Zero dislocation displacements and the computation of shear stresses on obstacles
+    C 6) Write output, if necessary
     
 DD Algorithm
 
 Subcycle:
     C 1) Solve FE (involves computing boundary conditions using dislocation fields, updated atom positions)
-    C 2) Sort dislocations (needs to be done after passing)
-    C 3) Compute new dislocation positions in absence of constitutive relations (annihilation, etc.) by using PK, updating "disp" attribute for each dislocation
-         Need to decide on integration algorithm!
-    C 4) Adjust dislocation displacements if they have crossed active obstacles
-    C 4.5) Update disl. relpos
-    C 5) Resolve crossings during movement
-          Same sign -> ?
-          Opposite sign -> annihilation
-    C 6) Resolve annihilation after movement
-    C 7) Update dislocation attributes (listed below), and remove/pass escaped dislocations
-           Posn
-           Local pos
-           Element
-    C 8) Rezero dislocation disp, obstacle compute
-    C 9) Update latent disl array (time) by looping over sources, add to real dislocation array if time > time_cr
-    C 10) Write output, if necessary
+    C 2) Update dislocations, sources:
+        C a)  Sort dislocations on slip planes
+        C b)  Compute PK forces on dislocations, corresponding displacements (using suitable integration algorithm)
+        C c)  Adjust dislocation displacements if they cross active obstacles
+        C d)  Update positions of dislocations on slip plane
+        C e)  Annihilate opposite signed dislocations that have crossed
+        C f)  Annihilate opposite signed dislocations within Lannih of each other
+        C g)  Update dislocation attributes, and remove/pass escaped dislocations
+            Posn
+            Local pos
+            Element
+        C h)  Update sources, latent dislocations (increment timer if tau > tau_cr, pop dipole if time > time_cr)
+        C i)  Zero dislocation displacements and the computation of shear stresses on obstacles
     
 Subcycle using functions
     1) solveFE_ptr

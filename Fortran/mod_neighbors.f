@@ -34,6 +34,7 @@ C     read-in
       real(dp) :: Lz
       real(dp) :: skin
 C     processed
+      logical :: delaunayregen
       integer :: incrementcurr
       integer ,allocatable :: binlist(:,:)
       integer, allocatable :: bincount(:,:)
@@ -180,7 +181,7 @@ C     allocate other arrays
       allocate(neighbors%possincelastcheck(2,nodes%natoms))
       allocate(neighbors%binlist(2,nodes%natoms)) 
 
-C     initialize neighbor list (this takes care of timestep initialization, etc.)
+C     initialize neighbor list (this takes care of timestep initialization, delaunayregen, etc.)
       call updateNeighborsNoCheck()
       
       end subroutine processNeighborData
@@ -293,12 +294,13 @@ C     *without checking* "check", "delay", and "every" conditions.
 
       implicit none
       
-      write(*,*) 'Updated neighbors'
+C     write(*,*) 'Updated neighbors'
       call genAtomBins()
       call genNeighList()
       call updatePosSinceLastCheck()
       neighbors%incrementcurr = 0
       neighbors%incrsincelastupdate = neighbors%incrementcurr
+      neighbors%delaunayregen = .true. ! need to regenerate triangulation, since neighbor list has been updated
       
       end subroutine
 ************************************************************************

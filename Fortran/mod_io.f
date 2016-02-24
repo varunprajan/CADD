@@ -425,8 +425,8 @@ C     Purpose: Initialize data needed for (cadd) simulations with disl. detectio
 C     input variables
       character(len=*) :: pref
       
-      call initDislIdentData()
       call initDetectionData(pref//suffixdetection)
+      call initDislIdentData()
       
       end subroutine initCADDChunk
 ************************************************************************

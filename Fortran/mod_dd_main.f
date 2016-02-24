@@ -256,9 +256,14 @@ C     local variables
       integer :: n, iobs
       
       n = splane%ncount
-      call findPointBetween(pold,pnew,splane%relpos(1:n),n,between,iobs)
-      pobs = splane%relpos(iobs)
-      obsnum = splane%objnum(iobs)   
+      if (n > 0) then
+          call findPointBetween(pold,pnew,splane%relpos(1:n),
+     &                          n,between,iobs)
+          pobs = splane%relpos(iobs)
+          obsnum = splane%objnum(iobs)   
+      else
+          between = .false.
+      end if
       
       end subroutine isObstacleBetween
 ************************************************************************

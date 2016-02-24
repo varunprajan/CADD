@@ -337,6 +337,8 @@ C     Purpose: Find a point in a vector between two points (used to determine
 C              whether obstacle lies between old and new dislocation positions
 C              see isObstacleBetween)
 
+      implicit none
+
 C     input variables
       integer :: n
       real(dp) :: pold, pnew

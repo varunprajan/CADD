@@ -87,9 +87,9 @@
       use mod_fe_main_2d_no_disl, only: getFEStressAtPoint,
      &  getFEStrainAtPoint
       use mod_disl_detect_pass, only: initDetectionData,
-     &  readDetectionData, processDetectionData,
+     &  readDetectionData, processDetectionData, getDislTravelDirection,
      &   writeDetectionData, assignDetectionPoints,
-     &  assignInsideDetectionBand, assignBranchCut, insideAnnulus,
+     &  assignInsideDetectionBand, getDislBranchCut, insideAnnulus,
      &  insideRectAnnulus, detection, boxfudge, errorInterface,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
      &  passContinuumToAtomistic, passAtomistictoContinuum,
@@ -141,18 +141,19 @@
      
       implicit none
       
-      call initNodeData('simplefe_nodes')
-      call initMaterialData('simplefe_materials')
-      call initFELibrary()
-      call readFEElementData('simplefe_feelements')     
-      call processFEElementData()
-      call processEdges()
-      call processNodeLists()
-      write(*,*) 'Boundary nodes'
-      write(*,*) feelements(1)%bdnodelist
-      write(*,*) 'All nodes'
-      write(*,*) feelements(1)%nodelist
-      write(*,*) 'Inverse node list'
-      write(*,*) feelements(1)%nodeinvlist
+      integer :: mnumfe, isys
+      real(dp) :: posn(2)
+      integer :: bcut
+      real(dp) :: travelvec(2)
+      
+      misc%iscrackproblem = .true.
+      detection%lattice = 'hex'
+      mnumfe = 1
+      isys = 3
+      call initSlipSysData('simple3_dd_slipsys')
+      posn = [-10.0_dp,10.0_dp]
+      bcut = getDislBranchCut(mnumfe,isys,posn)
+      travelvec = getDislTravelDirection(mnumfe,isys,bcut)
+      write(*,*) travelvec
             
       end program

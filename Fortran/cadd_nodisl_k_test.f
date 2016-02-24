@@ -28,12 +28,12 @@
       real(dp) :: xc, yc
       real(dp) :: mu, nu
       integer :: nstepsK, natomisticsteps, natomisticstepstot
-      real(dp) :: dt, disptol
+      real(dp) :: dt, forcetol
       character(len=15) :: gammasuffix, dtsuffix, stepssuffix
       character(len=:), allocatable :: filename
       
 C     read, initialize
-      call initSimulation('cadd_nodisl_k_test_medium','cadd_nodisl')
+      call initSimulation('cadd_nodisl_k_test_large','cadd_nodisl')
       call writeDump_ptr()
       write(*,*) 'Wrote dump'
       
@@ -58,7 +58,7 @@ C     atomistic stuff
       natomisticsteps = 20
       dt = 0.02_dp
       normaldamping%gamma = 0.1
-      disptol = 1.0e-5_dp
+      forcetol = 1.0e-4_dp
       
 C     file
       write (gammasuffix,'(I0)') nint(normaldamping%gamma*100.0_dp)
@@ -83,7 +83,7 @@ C     apply K, equilibrate, dump
           
           call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
           call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
-     &                               disptol,natomisticstepstot)
+     &                               forcetol,natomisticstepstot)
           write(iunit,*) KIcurr, natomisticstepstot
           call updateMiscIncrementCurr(1)
           call writeDump_ptr()
@@ -94,29 +94,26 @@ C     apply K, equilibrate, dump
       contains
 ************************************************************************
       subroutine equilibrateCADDNoDisl(natomisticsteps,dt,damp,
-     &                                 disptol,natomisticstepstot)
+     &                                 forcetol,natomisticstepstot)
 
 C     input variables
       integer :: natomisticsteps
       real(dp) :: dt
       type(dampingdata) :: damp
-      real(dp) :: disptol 
+      real(dp) :: forcetol
       
 C     output variables
       integer :: natomisticstepstot
 
 C     local variables
-      real(dp), allocatable :: allposnold(:,:)
-      real(dp), allocatable :: allposnnew(:,:)
-      real(dp) :: dispnorm
+      real(dp) :: forcenorm
       integer :: counter
 
-C     we will check nodal positions to see if we're done
-      allposnold = nodes%posn(1:2,:)    
-      dispnorm = huge(0.0_dp)
+C     we will check forces on atoms
+      forcenorm = huge(0.0_dp)
       counter = 0
       
-      do while (dispnorm > disptol)
+      do while (forcenorm > forcetol)
           write(*,*) 'Starting iteration'
           call loopVerlet(natomisticsteps,dt,'all',damp) ! step 1 (see Algorithm.txt)
           counter = counter + 1
@@ -124,55 +121,11 @@ C     we will check nodal positions to see if we're done
           call solveAll_ptr() ! step 3
           call updatePad() ! step 4
           
-C         need to update positions to compare
-          call updateFENodalPosnAll_ptr()
-          allposnnew = nodes%posn(1:2,:)
-          dispnorm = getDispNorm(allposnold,allposnnew,nodes%types)
-          allposnold = allposnnew
+          forcenorm = maxval(sum(abs(nodes%potforces),1)) ! infinity norm
+          write(*,*) 'forcenorm', forcenorm
       end do
       natomisticstepstot = counter*natomisticsteps
       
       end subroutine equilibrateCADDNoDisl
-************************************************************************
-      function getDispNorm(posnold,posnnew,types) result(dispnormmax)
-      
-      implicit none
-      
-C     input variables
-      real(dp) :: posnold(:,:)
-      real(dp) :: posnnew(:,:)
-      integer :: types(:,:)
-      
-C     output variables
-      real(dp) :: dispnormmax
-      
-C     local variables
-      integer :: i
-      integer :: nodetype
-      real(dp) :: dispnorm, dispnormatoms, dispnormfenodes
-      
-      dispnormatoms = 0.0_dp
-      dispnormfenodes = 0.0_dp
-      
-      do i = 1, size(types,2)
-          nodetype = types(2,i)
-          dispnorm = sum(abs(posnnew(:,i) - posnold(:,i))) ! infinity norm
-          if (nodetype == 0) then ! fe node
-              if (dispnorm > dispnormfenodes) then
-                  dispnormfenodes = dispnorm
-              end if
-          else if ((nodetype == 1).or.(nodetype == 2)) then
-              if (dispnorm > dispnormatoms) then
-                  dispnormatoms = dispnorm
-              end if
-          end if
-      end do
-      
-      write(*,*) 'Displacement inf. norm atoms', dispnormatoms
-      write(*,*) 'Displacement inf. norm fe nodes', dispnormfenodes
-      
-      dispnormmax = max(dispnormatoms,dispnormfenodes)
-      
-      end function getDispNorm
 ************************************************************************
       end program

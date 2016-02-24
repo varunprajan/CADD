@@ -19,7 +19,7 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       use mod_disl_ident_simple, only: computeCircuits, identsimple
       use mod_utils, only: writeMat, prettyPrintMat
       use mod_math, only: getIntersectionTwoLines, normalizeVec,
-     &                    piconst, tolconst
+     &                    piconst, tolconst, sameSign
       use mod_nodes, only: nodes
       use mod_fe_elements, only: interfaceedges, fematerials
       use mod_groups, only: groups, getGroupNum, tempgroupname
@@ -31,7 +31,7 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       use mod_mesh_find, only: findInAllWithGuess
       use mod_materials, only: materials, nmaterials
       use mod_integrate, only: loopVerlet
-      use mod_neighbors, only: getAtomsInBoxGroupTemp
+      use mod_neighbors, only: getAtomsInBoxGroupTemp, neighbors
       use mod_misc, only: misc
       use mod_damping, only: dampingdata, readDampingDataSub,
      &                       writeDampingDataSub
@@ -40,12 +40,12 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       private
       public :: initDetectionData, readDetectionData, boxfudge,
      &  processDetectionData, writeDetectionData, assignDetectionPoints,
-     &  assignInsideDetectionBand, assignBranchCut, insideAnnulus,
+     &  assignInsideDetectionBand, getDislBranchCut, insideAnnulus,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
      &  passContinuumToAtomistic, passAtomistictoContinuum, detection,
      &  updateAtomsPassing, insideRectAnnulus, imposeDipoleDispOnAtoms,
      &  findInterfaceIntersectionDeformed, errorInterface,
-     &  findInterfaceIntersectionUndeformed
+     &  findInterfaceIntersectionUndeformed, getDislTravelDirection
      
       type compdata
       real(dp), allocatable :: burgersvec(:)
@@ -157,6 +157,8 @@ C     Notes/TODO: Assumes detection band and adjacent FE continuum material all 
 
 C     Notes/TODO: Needs to be reworked for 3D...
       
+      implicit none
+      
 C     local variables
       integer :: mnumfe, mnum
       integer :: isys, bsgn
@@ -167,7 +169,7 @@ C     local variables
       mnum = fematerials%list(mnumfe)
 
 C     identsimple stuff
-      identsimple%mnum = mnum      
+      identsimple%mnum = mnum
       
 C     detection stuff
       detection%lattice = materials(mnum)%lattice
@@ -193,7 +195,6 @@ C     detection stuff
       
 C     delaunay stuff
       call assignInsideDetectionBand()
-      delaunay%regen = .true.
       
       end subroutine processDetectionData
 ************************************************************************
@@ -253,7 +254,8 @@ C     may not work since band may shear into two and lose continuity.
 C     local variables
       integer :: i
       integer :: node, counter
-      real(dp) :: temp(2,nodes%nrealatoms)
+      real(dp) :: tempxy(2,nodes%nrealatoms)
+      integer :: tempnodes(nodes%nrealatoms)
       real(dp) :: posn(2)
       
       counter = 0
@@ -262,15 +264,20 @@ C     local variables
           posn = nodes%posn(1:2,node) ! current position
           if (insideDetectionBand_ptr(posn)) then
               counter = counter + 1
-              temp(:,counter) = posn
+              tempxy(:,counter) = posn
+              tempnodes(counter) = node
           end if
       end do
       
 C     final result, store in delaunay
       if (allocated(delaunay%xy)) then
           deallocate(delaunay%xy)
-      end if    
-      delaunay%xy = temp(:,1:counter)
+      end if
+      if (allocated(delaunay%nodenums)) then
+          deallocate(delaunay%nodenums)
+      end if  
+      delaunay%xy = tempxy(:,1:counter)
+      delaunay%nodenums = tempnodes(1:counter)      
       
       end subroutine assignDetectionPoints
 ************************************************************************
@@ -390,30 +397,6 @@ C     local variables
       
       end function insideRectAnnulus
 ************************************************************************
-      function assignBranchCut(burgersvec,isys,bsgn,posn) result(bcut)
-      
-C     Notes/TODO: Need to fix for 3D...     
-      
-C     input variables
-      real(dp) :: burgersvec(2)
-      integer :: isys
-      integer :: bsgn
-      real(dp) :: posn(2)
-      
-C     output variables
-      integer :: bcut
-      
-      if ((misc%iscrackproblem).and.
-     &    (detection%lattice=='hex')) then
-          if (posn(1) > 0.0_dp) then ! cut should be pointed towards crack tip, at (0,0)
-              bcut = 0 
-          else
-              bcut = 1 ! reverse cut (equivalent to 180 degree rotation and sign flip)
-          end if
-      end if    
-      
-      end function assignBranchCut
-************************************************************************
       subroutine getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
  
 C     Subroutine: getDislPropsFromBurgersVec
@@ -451,7 +434,95 @@ C     local variables
       
       end subroutine getDislPropsFromBurgersVec
 ************************************************************************
-      subroutine detectAndPassDislocations()
+      function getDislBranchCut(mnumfe,isys,posn) result(bcut)
+      
+C     Function: getDislBranchCut
+
+C     Inputs: mnumfe --- fe material number
+C             isys --- number of slip system of dislocation
+C             posn --- position of dislocation
+
+C     Outputs: bcut --- branch cut of dislocation
+
+C     Purpose: Determine branch cut of dislocation from attributes of the dislocation detected in the atomistic region
+C     (the burgers circuit alone does not tell us this). For a crack problem,
+C     we assume that the cut points towards the crack.
+
+C     Notes/TODO: Fix ycrack = 0 bit, and resolve case where dislocation is at 0 or 180 degrees
+
+      implicit none
+      
+C     input variables
+      integer :: mnumfe
+      integer :: isys
+      real(dp) :: posn(2)
+      
+C     output variables
+      integer :: bcut
+      
+C     local variables
+      real(dp) :: cutvec(2)
+      real(dp) :: ycut, ycrack, ypos
+      
+      bcut = 0 ! default
+      
+      if ((misc%iscrackproblem).and.(detection%lattice=='hex')) then
+          ycrack = 0.0_dp ! assume crack plane is roughly at y = 0 (this should probably be fixed later)
+          cutvec = -slipsys(mnumfe)%trig(:,isys) ! default cut points in opposite direction to slip plane tangent
+                                                 ! however, actual cut should point toward crack plane (whence the dislocation came)
+          ycut = cutvec(2)                                                 
+          if (abs(ycut) > tolconst) then
+              ypos = posn(2) - ycrack
+              if (sameSign(ycut,ypos)) then
+                  bcut = 1
+              end if   
+          else
+              write(*,*) 'Warning, detected dislocation at 0 or
+     &                                                     180 degrees'
+              write(*,*) 'Assigning bcut = 0'
+          end if
+      end if    
+      
+      end function getDislBranchCut
+************************************************************************
+      function getDislTravelDirection(mnumfe,isys,bcut)
+     &                                                 result(travelvec)
+      
+C     Function: getDislTravelDirection
+
+C     Inputs: mnumfe --- fe material number
+C             isys --- number of slip system of dislocation
+C             bcut --- branch cut of dislocation
+
+C     Outputs: travelvec --- vector indicating direction of travel of dislocation
+
+C     Purpose: Determine travel direction of dislocation from attributes of the dislocation detected in the atomistic region
+C     (the burgers circuit alone does not tell us this). For a crack problem,
+C     we assume the dislocation travels away from the crack
+
+C     Notes/TODO: Are there more general ways to do this?
+      
+      implicit none
+      
+C     input variables
+      integer :: mnumfe
+      integer :: isys
+      integer :: bcut
+      
+C     output variables
+      real(dp) :: travelvec(2)      
+      
+      if ((misc%iscrackproblem).and.(detection%lattice=='hex')) then
+          travelvec = slipsys(mnumfe)%trig(:,isys) ! dislocation travels in opposite direction of cut vec
+                                                   ! since cut vec points towards crack
+          if (bcut == 1) then ! flip for opposite cut
+              travelvec = -travelvec
+          end if
+      end if
+      
+      end function getDislTravelDirection
+************************************************************************
+      subroutine detectAndPassDislocations(detected)
       
 C     Subroutine: detectAndPassDislocations
  
@@ -462,39 +533,48 @@ C     Outputs: None
 C     Purpose: Loop over all triangles in detection band triangulation,
 C     find dislocations (if any), pass them to continuum
  
-C     Notes/TODO: Assumes dislocation travels in direction of positive b...
- 
       implicit none
+      
+      logical :: detected ! FIX
      
 C     local variables
       integer :: i
+      integer :: node
       integer :: mnumfe
       real(dp), allocatable :: circuit(:,:)
       real(dp) :: burgersinfnorm
       real(dp) :: burgersvec(2), disldisp(2), dislpos(2)
       integer :: bcut, bsgn, isys
-      
-C     regen delaunay, if necessary
-      if (delaunay%regen) then
-          call assignDetectionPoints()
-          call genDelaunay()
-      end if
+    
+C     regen delaunay, if necessary (note: neighbors%delaunayregen set to .true. whenever neighbor list is updated)
+      if (neighbors%delaunayregen) then
+          call assignDetectionPoints() ! reassign nodes/pts
+          call genDelaunay() ! regenerate triangulation
+      else ! otherwise, just update xy coordinates
+          do i = 1, size(delaunay%nodenums)
+              node = delaunay%nodenums(i)
+              delaunay%xy(:,i) = nodes%posn(1:2,node) ! current position
+          end do
+      end if     
       
 C     compute burgers circuits
       mnumfe = detection%mnumfe
       circuit = computeCircuits()
+      detected = .false. ! FIX
       do i = 1, delaunay%numtri
           if (delaunay%trigood(i)) then
               burgersvec = circuit(:,i)
               burgersinfnorm = maxval(abs(burgersvec))
               if (burgersinfnorm > tolconst) then
+                  write(*,*) 'Found dislocation'
+                  detected = .true.
                   call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
                   dislpos = getTriCenter(i)
-                  bcut = assignBranchCut(burgersvec,isys,bsgn,dislpos)
-                  disldisp = bsgn*slipsys(mnumfe)%trig(:,isys)
+                  write(*,*) 'Dislocation position', dislpos
+                  bcut = getDislBranchCut(mnumfe,isys,dislpos)
+                  disldisp = getDislTravelDirection(mnumfe,isys,bcut)
                   call passAtomisticToContinuum(dislpos,disldisp,
      &                                          bsgn,bcut,isys)
-                  delaunay%regen = .true. ! since we passed dislocation, we'll need to regenerate delaunay next time
               end if
           end if
       end do
@@ -620,8 +700,6 @@ C     local variables
       dislnum = disl(mnumfe)%splanes(isys)%splane(iplane)%objnum(iobj)
       bsgn = disl(mnumfe)%list(dislnum)%sgn
       bcut = disl(mnumfe)%list(dislnum)%cut
-      cost = slipsys(mnumfe)%trig(1,isys)
-      sint = slipsys(mnumfe)%trig(2,isys)
 
 C     determine intersection of disl. path with detection band      
       disldisp = pint - dislpos
@@ -647,6 +725,8 @@ C     location (inside atomistic region)
       
 C     update atom positions, including imposing dipole displacements
 C     and minimizing atomic positions near core
+      cost = slipsys(mnumfe)%trig(1,isys)
+      sint = slipsys(mnumfe)%trig(2,isys)
       call updateAtomsPassing(dislpos,dislposnew,
      &                        burgers,bsgn,bcut,cost,sint)
       

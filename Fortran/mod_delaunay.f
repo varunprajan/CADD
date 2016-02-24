@@ -8,13 +8,13 @@ C     Notes/TODO: Only 2D, currently
       use mod_types, only: dp
       use mod_math, only: thirdconst, getCircumradiusSqforTriangle
       use mod_materials, only: materials
+      use mod_neighbors, only: neighbors
 
       implicit none
 
       type delaunaydata
-      logical :: regen
       real(dp) :: circumradiussqcutoff
-      integer :: numpoints
+      integer, allocatable :: nodenums(:)
       real(dp), allocatable :: xy(:,:)
       integer :: numtri
       integer, allocatable :: trivert(:,:)
@@ -46,6 +46,9 @@ C     label bad triangles)
       
       implicit none
       
+C     local variables
+      integer :: numpoints
+      
 C     deallocate, if necessary
       if (allocated(delaunay%trivert)) then
           deallocate(delaunay%trivert)
@@ -58,8 +61,10 @@ C     deallocate, if necessary
       end if
       
 C     run main routine
-      call dtris2(delaunay%numpoints,delaunay%xy,
+      numpoints = size(delaunay%xy,2)
+      call dtris2(numpoints,delaunay%xy,
      &            delaunay%trivert,delaunay%trineigh)
+      
       delaunay%numtri = size(delaunay%trivert,2)
       
 C     find bad triangles
@@ -67,19 +72,21 @@ C     find bad triangles
       call identifyLargeTri()  
       
 C     reset regen
-      delaunay%regen = .false.
+      neighbors%delaunayregen = .false.
       
       end subroutine genDelaunay
 ************************************************************************
       function getTriNodes(trinum) result(trinodes)
       
-C     Subroutine: getTriNodes
+C     Function: getTriNodes
 
 C     Inputs: trinum --- index of triangle in triangulation
 
 C     Outputs: trinodes --- array, 2 by 3, of coordinates of nodes/vertices of triangle
       
 C     Purpose: Get coordinates of nodes/vertices of triangle     
+      
+      implicit none
       
 C     input variables
       integer :: trinum
@@ -99,7 +106,7 @@ C     local variables
 ************************************************************************
       function getTriCenter(trinum) result(tricenter)
       
-C     Subroutine: getTriCenter
+C     Function: getTriCenter
 
 C     Inputs: trinum --- index of triangle in triangulation
 
@@ -107,6 +114,8 @@ C     Outputs: tricenter --- vector, 2 by 1, coordinates of triangle center
       
 C     Purpose: Get the center of a triangle (presumed to be location
 C     of dislocation, if it is found in that triangle)
+      
+      implicit none
       
 C     input variables
       integer :: trinum
@@ -245,7 +254,7 @@ C     local variables
               end if
           end do
           if ( k == 0 ) then
-              write ( *, '(a)' ) 'DTRIS2 - Fatal error!'
+              write ( *, '(a)' ) 'DTRIS2 - Fatal error 1!'
               stop
           end if
       end do
@@ -259,7 +268,7 @@ C     local variables
       do
           if ( point_num < j ) then
               write ( *, '(a)' ) ' '
-              write ( *, '(a)' ) 'DTRIS2 - Fatal error!'
+              write ( *, '(a)' ) 'DTRIS2 - Fatal error 2!'
               ierr = 225
               return
           end if
@@ -369,7 +378,7 @@ C     local variables
               top = top + 1
               if (point_num < top) then
                   ierr = 8
-                  write ( *, '(a)' ) 'DTRIS2 - Fatal error!'
+                  write ( *, '(a)' ) 'DTRIS2 - Fatal error 3!'
                   stop
               end if
               stack(top) = tri_num
@@ -385,7 +394,7 @@ C     local variables
           call swapec(m,top,ltri,ledg,point_num,point_xy,tri_num,
      &                tri_vert,tri_nabe,stack,ierr)
           if (ierr/=0) then
-              write ( *, '(a)' ) 'DTRIS2 - Fatal error!'
+              write ( *, '(a)' ) 'DTRIS2 - Fatal error 4!'
               stop
           end if
       end do

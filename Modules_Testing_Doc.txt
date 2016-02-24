@@ -12,34 +12,7 @@ Note: simple2_dd was used to check most of mod_dd_main
 Fix test:
     annihilateDislocations (counter issue)
     createDipole (sign issue)
-    processNodeLists (issue with 3rd column)
-
-mod_dd_integrate
-    Doc:
-    assignDispFromPKOneMat
-        Doc: Done!
-        Test: Implicitly, through source_with_obstacles
-    dispfromPK
-        Doc: Done!
-        Test: Implicitly, through source_with_obstacles
-    dispfromPKOneMat
-        Doc: Done!
-        Test: Implicitly, through source_with_obstacles
-    dispfromPKOneMatVCorr
-        Doc: Done!
-        Test: Implicitly, through source_with_obstacles
-    getResolvedStressOnDisl
-        Doc: Done!
-        Test: Implicitly, through source_with_obstacles
-    velFromTau
-        Doc: Done!
-        Test: Done!
-    velFromTauCorr
-        Doc: Done!
-        Test: Done!
-    dispFromVel
-        Doc: Done!
-        Test: Done!
+    isObstacleBetween (zero obstacles)
 
 Check:
     mod_utils
@@ -104,6 +77,32 @@ mod_damping
         Doc: Done!
         Test: Done!
     getDampingForce
+        Doc: Done!
+        Test: Done!
+mod_dd_integrate
+    Doc:
+    assignDispFromPKOneMat
+        Doc: Done!
+        Test: Implicitly, through source_with_obstacles
+    dispfromPK
+        Doc: Done!
+        Test: Implicitly, through source_with_obstacles
+    dispfromPKOneMat
+        Doc: Done!
+        Test: Implicitly, through source_with_obstacles
+    dispfromPKOneMatVCorr
+        Doc: Done!
+        Test: Implicitly, through source_with_obstacles
+    getResolvedStressOnDisl
+        Doc: Done!
+        Test: Implicitly, through source_with_obstacles
+    velFromTau
+        Doc: Done!
+        Test: Done!
+    velFromTauCorr
+        Doc: Done!
+        Test: Done!
+    dispFromVel
         Doc: Done!
         Test: Done!
 mod_dd_main
@@ -201,10 +200,13 @@ mod_disl_detect_pass
     assignInsideDetectionBand
         Doc: Done!
         Test: (Implicitly tested using assignDetectionPoints)
-    assignBranchCut
-        Doc: Done!
-        Test: Awaits CADD simulation...
     getDislPropsFromBurgersVec
+        Doc: Done!
+        Test: Done!
+    getDislBranchCut
+        Doc: Done!
+        Test: Done!
+    getDislTravelDirection
         Doc: Done!
         Test: Done!
     detectAndPassDislocations
