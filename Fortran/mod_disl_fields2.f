@@ -139,7 +139,7 @@ C     local variables
       stress = 0.0_dp
       stress = stress + getRealPKStressAll(dislnum,mnumfe)
       stress = stress + getLatentStressAtPointAll(posn,mnumfe)
-      stress = stress + getGhostStressAtPointAll(posn,mnumfe)
+C     (no contributions from ghost or escaped dislocations, since they're not real)
       
       end function getPKTildeStressAll
 ************************************************************************
@@ -373,6 +373,8 @@ C     Outputs: stress --- stress at point (vector, 3 by 1)
  
 C     Purpose: Get stress at point from *all* ghost dislocations associated with material
       
+      implicit none
+      
 C     input variables
       real(dp) :: posn(2)
       integer :: mnumfe
@@ -414,6 +416,8 @@ C             mnumfe --- fe material in which point lies
 C     Outputs: disp --- displacement at point (vector, 2 by 1)
 
 C     Purpose: Get displacement at point from *all* latent dislocations in material (from sources)
+      
+      implicit none
       
 C     input variables
       real(dp) :: posn(2)
