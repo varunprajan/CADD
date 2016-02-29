@@ -719,6 +719,8 @@ C     Purpose: Determine whether local coordinates from findinCPE4
 C              lie on the correct side of edge (if checkCPE4(edge,r,s)
 C              is true for all edges, then point lies inside element)
       
+      implicit none
+      
 C     input variables
       integer :: edge
       real(dp) :: r, s
@@ -727,13 +729,13 @@ C     output variables
       logical :: check
       
       if (edge == 1) then
-          check = (s >= -1)
+          check = (s >= -1.0_dp)
       else if (edge == 2) then
-          check = (r <= 1)
+          check = (r <= 1.0_dp)
       else if (edge == 3) then
-          check = (s <= 1)
+          check = (s <= 1.0_dp)
       else
-          check = (r >= -1)
+          check = (r >= -1.0_dp)
       end if
       
       end function checkCPE4  
@@ -752,6 +754,8 @@ C     Purpose: Determine whether local coordinates from findinCPE3
 C              lie on the correct side of edge (if checkCPE3(edge,r,s)
 C              is true for all edges, then point lies inside element)
       
+      implicit none
+      
 C     input variables
       integer :: edge
       real(dp) :: r, s
@@ -760,11 +764,11 @@ C     output variables
       logical :: check
       
       if (edge == 1) then
-          check = (s >= 0)
+          check = (s >= 0.0_dp)
       else if (edge == 2) then
-          check = (r + s <= 1)
+          check = (r + s <= 1.0_dp)
       else
-          check = (r >= 0)
+          check = (r >= 0.0_dp)
       end if
       
       end function checkCPE3
