@@ -470,7 +470,6 @@ C     local variables
       integer :: bsgn1, bsgn2
       real(dp) :: p1(2), p2(2)
 
-      write(*,*) 'Annihilated dislocations!'
       dislnum1 = splane%objnum(iobj1)
       dislnum2 = splane%objnum(iobj2)      
       bcut1 = disl(mnumfe)%list(dislnum1)%cut
@@ -581,6 +580,9 @@ C     then, figure out if dislocation is still in mesh
       
       if (badflip) then ! not in mesh
           write(*,*) 'badflip', badflip ! FIX
+          write(*,*) 'dislposold', dislposold
+          write(*,*) 'disp', disp
+          write(*,*) 'dislposnew', dislposnew
 C         Two possibilities:
 C         1) Crossed back to atomistic region
 C         2) Left mesh, leaving a slip step (associated with escaped dislocation)
@@ -589,6 +591,8 @@ C         between continuum and atomistic
 
           call findInterfaceIntersectionUndeformed(interfaceedges%array,
      &                        dislposold,dislposnew,pint,isint,edgenum)
+          write(*,*) 'pint', pint
+          write(*,*) 'isint', isint
           if (isint) then ! in atomistic region
               call passContinuumToAtomistic(dislposold,pint,mnumfe,
      &                                      isys,iplane,iobj)
