@@ -8,6 +8,7 @@ C     Possible extensions: See below.
 C     TODO: Need to time algorithm, see if it's fast enough.
 C     TODO: Also, change brute force algorithm to generate guess in a smarter way
 C     TODO: Also, need to check if there are problems with crossing over "internal boundaries" (e.g. crack face)
+C     TODO: Need to fix findInOneMatSub to deal with points lying on corners/edges
 
       use mod_types, only: dp
       use mod_fe_elements, only: feelements, nfematerials
@@ -189,7 +190,8 @@ C     local variables
       integer:: eltypenum
       
       eltypenum = feelements(mnumfe)%eltypenum      
-      call findInOneMatSub(mnumfe,eltypenum,elguess,xp,yp,r,s,badflip)
+      call findInOneMatSubAlt(mnumfe,eltypenum,elguess,
+     &                        xp,yp,r,s,badflip)
       
       end subroutine findInOneMat
 ************************************************************************      
@@ -222,8 +224,9 @@ C       4) if not, flip to adjacent element (from neighbor list), depending on l
       
 C     Notes: Supplying a good guess is very important, especially
 C            for non-convex domains (where getting stuck is a possibility)
-C            I'm a bit concerned that this algorithm might yield bad
-C            results for search points lying on edges or vertices (nodes)...
+
+C     IMPORTANT NOTE: This algorithm appears to be flawed for points lying on element
+C                     vertices...not sure how to fix. See bad result in findInOneMatSub_test.txt
       
       implicit none
       
@@ -249,7 +252,7 @@ C     local variables
       do counter = 1, countermax
           do i = 1, felib(eltypenum)%nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
-              posn(i,:) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed pos.
+              posn(i,:) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed positions
           end do
           r = 0.0_dp
           s = 0.0_dp
@@ -283,47 +286,6 @@ C     if we've gotten to this point, search was unsuccessful
       badflip = .true.
       
       end subroutine findInOneMatSub
-************************************************************************
-      subroutine getLocalCoords(posn,eltypenum,xp,yp,r,s)
-
-C     Subroutine: getLocalCoords
-
-C     Inputs: posn --- array, nelnodes by 2, of nodal positions (each row
-C                      is a coordinate pair)
-C             eltypenum --- number code of fe element in felib
-C             xp, yp --- coordinates of target point
-
-
-C     Outputs: r, s --- local coordinates of point in element
-                      
-C     Purpose: Determine local coordinates of point w.r.t. element
-
-C     input variables
-      real(dp) :: posn(:,:)
-      integer :: eltypenum
-      real(dp) :: xp, yp
-      
-C     in/out variables
-      real(dp) :: r, s
-      
-C     local variables
-      integer :: i
-      real(dp) :: norm
-      real(dp) :: rold, sold
-
-      norm = huge(0.0_dp)
-      do i = 1, 10
-          if (norm < normconst) then
-              return
-          else    
-              rold = r
-              sold = s
-              call felib(eltypenum)%findinElement_ptr(posn,xp,yp,r,s)
-              norm = sqrt((r - rold)**2 + (s - sold)**2)
-          end if    
-      end do
-      
-      end subroutine getLocalCoords
 ************************************************************************
       subroutine findInOneMatSubAlt(mnumfe,eltypenum,
      &                              elguess,xp,yp,r,s,badflip)
@@ -388,8 +350,7 @@ C     local variables
       do counter = 1, countermax
           do i = 1, nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
-C             undeformed positions
-              posn(:,i) = nodes%posn(1:2,node) - nodes%posn(4:5,node)
+              posn(:,i) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed positions
           end do
           proceed = .true.
           badflip = .false.
@@ -427,6 +388,49 @@ C     if we've gotten to this point, search was unsuccessful
       badflip = .true. 
       
       end subroutine findInOneMatSubAlt
+************************************************************************
+      subroutine getLocalCoords(posn,eltypenum,xp,yp,r,s)
+
+C     Subroutine: getLocalCoords
+
+C     Inputs: posn --- array, nelnodes by 2, of nodal positions (each row
+C                      is a coordinate pair)
+C             eltypenum --- number code of fe element in felib
+C             xp, yp --- coordinates of target point
+
+
+C     Outputs: r, s --- local coordinates of point in element
+                      
+C     Purpose: Determine local coordinates of point w.r.t. element
+
+      implicit none
+
+C     input variables
+      real(dp) :: posn(:,:)
+      integer :: eltypenum
+      real(dp) :: xp, yp
+      
+C     in/out variables
+      real(dp) :: r, s
+      
+C     local variables
+      integer :: i
+      real(dp) :: norm
+      real(dp) :: rold, sold
+
+      norm = huge(0.0_dp)
+      do i = 1, 10
+          if (norm < normconst) then
+              return
+          else    
+              rold = r
+              sold = s
+              call felib(eltypenum)%findinElement_ptr(posn,xp,yp,r,s)
+              norm = sqrt((r - rold)**2 + (s - sold)**2)
+          end if    
+      end do
+      
+      end subroutine getLocalCoords
 ************************************************************************
       function getElGuessBrute(mnumfe,xp,yp) result(elguess)
       
