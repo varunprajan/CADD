@@ -479,6 +479,8 @@ C     Outputs: closestnode --- number of node closest to point of interest
 C     Purpose: Find closest fe node within material to point of interest
 C     (in the deformed configuration)
 
+      implicit none
+
 C     input variables
       real(dp) :: xp, yp
       integer :: mnumfe
@@ -490,15 +492,14 @@ C     local variables
       integer :: j
       integer :: node
       real(dp) :: distsq, distsqtry
-      real(dp) :: pt(2)
+      real(dp) :: pt(2), posn(2)
       
       pt = [xp,yp]
       distsq = huge(0.0_dp)
       do j = 1, size(feelements(mnumfe)%nodelist)
           node = feelements(mnumfe)%nodelist(j)
-C         could use undeformed positions,
-C         but this is probably close enough
-          distsqtry = sum((nodes%posn(1:2,node)-pt)**2)
+          posn = nodes%posn(1:2,node) - nodes%posn(4:5,node)
+          distsqtry = sum((posn-pt)**2)
           if (distsqtry < distsq) then
               distsq = distsqtry
               closestnode = node
