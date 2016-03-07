@@ -36,7 +36,6 @@ C     module variables
       type(nodedata) :: nodes
       
       contains
-      
 ************************************************************************
       subroutine initNodeData(nodefile)
       

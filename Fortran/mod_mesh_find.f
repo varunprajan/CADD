@@ -1,7 +1,7 @@
       module mod_mesh_find
       
-C     Purpose: Module for finding in which element in the mesh a
-C     particular point lies.
+C     Purpose: Module for finding in which element in the mesh and at which local position
+C     a particular point lies.
 
 C     Possible extensions: See below.
 
@@ -9,6 +9,19 @@ C     TODO: Need to time algorithm, see if it's fast enough.
 C     TODO: Also, change brute force algorithm to generate guess in a smarter way
 C     TODO: Also, need to check if there are problems with crossing over "internal boundaries" (e.g. crack face)
 C     TODO: Need to fix findInOneMatSub to deal with points lying on corners/edges
+
+C     Long note: Why don't we use deformed positions? Few reasons:
+C     1) They are expensive to calculate --- we'd have to compute
+C     dislocation displacement fields at every single FE node. In other words, we only want to calculate
+C     the nodal displacements when needed (i.e. before a dump or restart)
+C     2) If the mesh becomes highly distorted (e.g., near the interface), the mesh finding algorithm could
+C     break down.
+C     3) The goal of finding the local position of a dislocation is in order to calculate the stresses
+C     on it. So, there is an inconsistency if the FE stresses are calculated
+C     with respect to the undeformed mesh and the DD stresses with respect to the deformed mesh.
+C     I think the only want to circumvent this problem would be to reassemble/decompose the stiffness matrix
+C     using the deformed coordinates every iteration, which is quite costly.
+
 
       use mod_types, only: dp
       use mod_fe_elements, only: feelements, nfematerials
@@ -24,8 +37,9 @@ C     TODO: Need to fix findInOneMatSub to deal with points lying on corners/edg
 
 C     module variables (private)
 C     HARD-CODED CONSTANTS
-      integer, parameter :: countermax = 1000
-      real(dp), parameter :: normconst = 1.0e-5_dp
+      integer, parameter :: COUNTERMAX = 1000
+      integer, parameter :: COUNTERMAX2 = 20
+      real(dp), parameter :: NORMCONST = 1.0e-5_dp
       
       contains
 ************************************************************************
@@ -249,7 +263,7 @@ C     local variables
       logical :: proceed, check
       integer :: eltry
 
-      do counter = 1, countermax
+      do counter = 1, COUNTERMAX
           do i = 1, felib(eltypenum)%nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
               posn(i,:) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed positions
@@ -347,7 +361,7 @@ C     local variables
 
       pt = [xp,yp]
       nelnodes = felib(eltypenum)%nelnodes
-      do counter = 1, countermax
+      do counter = 1, COUNTERMAX
           do i = 1, nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
               posn(:,i) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed positions
@@ -398,7 +412,6 @@ C                      is a coordinate pair)
 C             eltypenum --- number code of fe element in felib
 C             xp, yp --- coordinates of target point
 
-
 C     Outputs: r, s --- local coordinates of point in element
                       
 C     Purpose: Determine local coordinates of point w.r.t. element
@@ -419,8 +432,8 @@ C     local variables
       real(dp) :: rold, sold
 
       norm = huge(0.0_dp)
-      do i = 1, 10
-          if (norm < normconst) then
+      do i = 1, COUNTERMAX2
+          if (norm < NORMCONST) then
               return
           else    
               rold = r
@@ -429,6 +442,7 @@ C     local variables
               norm = sqrt((r - rold)**2 + (s - sold)**2)
           end if    
       end do
+      write(*,*) 'Getting local coordinates took way too long'
       
       end subroutine getLocalCoords
 ************************************************************************

@@ -21,7 +21,7 @@ C     opposite signed dislocations that cross, etc.
       use mod_fe_main_2d, only: getFEStressAtPoint
       use mod_disl_fields2, only: getTildeStressOnSourceAll,
      &  getTildeStressAtPointAll
-      use mod_math, only: findPointBetween, tolconst, sameSign
+      use mod_math, only: findPointBetween, TOLCONST, sameSign
       use mod_dd_integrate, only: dispFromPK, assignDispFromPKOneMat
       implicit none
       
@@ -37,7 +37,7 @@ C     opposite signed dislocations that cross, etc.
       procedure(Dummy), pointer :: updateDislPosSub_ptr => NULL()
       
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: obsfudge = 0.9_dp ! see enforceObstacles
+      real(dp), parameter :: OBSFUDGE = 0.9_dp ! see enforceObstacles
       
       contains
 ************************************************************************
@@ -211,10 +211,10 @@ C     local variables
               end if
               if (active) then ! obstacle is active, adjust disp
                   relposdiff = relposobs - relposold
-                  if (abs(relposdiff) < tolconst) then
+                  if (abs(relposdiff) < TOLCONST) then
                       dispnew = 0.0_dp ! if dislocation is very close to obstacle, don't move it
                   else
-                      dispnew = obsfudge*relposdiff ! otherwise, move it fractionally closer
+                      dispnew = OBSFUDGE*relposdiff ! otherwise, move it fractionally closer
                   end if
                   disl(mnumfe)%list(dislnum)%disp = dispnew
               end if
@@ -579,20 +579,18 @@ C     then, figure out if dislocation is still in mesh
      &                        mnumfenew,element,r,s,badflip)
       
       if (badflip) then ! not in mesh
-          write(*,*) 'badflip', badflip ! FIX
-          write(*,*) 'dislposold', dislposold
-          write(*,*) 'disp', disp
-          write(*,*) 'dislposnew', dislposnew
-C         Two possibilities:
+C         Few possibilities:
 C         1) Crossed back to atomistic region
+C              a) Can be placed properly in atomistic region (past detection band)
+C              b) Cannot be (reenters continuum or exits free surface)
 C         2) Left mesh, leaving a slip step (associated with escaped dislocation)
-C         Check first possibility by seeing if it crossed interface
-C         between continuum and atomistic
-
+C         Algorithm:
+C         1) Check first possibility by seeing if it crossed atomistic-continuum interface
+C         2) If so, passContinuumtoAtomistic takes care of logic in 1a, 1b
+C         3) If not, then second possibility has occurred: so, delete the discrete dislocation and add an escaped one
+ 
           call findInterfaceIntersectionUndeformed(interfaceedges%array,
      &                        dislposold,dislposnew,pint,isint,edgenum)
-          write(*,*) 'pint', pint
-          write(*,*) 'isint', isint
           if (isint) then ! in atomistic region
               call passContinuumToAtomistic(dislposold,pint,mnumfe,
      &                                      isys,iplane,iobj)
@@ -601,9 +599,8 @@ C         between continuum and atomistic
               call addEscapedDislocation(dislposold,dislposnew,
      &                                   isys,bsgn,bcut,mnumfe)
           end if
-          
       else ! still in mesh
-          if (mnumfenew/=mnumfe) then ! moved to different material
+          if (mnumfenew /= mnumfe) then ! moved to different material
               call addDislocation(mnumfenew,element,dislposnew(1),
      &                            dislposnew(2),isys,bsgn,bcut) ! assumes slip systems have same numbers (isys) in different materials
               call deleteDislocation(mnumfe,isys,iplane,iobj)
@@ -739,7 +736,7 @@ C     local variables
       tauprev = source%tauprev
       time = source%time
       if (abs(tau) > source%taucr) then
-          if (time < tolconst) then ! start timer
+          if (time < TOLCONST) then ! start timer
               time = time + dt
           else
               if (sameSign(tau,tauprev)) then ! same sign, so increment up
@@ -753,7 +750,7 @@ C     local variables
               end if
           end if
       else
-          if (time > tolconst) then
+          if (time > TOLCONST) then
               time = max(time - dt,0.0_dp) ! decrement back to zero
               tau = tauprev ! keep record of previous tau > taucr stress, in case tau > taucr in future
           end if    

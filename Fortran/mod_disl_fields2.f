@@ -27,7 +27,7 @@ C     Curtin, JAM, 2004). So, the only relevant dislocations are
 C     those in material i for a point (x,y) in material i.
       
       use mod_types, only: dp
-      use mod_math, only: tolconst, piconst, rotateVec2d, rotateStress2d
+      use mod_math, only: TOLCONST, rotateVec2d, rotateStress2d
       use mod_disl_try, only: disl, sources
       use mod_disl_ghost, only: ghostdisl
       use mod_slip_sys, only: slipsys
@@ -442,7 +442,7 @@ C     local variables
       mnum = fematerials%list(mnumfe)
       do i = 1, size(sources(mnumfe)%list)
       time = sources(mnumfe)%list(i)%time
-      if (time > tolconst) then ! source is active
+      if (time > TOLCONST) then ! source is active
           sourcepos = sources(mnumfe)%list(i)%posn
           isys = sources(mnumfe)%list(i)%slipsys
           cost = slipsys(mnumfe)%trig(1,isys)
@@ -499,7 +499,7 @@ C     local variables
       mnum = fematerials%list(mnumfe)
       do i = 1, size(sources(mnumfe)%list)
       time = sources(mnumfe)%list(i)%time
-      if (time > tolconst) then ! source is active
+      if (time > TOLCONST) then ! source is active
           sourcepos = sources(mnumfe)%list(i)%posn
           isys = sources(mnumfe)%list(i)%slipsys
           cost = slipsys(mnumfe)%trig(1,isys)
@@ -560,7 +560,7 @@ C     local variables
       do i = 1, size(sources(mnumfe)%list)
           if (i /= sourcenum) then ! no "self"-stress
           time = sources(mnumfe)%list(i)%time
-          if (time > tolconst) then ! source is active
+          if (time > TOLCONST) then ! source is active
               sourcepos = sources(mnumfe)%list(i)%posn
               isys = sources(mnumfe)%list(i)%slipsys
               cost = slipsys(mnumfe)%trig(1,isys)
@@ -745,7 +745,7 @@ C     original DD code --- compare routines dissig.f and dislp.f)
       rsq = dxn*dxn + dyn*dyn      
 C     
       if (rsq < rcoresq) then
-          if (rsq < tolconst*rcoresq) then ! if point and dislocation are basically coincident
+          if (rsq < TOLCONST*rcoresq) then ! if point and dislocation are basically coincident
               rcorefac = sqrt(rcoresq/2.0_dp)
               dxn = sign(rcorefac,dxn)
               dyn = sign(rcorefac,dyn)

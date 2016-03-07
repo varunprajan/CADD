@@ -1,7 +1,7 @@
       module mod_slip_sys
 
       use mod_types, only: dp
-      use mod_math, only: projectVec, tolconst
+      use mod_math, only: projectVec, TOLCONST
       use mod_utils, only: writeMatTransposeSize, readMatTransposeSize,
      &                     writeVecSize, readVecSize
       implicit none
@@ -161,7 +161,7 @@ C     local variables
       pdist = sqrt(sum(ptvecrej**2))
       iplane = nint(pdist/space) + 1 ! first slip plane is 1, not zero
       relpos = dot_product(ptvecproj,linevec)
-      if (pdist < tolconst) then
+      if (pdist < TOLCONST) then
           posperp = [0.0_dp,0.0_dp]
       else    
           posperp = ((iplane-1)*space)*(ptvecrej/pdist)

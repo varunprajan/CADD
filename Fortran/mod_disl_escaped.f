@@ -53,7 +53,7 @@ C     All of this was satisfactorily handled in the original vdG/Needleman probl
 C     because the sample was convex (a rectangle)
 
       use mod_types, only: dp
-      use mod_math, only: normalizeVec, rotateVec2D, tolconst
+      use mod_math, only: normalizeVec, rotateVec2D, TOLCONST
       use mod_disl_try, only: checkTooManyDisl
       use mod_slip_sys, only: slipsys
       use mod_materials, only: materials
@@ -100,10 +100,10 @@ C     module variables
 
 C     HARD-CODED CONSTANTS
 C     region numbers
-      integer, parameter :: regionmainbody = 0
-      integer, parameter :: regionuppercrack = 1
-      integer, parameter :: regionlowercrack = -1
-      real(dp), parameter :: maxlenfac = 2.0_dp ! see getEscapedPos
+      integer, parameter :: REGIONMAINBODY = 0
+      integer, parameter :: REGIONUPPERCRACK = 1
+      integer, parameter :: REGIONLOWERCRACK = -1
+      real(dp), parameter :: MAXLENFAC = 2.0_dp ! see getEscapedPos
       
       contains
 ************************************************************************
@@ -383,7 +383,7 @@ C     local variables
       real(dp), allocatable :: dispnorm(:)
       
       dispnorm = normalizeVec(posnnew-posnold)
-      escapedpos = posnold + (maxlenfac*box%maxlen)*dispnorm ! add sufficiently large vector in direction of travel
+      escapedpos = posnold + (MAXLENFAC*box%maxlen)*dispnorm ! add sufficiently large vector in direction of travel
       
       end function getEscapedPos
 ************************************************************************
@@ -415,7 +415,7 @@ C     input variables
 C     output variables
       integer :: region
       
-      region = regionmainbody    
+      region = REGIONMAINBODY    
       
       end function getEscapedRegion
 ************************************************************************
@@ -447,22 +447,21 @@ C     local variables
       real(dp) :: xintersection
       
       ydiff = posnnew(2) - posnold(2)
-      if (abs(ydiff) < tolconst) then ! doesn't intersect crack plane (parallel to crack plane)
-          region = regionmainbody
+      if (abs(ydiff) < TOLCONST) then ! doesn't intersect crack plane (parallel to crack plane)
+          region = REGIONMAINBODY
       else    
           s = -posnold(2)/ydiff
           xintersection = posnold(1)*(1.0_dp-s) + posnnew(1)*s
           if (xintersection >= 0.0_dp) then
-              region = regionmainbody
+              region = REGIONMAINBODY
           else
               if (posnold(2) > 0.0_dp) then
-                  region = regionuppercrack
+                  region = REGIONUPPERCRACK
               else
-                  region = regionlowercrack
+                  region = REGIONLOWERCRACK
               end if
           end if
       end if
-      region = regionmainbody ! FIX
       
       end function getEscapedRegionCrack
 ************************************************************************

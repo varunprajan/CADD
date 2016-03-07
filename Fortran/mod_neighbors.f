@@ -8,7 +8,7 @@ C     etc.)
 C     Possible extensions: ?
 
       use mod_types, only: dp
-      use mod_math, only: tolconst, piconst, isMultiple,
+      use mod_math, only: TOLCONST, PICONST, isMultiple,
      &                    logicalToInt, intToLogical
       use mod_nodes, only: nodes, getXYAtomBounds
       use mod_materials, only: materials, nmaterials
@@ -64,8 +64,8 @@ C     module variables (global)
 C     HARD-CODED CONSTANTS
 C     factors of safety for computing max. neighbors, etc.
 C     (see initNeighbors and genNeighList)
-      real(dp) :: nmaxneighfac = 2.0_dp
-      real(dp) :: nmaxbinfac = 2.5_dp
+      real(dp) :: NMAXNEIGHFAC = 2.0_dp
+      real(dp) :: NMAXBINFAC = 2.5_dp
       
       contains
 ************************************************************************      
@@ -168,12 +168,12 @@ C     first calculate largest force cutoff, then add skin distance
 
 C     calculate nmaxneigh using area of circle, density,
 C     factor of safety of nmaxneighfac, then allocate neighlist
-      neighbors%nmaxneigh = ceiling(nmaxneighfac*neighbors%rhomax*
-     &                              piconst*neighbors%rneighsq)
+      neighbors%nmaxneigh = ceiling(NMAXNEIGHFAC*neighbors%rhomax*
+     &                              PICONST*neighbors%rneighsq)
       allocate(neighbors%neighlist(neighbors%nmaxneigh,nodes%natoms))
       
 C     similar for nmaxbin
-      neighbors%nmaxbin = ceiling(nmaxbinfac*neighbors%rhomax*
+      neighbors%nmaxbin = ceiling(NMAXBINFAC*neighbors%rhomax*
      &                            neighbors%rneighsq)
       
 C     allocate other arrays
@@ -403,8 +403,8 @@ C     get x, y bounds, store in atombox structure
      &                     atombox%ymin,atombox%ymax)
       
 C     figure out # of bins, fudge end points slightly b/c of finite prec.
-      atombox%xmin = atombox%xmin - tolconst
-      atombox%ymin = atombox%ymin - tolconst
+      atombox%xmin = atombox%xmin - TOLCONST
+      atombox%ymin = atombox%ymin - TOLCONST
       nbinsx = ceiling((atombox%xmax - atombox%xmin)/neighbors%rneigh)
       nbinsy = ceiling((atombox%ymax - atombox%ymin)/neighbors%rneigh)
       
@@ -503,7 +503,7 @@ C                 use symmetry (if i is neigh. of j, j is neigh. of i)
                           if ((neighcount1 > neighbors%nmaxneigh).or.
      &                        (neighcount2 > neighbors%nmaxneigh)) then
                               write(*,*) 'nmaxneigh is too small'
-                              write(*,*) 'increase nmaxneighfac'
+                              write(*,*) 'increase NMAXNEIGHFAC'
                               stop
                           end if
                           neighbors%neighlist(neighcount1,i) = neigh
