@@ -461,7 +461,8 @@ C     local variables
                   region = regionlowercrack
               end if
           end if
-      end if    
+      end if
+      region = regionmainbody ! FIX
       
       end function getEscapedRegionCrack
 ************************************************************************
