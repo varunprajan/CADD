@@ -13,7 +13,7 @@ C     of attaching const to the end of any parameters (e.g. pi -> piconst)
       implicit none
       
       private
-      public :: tolconst, piconst, thirdconst, linearInterp,
+      public :: TOLCONST, PICONST, THIRDCONST, linearInterp,
      &          rotateVec2d, rotateStress2d, invertMat2,
      &          getUnitNormalRHR, getIntersectionTwoLines,
      &          getUniqueInts, getDuplicates, normalizeVec,
@@ -23,10 +23,10 @@ C     of attaching const to the end of any parameters (e.g. pi -> piconst)
      &          findPointBetween, getCircumradiusSqForTriangle,
      &          logicalToInt, intToLogical, linspace
       
-      real(dp), parameter :: tolconst = 1.0e-10_dp
-      real(dp), parameter :: piconst = 3.14159265358979323846_dp
-      real(dp), parameter :: thirdconst = 0.33333333333333333333_dp
-      real(dp), parameter :: tolconst2 = 1.0e-6_dp
+      real(dp), parameter :: TOLCONST = 1.0e-10_dp
+      real(dp), parameter :: PICONST = 3.14159265358979323846_dp
+      real(dp), parameter :: THIRDCONST = 0.33333333333333333333_dp
+      real(dp), parameter :: TOLCONST2 = 1.0e-6_dp
       
       contains
 ************************************************************************
@@ -144,7 +144,7 @@ C     local variables
       B = Bx*Bx + By*By
       C = Cx*Cx + Cy*Cy
       areatw = abs((x3 - xc)*Cy + (x1 - xc)*Ay + (x2 - xc)*By)
-      areatw = max(tolconst2,areatw) ! prevent divide by zero
+      areatw = max(TOLCONST2,areatw) ! prevent divide by zero
       circumradiussq = 0.25_dp*A*B*C/(areatw*areatw)
       
       end function getCircumradiusSqForTriangle

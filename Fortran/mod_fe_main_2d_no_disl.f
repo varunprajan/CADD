@@ -42,10 +42,10 @@ C     module variables (local)
       type(assemblydata), allocatable :: assembly(:)
       
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: lfactfac = 1.25_dp
-      real(dp), parameter :: lifactfac = 1.25_dp
-      real(dp), parameter :: lkeepfac = 1.25_dp
-      real(dp), parameter :: lworkfac = 1.25_dp
+      real(dp), parameter :: LFACTFAC = 1.25_dp
+      real(dp), parameter :: LIFACTFAC = 1.25_dp
+      real(dp), parameter :: LKEEPFAC = 1.25_dp
+      real(dp), parameter :: LWORKFAC = 1.25_dp
       
       contains
 ************************************************************************ 
@@ -194,7 +194,7 @@ C     local variables
       lrhs = neqns
       lfact = size(assembly(mnumfe)%fact)
       lifact = size(assembly(mnumfe)%ifact)
-      lwork = ceiling(lworkfac*neqns*nrhs)
+      lwork = ceiling(LWORKFAC*neqns*nrhs)
       allocate(work(lwork))
       allocate(iwork(neqns))
       call MA57CD(job,neqns,assembly(mnumfe)%fact,lfact,
@@ -241,15 +241,15 @@ C     local variables
       call MA57ID(cntl,icntl)
       neqns = assembly(mnumfe)%neqnstot
       nentries = assembly(mnumfe)%nentriestot
-      lkeep = ceiling(lkeepfac*(5*neqns + nentries +
+      lkeep = ceiling(LKEEPFAC*(5*neqns + nentries +
      &                          max(neqns,nentries) + 42))
       allocate(keep(lkeep))
       allocate(iwork(5*neqns))
       call MA57AD(neqns,nentries,assembly(mnumfe)%rowindex,
      &                           assembly(mnumfe)%colindex,
      &           lkeep,keep,iwork,icntl,info,rinfo)
-      lfact = ceiling(lfactfac*info(9))
-      lifact = ceiling(lifactfac*info(10))
+      lfact = ceiling(LFACTFAC*info(9))
+      lifact = ceiling(LIFACTFAC*info(10))
       allocate(assembly(mnumfe)%fact(lfact))
       allocate(assembly(mnumfe)%ifact(lifact))
       call MA57BD(neqns,nentries,assembly(mnumfe)%Ksparse,

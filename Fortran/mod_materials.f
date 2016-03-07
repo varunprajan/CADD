@@ -43,7 +43,7 @@ C     module variables (global)
       integer :: nmaterials
       
 C     module variables (private)
-      real(dp), parameter :: corefac = 2.0_dp
+      real(dp), parameter :: COREFAC = 2.0_dp ! ratio of radius of dislocation core to burgers vector (used to cut off disl. fields close to core)
       
       contains
 ************************************************************************      
@@ -131,7 +131,7 @@ C     local variables
           call getMuNuApprox(materials(i)%elconst,mu,nu)
           materials(i)%mu = mu
           materials(i)%nu = nu
-          materials(i)%rcoresq = (corefac*materials(i)%burgers)**2
+          materials(i)%rcoresq = (COREFAC*materials(i)%burgers)**2
           materials(i)%dispprefac =
      &               0.25_dp*materials(i)%burgers/(piconst*(1.0_dp-nu))
           materials(i)%stressprefac = 
