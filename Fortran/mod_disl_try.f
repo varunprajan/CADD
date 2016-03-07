@@ -1010,6 +1010,7 @@ C     local variables
       logical :: badflip
       real(dp) :: r, s
       integer :: element
+      real(dp) :: posn(2)
       
       element = elguess
       if (element == 0) then ! bad guess
@@ -1018,9 +1019,10 @@ C     local variables
           call findInOneMat(mnumfe,element,x,y,r,s,badflip)
       end if
       call checkImproperAssignment(badflip,x,y)
-      call getSlipPlane([x,y],mnumfe,isys,iplane,relpos)
-      call addDislocationSub(mnumfe,element,x,y,isys,bsgn,bcut,
-     &                                                    r,s,dislnum)
+      posn = [x,y]
+      call getSlipPlane(posn,mnumfe,isys,iplane,relpos) ! adjusts posn slightly so that disl lies on slip plane
+      call addDislocationSub(mnumfe,element,posn(1),posn(2),
+     &                       isys,bsgn,bcut,r,s,dislnum)
       call addObjSub(disl(mnumfe)%splanes(isys)%splane(iplane),
      &               relpos,dislnum)
       

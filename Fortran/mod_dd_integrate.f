@@ -17,7 +17,7 @@
       procedure(Dummy), pointer :: dispFromPKOneMat_ptr => NULL()
       
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: dposfac = 1.0e-6_dp      
+      real(dp), parameter :: DPOSFAC = 1.0e-6_dp      
       
       contains
 ************************************************************************
@@ -182,7 +182,7 @@ C     local variables
       bfacabs = burgers/disldrag
       
       lengthscale = vmax*dt ! this sets length scale
-      ds = lengthscale*dposfac ! increment for computing derivative numerically
+      ds = lengthscale*DPOSFAC ! increment for computing derivative numerically
       invds = 1.0_dp/ds
       
       do i = 1, disl(mnumfe)%ndisl
