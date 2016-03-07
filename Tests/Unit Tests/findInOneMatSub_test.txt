@@ -89,3 +89,28 @@ Output:
  Local coords  -2.0000000000000000        2.0000000000000000     
  Not successful? T
 ******************************************************
+Test #4: Bad result
+
+Code:
+
+      logical :: detected
+      real(dp) :: posn(2)
+      real(dp) :: r, s
+      integer :: element
+      logical :: badflip
+      integer :: i
+      integer :: mnumfe
+      
+      call initSimulation('cadd_k_test_medium_restart','dd')
+      posn = [-17.999999999999993_dp, 24.133974596215559_dp]
+      call findInOneMatSub(1,posn(1),posn(2),element,r,s,badflip)
+      write(*,*) 'element', element
+      write(*,*) 'r', r, 's', s
+      write(*,*) 'badflip', badflip
+
+Output:
+ Search in findInOneMatSub took way too long
+ element           0
+ r  0.99999999999999645      s  -1.4574369791440159E-029
+ badflip T
+

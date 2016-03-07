@@ -3,89 +3,95 @@ Test #1:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
-posn = [0.0_dp,0.0_dp]
-res = insideAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
+      posn = [0.0_dp,0.0_dp]
+      res = insideAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- F     
+ 1     
 ******************************************************
 Test #2:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
-posn = [sqrt(3.5_dp),0.0_dp]
-res = insideAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
+      posn = [sqrt(3.5_dp),0.0_dp]
+      res = insideAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************
 Test #3:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
-posn = [sqrt(4.5_dp),0.0_dp]
-res = insideAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
+      posn = [sqrt(4.5_dp),0.0_dp]
+      res = insideAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- F     
+ -1     
 ******************************************************
 Test #4:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
-posn = sqrt(4.5_dp)*[cos(2.3),sin(2.3)]
-res = insideAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
+      posn = sqrt(4.5_dp)*[cos(2.3),sin(2.3)]
+      res = insideAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- F     
+ -1     
 ******************************************************
 Test #5:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
-posn = sqrt(3.5_dp)*[cos(2.3),sin(2.3)]
-res = insideAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp]
+      posn = sqrt(3.5_dp)*[cos(2.3),sin(2.3)]
+      res = insideAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************
 Test #6:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [3.0_dp,4.0_dp,16.0_dp,36.0_dp]
-posn = [0.0_dp,0.0_dp]
-res = insideAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [3.0_dp,4.0_dp,16.0_dp,36.0_dp]
+      posn = [0.0_dp,0.0_dp]
+      res = insideAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************

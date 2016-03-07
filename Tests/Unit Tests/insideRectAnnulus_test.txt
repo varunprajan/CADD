@@ -3,104 +3,111 @@ Test #1:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [0.0_dp,0.0_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [0.0_dp,0.0_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- F     
+ 1     
 ******************************************************
 Test #2:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [3.5_dp,0.0_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [3.5_dp,0.0_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************
 Test #3:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [4.5_dp,0.0_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [4.5_dp,0.0_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- F     
+ -1     
 ******************************************************
 Test #4:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
 
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [3.5_dp,4.5_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [3.5_dp,4.5_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************
 Test #5:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [0.5_dp,4.5_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [3.5_dp,4.5_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************
 Test #6:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [-0.5_dp,-4.5_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [-0.5_dp,-4.5_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ 0     
 ******************************************************
 Test #7:
 
 Code:
 
-real(dp) :: posn(2)
-logical :: res
-
-detection%params = [2.0_dp,1.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
-posn = [5.5_dp,6.5_dp]
-res = insideRectAnnulus(posn)
-write(*,*) res
+      real(dp) :: posn(2)
+      integer :: res
+      real(dp), allocatable :: params(:)
+      
+      params = [2.0_dp,1.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      posn = [5.5_dp,6.5_dp]
+      res = insideRectAnnulus(posn,params)
+      write(*,*) res
 
 Output:
- T     
+ -1     
 ******************************************************
