@@ -9,7 +9,7 @@ Subcycle:
             ii) Update neighbors, if necessary
     C 2) Detect dislocations, pass outwards
     C 3) Solve FE (involves computing boundary conditions using dislocation fields, updated atom positions)
-    C 4) Update pad atoms using FE displacements
+    C 4) Update pad atoms using total displacements (FE + DD)
     C 5) Update dislocations, sources:
         C a)  Sort dislocations on slip planes
         C b)  Compute PK forces on dislocations, corresponding displacements (using suitable integration algorithm)

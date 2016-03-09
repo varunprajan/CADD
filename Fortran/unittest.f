@@ -1,7 +1,8 @@
       program unittest
 
       use mod_types, only: dp
-      use mod_utils, only: prettyPrintMat, writeMat, prettyPrintVec
+      use mod_utils, only: prettyPrintMat, writeMat, prettyPrintVec,
+     &                     writeMatTranspose, readMatTransposeSize
       use mod_math, only: rotateVec2d, rotateStress2d, linspace,
      &    piconst, invertmat2, getUnitNormalRHR, getDuplicates,
      &    getIntersectionTwoLines, getUniqueInts, normalizeVec,
@@ -87,14 +88,15 @@
       use mod_fe_main_2d_no_disl, only: getFEStressAtPoint,
      &  getFEStrainAtPoint
       use mod_disl_detect_pass, only: initDetectionData,
-     &  readDetectionData, processDetectionData, getDislTravelDirection,
-     &   writeDetectionData, assignDetectionPoints,
-     &  assignInsideDetectionBand, getDislBranchCut, insideAnnulus,
-     &  insideRectAnnulus, detection, boxfudge, errorInterface,
+     &  readDetectionData, processDetectionData, BOXWIDTHNORM,
+     &  writeDetectionData, assignDetectionPoints, placeDetectionSub,
+     &  getDislBranchCut, insideAnnulus, getPaddedParamsAnnulus,
+     &  insideRectAnnulus, detection, errorInterface,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
      &  passContinuumToAtomistic, passAtomistictoContinuum,
-     &  updateAtomsPassing, findInterfaceIntersectionDeformed,
-     &  imposeDipoleDispOnAtoms, findInterfaceIntersectionUndeformed
+     &  updateAtomsPassing, assignDetectionBand, placeInsideDetection,
+     &  imposeDipoleDispOnAtoms, findInterfaceIntersectionDeformed,
+     &  getPaddedParamsRectAnnulus, placeOutsideDetection
       use mod_io, only: initCADD, writeRestartCADD, initAtomistic,
      & initSimulation, initDD, initFE, writeRestart_ptr, writeDump_ptr,
      & initGeneralChunk, initAtomisticChunk, initFEChunk,
@@ -141,19 +143,19 @@
      
       implicit none
       
-      integer :: mnumfe, isys
+      logical :: detected
       real(dp) :: posn(2)
-      integer :: bcut
-      real(dp) :: travelvec(2)
+      real(dp) :: r, s
+      integer :: element
+      logical :: badflip
+      integer :: i
+      integer :: mnumfe
       
-      misc%iscrackproblem = .true.
-      detection%lattice = 'hex'
-      mnumfe = 1
-      isys = 3
-      call initSlipSysData('simple3_dd_slipsys')
-      posn = [-10.0_dp,10.0_dp]
-      bcut = getDislBranchCut(mnumfe,isys,posn)
-      travelvec = getDislTravelDirection(mnumfe,isys,bcut)
-      write(*,*) travelvec
-            
+      call initSimulation('cadd_k_test_medium_restart','dd')
+      posn = [-17.999999999999993_dp, 24.133974596215559_dp]
+      call findInOneMatInitially(1,posn(1),posn(2),element,r,s,badflip)
+      write(*,*) 'element', element
+      write(*,*) 'r', r, 's', s
+      write(*,*) 'badflip', badflip
+      
       end program

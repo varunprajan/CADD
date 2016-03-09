@@ -1,0 +1,70 @@
+******************************************************
+Test #1:
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      logical :: isint
+      
+      posold = [2.0_dp,4.5_dp]
+      dispnorm = normalizeVec([0.0_dp,2.0_dp])
+      
+      detection%bandtype = 'rect_annulus'
+      detection%burgers = 0.01_dp
+      detection%maxdisttointerface = 10.0_dp
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeOutsideDetection(posold,dispnorm,pint,isint)
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+
+Output: 
+ pint   2.0000000000000000        5.0000000000000000     
+ isint T
+******************************************************
+Test #2: Reverse direction
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      logical :: isint
+      
+      posold = [2.0_dp,4.5_dp]
+      dispnorm = normalizeVec([0.0_dp,-2.0_dp])
+      
+      detection%bandtype = 'rect_annulus'
+      detection%burgers = 0.01_dp
+      detection%maxdisttointerface = 10.0_dp
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeOutsideDetection(posold,dispnorm,pint,isint)
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+
+Output: 
+ pint   2.0000000000000000        5.0000000000000000     
+ isint T
+******************************************************
+Test #3: Corner
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      logical :: isint
+      
+      posold = [2.0_dp,6.0_dp]
+      dispnorm = normalizeVec([1.0_dp,-2.01_dp])
+      
+      detection%bandtype = 'rect_annulus'
+      detection%burgers = 0.01_dp
+      detection%maxdisttointerface = 10.0_dp
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeInsideDetection(posold,dispnorm,pint,isint)
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+
+Output: 
+ pint   2.9977654047224984        3.9944915365077787     
+ isint T
+******************************************************

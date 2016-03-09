@@ -3,9 +3,9 @@ Test #1:
  
 Code:
 
-call initSimulation('detect_test_1','atomistic')
-call readDetectionData(trim(misc%simname)//'_detection')
-call writeDetectionData(trim(misc%simname)//'_detection_out')
+      call initSimulation('detect_test_1','atomistic')
+      call readDetectionData(trim(misc%simname)//'_detection')
+      call writeDetectionData(trim(misc%simname)//'_detection_out')
 
 Output: See file --- essentially identical to detect_test_1_detection
 ******************************************************

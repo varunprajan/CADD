@@ -18,7 +18,7 @@
 C     call writeRestart_ptr()
 C     K displacement field has already been applied
       call runNVE('all',5000)
-C     call writeRestart_ptr()
+      call writeRestart_ptr()
 
       contains
 ************************************************************************

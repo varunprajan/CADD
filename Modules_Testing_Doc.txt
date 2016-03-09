@@ -1,11 +1,4 @@
 List of Modules/Functions, Status of Testing/Documentation
-
-Left:
-mod_disl_fields --- not sure how to check collective fields, but individual fields appear correct.
-                    maybe look at dislocation dipole?
-mod_poten_pair --- need to check forces from images!
-mod_io -- awaits realistic configuration
-mod_mesh_find/mod_disl --- some multi-material tests haven't yet been done
     
 Note: simple2_dd was used to check most of mod_dd_main
 
@@ -17,18 +10,17 @@ Fix test:
 Check:
     mod_utils
             
-            
-Awaits DD:
+To be checked:            
     mod_dd_main
         Various
     mod_disl_detect_pass
         Various
     mod_disl_fields
-        Various
+        Ghost dislocation stuff
     mod_fe_main_2d
-        Various
+        Dislocation fields on boundary, in element
     mod_mesh_find
-        Various
+        findInOneMatSub (after reworking)
         
 
 mod_compute
@@ -52,7 +44,7 @@ mod_compute
         Test: Implicitly through readComputeData
     getCentroAtoms
         Doc: Done!
-        Test: Half done (Implicitly, through atomistic_2)...awaits CADD simulation
+        Test: Implicitly, through atomistic_2
     getCentroAtom
         Doc: Done!
         Test: Done!   
@@ -109,7 +101,7 @@ mod_dd_main
     Doc: Done!
     assignDD
         Doc: Done!
-        Test: Half done implicitly, through rmesh/cmesh_1; awaits CADD simulation...
+        Test: Implicitly, through rmesh/cmesh_1/cadd_k_test
     runDDStep
         Doc: Done!
         Test: Implicitly, through source_with_obstacles
@@ -139,7 +131,7 @@ mod_dd_main
         Test: Done! (also see rmesh for badflip = True)
     updateDislPosSub
         Doc: Done!
-        Test: Half done...awaits CADD simulation
+        Test: Half done...awaits CADD simulation with reverse passing
     updateDislPosSub
         Doc: Done!
         Test: Done! (also see rmesh for badflip = True)
@@ -191,42 +183,48 @@ mod_disl_detect_pass
     assignDetectionPoints
         Doc: Done!
         Test: Done!
+    assignDetectionBand
+        Doc: Done!
+        Test: Implicitly, through assignDetectionPoints
     insideAnnulus
+        Doc: Done!
+        Test: Done!
+    getPaddedParamsAnnulus
         Doc: Done!
         Test: Done!
     insideRectAnnulus
         Doc: Done!
         Test: Done!
-    assignInsideDetectionBand
+    getPaddedParamsRectAnnulus
         Doc: Done!
-        Test: (Implicitly tested using assignDetectionPoints)
+        Test: Done!
     getDislPropsFromBurgersVec
         Doc: Done!
         Test: Done!
     getDislBranchCut
         Doc: Done!
-        Test: Done!
-    getDislTravelDirection
-        Doc: Done!
-        Test: Done!
+        Test: Not needed.
     detectAndPassDislocations
         Doc: Done!
-        Test: Awaits CADD simulation...
+        Test: Implicitly, through cadd_k_test
     passAtomisticToContinuum
         Doc: Done!
         Test: Awaits CADD simulation...
     passContinuumToAtomistic
         Doc: Done!
         Test: Awaits CADD simulation...
+    placeInsideDetection
+        Doc: Done!
+        Test: Done!
+    placeOutsideDetection
+        Doc: Done!
+        Test: Done!
+    placeDetectionSub
+        Doc: Done
+        Test: Done!
     findInterfaceIntersectionDeformed
         Doc: Done!
-        Test: Done!
-    findInterfaceIntersectionUndeformed
-        Doc: Done!
-        Test: Done!
-    findInterfaceIntersectionSub
-        Doc: Done!
-        Test: Implicitly, through findInterfaceIntersectionDeformed/findInterfaceIntersectionUndeformed
+        Test: Done! 
     errorInterface
         Doc: Done!
         Test: Not needed.
@@ -694,7 +692,7 @@ mod_fe_main_2d
         Test: Half done. Awaits test with dislocations.
     getDislForceSub
         Doc: Done!
-        Test: Awaits model with dislocations.
+        Test: Awaits test with dislocations.
     getDispRHS
         Doc: Done!
         Test: Half done. Awaits test with dislocations.
@@ -869,7 +867,7 @@ mod_materials
         Test: Done!
     getNucleationLength
         Doc: Done!
-        Test:
+        Test: Done!
 mod_math
     Doc: Done!
     intToLogical
@@ -895,7 +893,7 @@ mod_math
         Test: Done!
     searchSortedSpecial
         Doc: Done!
-        Test:
+        Test: N/A
     findPointBetween
         Doc: Done!
         Test: Done!
@@ -957,7 +955,7 @@ mod_mesh_find
         Test: Done!
     findInOneMatSub
         Doc: Done!
-        Test: Done!
+        Test: Needs to be reworked
     getLocalCoords
         Doc: Done!
         Test: Done!

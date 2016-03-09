@@ -13,8 +13,8 @@ C     opposite signed dislocations that cross, etc.
      & addDislocation, sortDislPlanes, sourcet
       use mod_disl_escaped, only: addEscapedDislocation
       use mod_mesh_find, only: findInAllWithGuess
-      use mod_disl_detect_pass, only: 
-     &  findInterfaceIntersectionUndeformed, passContinuumtoAtomistic
+      use mod_disl_detect_pass, only: findInterfaceIntersectionDeformed,
+     &   passContinuumtoAtomistic
       use mod_slip_sys, only: resolveStress, invResolveDisp, slipsys
       use mod_materials, only: materials
       use mod_fe_elements, only: fematerials, interfaceedges
@@ -589,7 +589,7 @@ C         1) Check first possibility by seeing if it crossed atomistic-continuum
 C         2) If so, passContinuumtoAtomistic takes care of logic in 1a, 1b
 C         3) If not, then second possibility has occurred: so, delete the discrete dislocation and add an escaped one
  
-          call findInterfaceIntersectionUndeformed(interfaceedges%array,
+          call findInterfaceIntersectionDeformed(interfaceedges%array,
      &                        dislposold,dislposnew,pint,isint,edgenum)
           if (isint) then ! in atomistic region
               call passContinuumToAtomistic(dislposold,pint,mnumfe,

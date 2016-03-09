@@ -1,0 +1,158 @@
+******************************************************
+Test #1:
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      integer :: regdesired, regfailed
+      real(dp) :: step, dispmax
+      logical :: isint, failed
+      
+      posold = [0.0_dp,0.0_dp]
+      dispnorm = normalizeVec([1.0_dp,2.0_dp])
+      step = sqrt(1.0_dp**2 + 2.0_dp**2)
+      dispmax = 10.0_dp
+      regfailed = 2 ! fake
+      regdesired = 0
+      
+      detection%bandtype = 'rect_annulus'
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                             step,dispmax,pint,isint,failed)
+     
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+      write(*,*) 'failed', failed
+
+Output: 
+ pint   2.0000000000000000        4.0000000000000000     
+ isint T
+ failed F
+
+******************************************************
+Test #2: Different step
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      integer :: regdesired, regfailed
+      real(dp) :: step, dispmax
+      logical :: isint, failed
+      
+      posold = [0.0_dp,0.0_dp]
+      dispnorm = normalizeVec([1.0_dp,2.0_dp])
+      step = 1.0_dp
+      dispmax = 10.0_dp
+      regfailed = 2 ! fake
+      regdesired = 0
+      
+      detection%bandtype = 'rect_annulus'
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                             step,dispmax,pint,isint,failed)
+     
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+      write(*,*) 'failed', failed
+
+Output: 
+ pint   2.2360679774997898        4.4721359549995796     
+ isint T
+ failed F
+******************************************************
+Test #3: Different success region
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      integer :: regdesired, regfailed
+      real(dp) :: step, dispmax
+      logical :: isint, failed
+      
+      posold = [0.0_dp,0.0_dp]
+      dispnorm = normalizeVec([1.0_dp,2.0_dp])
+      step = 0.01_dp
+      dispmax = 10.0_dp
+      regfailed = 2 ! fake
+      regdesired = -1
+      
+      detection%bandtype = 'rect_annulus'
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                             step,dispmax,pint,isint,failed)
+     
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+      write(*,*) 'failed', failed
+
+Output: 
+ pint   2.5043961347997308        5.0087922695994616     
+ isint T
+ failed F
+******************************************************
+Test #4: Fail region
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      integer :: regdesired, regfailed
+      real(dp) :: step, dispmax
+      logical :: isint, failed
+      
+      posold = [0.0_dp,0.0_dp]
+      dispnorm = normalizeVec([1.0_dp,2.0_dp])
+      step = 0.01_dp
+      dispmax = 10.0_dp
+      regfailed = 0
+      regdesired = -1
+      
+      detection%bandtype = 'rect_annulus'
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                             step,dispmax,pint,isint,failed)
+     
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+      write(*,*) 'failed', failed
+
+Output: 
+ pint   2.0035169078397885        4.0070338156795771     
+ isint F
+ failed T
+******************************************************
+Test #5: No intersection within dispmax
+
+Code:
+
+      real(dp) :: posold(2), dispnorm(2), pint(2)
+      integer :: regdesired, regfailed
+      real(dp) :: step, dispmax
+      logical :: isint, failed
+      
+      posold = [0.0_dp,0.0_dp]
+      dispnorm = normalizeVec([1.0_dp,2.0_dp])
+      step = 0.01_dp
+      dispmax = 2.0_dp
+      regfailed = 2 ! fake
+      regdesired = -1
+      
+      detection%bandtype = 'rect_annulus'
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      call assignDetectionBand(1.0_dp)
+      call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                             step,dispmax,pint,isint,failed)
+     
+      write(*,*) 'pint', pint
+      write(*,*) 'isint', isint
+      write(*,*) 'failed', failed
+
+Output: 
+ pint  0.89442719099991641        1.7888543819998328     
+ isint F
+ failed F
+
+******************************************************

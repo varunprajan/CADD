@@ -25,3 +25,26 @@ Output:
  Intersection point   2.5000000000000000        0.0000000000000000     
  Number of intersected edge           2
 ******************************************************
+Test #2: No edges
+ 
+Code:
+
+      real(dp) :: p0(2),p1(2),pint(2)
+      logical :: isint
+      integer :: edgenum
+
+      allocate(interfaceedges%array(2,0))
+      p0 = [0.0_dp,0.0_dp]
+      p1 = [4.0_dp,0.0_dp]
+      call findInterfaceIntersectionDeformed(interfaceedges%array,
+     &                               p0,p1,pint,isint,edgenum)
+      write(*,*) 'Intersected?', isint
+      write(*,*) 'Intersection point', pint
+      write(*,*) 'Number of intersected edge', edgenum
+
+Output:
+
+ Intersected? F
+ Intersection point   3.8675341388953781E-307   5.2370992005534917E-307
+ Number of intersected edge           1
+******************************************************

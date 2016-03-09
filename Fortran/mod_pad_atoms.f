@@ -53,8 +53,8 @@ C     local variables
       allocate(padatoms(nodes%npadatoms))
       do i = 1, nodes%npadatoms
           node = nodes%padatomlist(i)
-          xp = nodes%posn(1,node) - nodes%posn(4,node) ! undeformed positions
-          yp = nodes%posn(2,node) - nodes%posn(5,node) ! undeformed positions
+          xp = nodes%posn(1,node) ! deformed positions
+          yp = nodes%posn(2,node) ! deformed positions
           call findInAllInitially(xp,yp,mnumfe,element,r,s,badflip)
           if (badflip) then
               write(*,*) 'Unable to locate pad atom at', xp, yp

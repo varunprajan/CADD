@@ -5,11 +5,12 @@ Code:
 
       call initSimulation('detect_test_1','atomistic')
       call readDetectionData(trim(misc%simname)//'_detection')
-      call prettyPrintMat(detection%interfaceedges,'edges')
+      call prettyPrintMat(detection%impermissibleedges,'edges')
       call prettyPrintVec(detection%params,'params')
       write(*,*) 'mnumfe', detection%mnumfe
       write(*,*) 'damping flag', detection%damp%flag
       write(*,*) 'damping gamma', detection%damp%gamma
+      write(*,*) 'pass distance, a->c', detection%passdistanceatoc
 
 Output:  
  edges
@@ -25,4 +26,5 @@ Output:
  mnumfe           1
  damping flag T
  damping gamma  0.50000000000000000     
+ pass distance, a->c   2.0000000000000000       
 ******************************************************

@@ -4,11 +4,34 @@ C     Purpose: Reads/writes/stores information related to dislocation
 C     detection and passing. Also contains procedures for detecting
 C     dislocations (using procedure in Stukowski, 2014, JMPS) and passing dislocations
 C     (both from the atomistic region to the continuum and vice versa).
-      
-C     TODO: check if use of deformed/undeformed positions is correct
-C     Problem: Dislocation is found in mesh using mesh_find, which uses
-C     undeformed positions, but this module uses deformed positions to track crossings, etc....
-C     so, dislocation may be "lost"
+
+C     Long note: There are a number of tricky algorithmic issues involved with dislocation detection and passing
+C     1) Branch cut: Dislocation detection algorithms (including the original one in Shilkrot et al., 2004)
+C     are unable to determine the branch cut of a dislocation. This is problem-specific information;
+C     it is difficult (impossible?) to write a general algorithm.
+C     For instance, for a crack problem, the cut of an emitted dislocation originates from the crack tip.
+
+C     2) Direction of travel: Stukowski's algorithm is unable to determine the direction of travel of the dislocation.
+C     (The algorithm in Shilkrot can do this, with some difficulty, but suffers from a number of other issues.)
+C     What we need is an orientation to the detection band --- a way of specifying "outside" (closer to the continuum)
+C     vs. "inside" (completely within the atoms). This is the purpose of the region function (insideDetectionBand_ptr).
+
+C     3) There are two "corner cases" that need to be considered carefully.
+
+C     First, when a dislocation apparently crosses the interface, placing it in the pure atomistic region, 
+C     past the detection band, may not be possible. This can occur if the dislocation path cuts a corner
+C     of the atomistic region and reenters the continuum region. In this case, I have chosen to simply pass
+C     the dislocation through to the other side of the continuum.
+C     (Placing it in the atomistic region is problematic --- how do we detect when it subsequently leaves?)
+
+C     Second, the dislocation path during passing should not be allowed to cross over empty space
+C     (such as the crack plane). This possibility is prevented by the user
+C     defining an interface ("impermissibleedges") that cannot be crossed,
+C     and checking if the proposed dislocation path crosses it. The interface
+C     should be in the atomistic region.
+
+C     The final logic (in passContinuumtoAtomistic and passAtomistictoContinuum)
+C     ends up being fairly involved but (hopefully) robust.
 
 C     TODO: Needs to be modified (heavily?) for 3D.      
       
@@ -19,7 +42,7 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       use mod_disl_ident_simple, only: computeCircuits, identsimple
       use mod_utils, only: writeMat, prettyPrintMat
       use mod_math, only: getIntersectionTwoLines, normalizeVec,
-     &                    piconst, tolconst, sameSign
+     &                    TOLCONST, sameSign
       use mod_nodes, only: nodes
       use mod_fe_elements, only: interfaceedges, fematerials
       use mod_groups, only: groups, getGroupNum, tempgroupname
@@ -38,14 +61,15 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       implicit none
  
       private
-      public :: initDetectionData, readDetectionData, boxfudge,
+      public :: initDetectionData, readDetectionData, placeDetectionSub,
      &  processDetectionData, writeDetectionData, assignDetectionPoints,
-     &  assignInsideDetectionBand, getDislBranchCut, insideAnnulus,
+     &  assignDetectionBand, getDislBranchCut, insideAnnulus,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
      &  passContinuumToAtomistic, passAtomistictoContinuum, detection,
      &  updateAtomsPassing, insideRectAnnulus, imposeDipoleDispOnAtoms,
-     &  findInterfaceIntersectionDeformed, errorInterface,
-     &  findInterfaceIntersectionUndeformed, getDislTravelDirection
+     &  errorInterface, placeInsideDetection, placeOutsideDetection,
+     &  findInterfaceIntersectionDeformed, BOXWIDTHNORM,
+     &  getPaddedParamsAnnulus, getPaddedParamsRectAnnulus
      
       type compdata
       real(dp), allocatable :: burgersvec(:)
@@ -57,30 +81,32 @@ C     TODO: Needs to be modified (heavily?) for 3D.
 C     (read-in)
       character(len=20) :: bandtype
       type(dampingdata) :: damp
-      integer, allocatable :: interfaceedges(:,:)
+      integer, allocatable :: impermissibleedges(:,:)
+      real(dp) :: maxdisttointerface
       integer :: mdnincrements
       real(dp) :: mdtimestep
       integer :: mnumfe
       real(dp), allocatable :: params(:)
-      real(dp) :: passdistance
+      real(dp) :: passdistanceatoc
+      real(dp) :: passdistancectoa
 C     (processed)
       real(dp) :: burgers
       character(len=20) :: lattice
       type(compdata), allocatable :: comp(:)
+      real(dp), allocatable :: paramspadded(:)
       end type
 
 C     module variables (private)
       type(detectiondata) :: detection
-      procedure(Dummy), pointer :: insideDetectionBand_ptr
+      procedure(Dummy), pointer :: insideDetectionBand_ptr    
 
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: distfudge = 1.5_dp ! this parameter is not too important, see passAtomistictoContinuum
-      real(dp), parameter :: distfudge2 = 3.0_dp ! see passAtomistictoContinuum. If dislocation path crosses interface at p,
-                                                 !  dislocation is placed at p + distfudge2*b*m, where m is direction of travel
-      real(dp), parameter :: boxfudge = 10.0_dp ! box border width; see updateAtomsPassing
-      real(dp), parameter :: circumsqfachex = 2.0_dp ! see identifyLargeTri/processDetectionData
-C                                                  ! ratio of circumradius**2 in largest dislocated triangle to circumradius**2 in equilibrium triangle
-                                                   ! (must be less than 3, because otherwise edge triangles would be counted as "good")
+      real(dp), parameter :: BOXWIDTHNORM = 10.0_dp ! see updateAtomsPassing
+      real(dp), parameter :: DISTPAD = 1.5_dp ! see paramspadded/processDetectionData
+      real(dp), parameter :: CIRCUMSQFACHEX = 2.0_dp ! see identifyLargeTri/processDetectionData
+C                                                    ! ratio of circumradius**2 in largest dislocated triangle to circumradius**2 in equilibrium triangle
+                                                     ! (must be less than 3, because otherwise edge triangles would be counted as "good")
+
       contains
 ************************************************************************
       subroutine initDetectionData(detectionfile)
@@ -130,12 +156,14 @@ C     local variables
       
       read(iunit,*) detection%bandtype
       call readDampingDataSub(iunit,detection%damp)
-      call readMatTransposeSize(iunit,detection%interfaceedges)
+      call readMatTransposeSize(iunit,detection%impermissibleedges)
+      read(iunit,*) detection%maxdisttointerface
       read(iunit,*) detection%mdnincrements
       read(iunit,*) detection%mdtimestep
       read(iunit,*) detection%mnumfe
       call readVecSize(iunit,detection%params)
-      read(iunit,*) detection%passdistance
+      read(iunit,*) detection%passdistanceatoc
+      read(iunit,*) detection%passdistancectoa
       
       close(iunit)
       
@@ -164,6 +192,7 @@ C     local variables
       integer :: isys, bsgn
       integer :: nslipsys, ncomp, counter
       real(dp) :: direction(2)
+      real(dp) :: padding
       
       mnumfe = detection%mnumfe
       mnum = fematerials%list(mnumfe)
@@ -190,11 +219,12 @@ C     detection stuff
               end do    
           end do
           delaunay%circumradiussqcutoff =
-     &         circumsqfachex*(detection%burgers)**2/3.0_dp ! 1/sqrt(3) is factor for circumradius for equilateral triangle
+     &         CIRCUMSQFACHEX*(detection%burgers)**2/3.0_dp ! 1/sqrt(3) is factor for circumradius for equilateral triangle
       end if
       
 C     delaunay stuff
-      call assignInsideDetectionBand()
+      padding = DISTPAD*detection%burgers
+      call assignDetectionBand(padding)
       
       end subroutine processDetectionData
 ************************************************************************
@@ -223,12 +253,14 @@ C     local variables
 
       write(iunit,*) detection%bandtype  
       call writeDampingDataSub(iunit,detection%damp)
-      call writeMatTransposeSize(iunit,detection%interfaceedges)
+      call writeMatTransposeSize(iunit,detection%impermissibleedges)
+      write(iunit,*) detection%maxdisttointerface
       write(iunit,*) detection%mdnincrements
       write(iunit,*) detection%mdtimestep
       write(iunit,*) detection%mnumfe
       call writeVecSize(iunit,detection%params) 
-      write(iunit,*) detection%passdistance
+      write(iunit,*) detection%passdistanceatoc
+      write(iunit,*) detection%passdistancectoa
       
       close(iunit)
       
@@ -236,7 +268,7 @@ C     local variables
 ************************************************************************
       subroutine assignDetectionPoints()
  
-C     Subroutine: assignDetectionPoints
+C     Subroutine: assignDetectionPoints                                                                                                                                                                                                                                                                                                                                                                                                                                     ctionPoints
  
 C     Inputs: None
  
@@ -262,7 +294,8 @@ C     local variables
       do i = 1, nodes%nrealatoms
           node = nodes%realatomlist(i)
           posn = nodes%posn(1:2,node) ! current position
-          if (insideDetectionBand_ptr(posn)) then
+          if (insideDetectionBand_ptr(posn,
+     &                                detection%paramspadded) == 0) then ! use padded params to grab atoms just outside the band
               counter = counter + 1
               tempxy(:,counter) = posn
               tempnodes(counter) = node
@@ -281,121 +314,204 @@ C     final result, store in delaunay
       
       end subroutine assignDetectionPoints
 ************************************************************************
-      subroutine assignInsideDetectionBand()
+      subroutine assignDetectionBand(padding)
  
-C     Subroutine: assignInsideDetectionBand
+C     Subroutine: assignDetectionBand
  
 C     Inputs: None
  
 C     Outputs: None
  
-C     Purpose: Assigns insideDetectionBand_ptr to function, based on style
+C     Purpose: Assigns arguments based on style
 C     of detection band. Currently only implemented for circular and
 C     rectangular annuli.
+
+      implicit none
       
-      select case (detection%bandtype)
+C     input variables
+      real(dp) :: padding
+      
+      select case (trim(detection%bandtype))
           case ('annulus')
               insideDetectionBand_ptr => insideAnnulus
+              detection%paramspadded =
+     &              getPaddedParamsAnnulus(detection%params,padding)
           case ('rect_annulus')
               insideDetectionBand_ptr => insideRectAnnulus
+              detection%paramspadded =
+     &              getPaddedParamsRectAnnulus(detection%params,padding)
           case default
               write(*,*) 'Detection band style has not yet been defined'
               stop
       end select
       
-      end subroutine assignInsideDetectionBand
+      end subroutine assignDetectionBand
 ************************************************************************
-      function Dummy(posn) result(inside)
+      function Dummy(posn,params) result(inside)
       
 C     input variables
       real(dp) :: posn(2)
+      real(dp) :: params(:)
       
 C     output variables
-      logical :: inside
+      integer :: inside
       
       end function Dummy
 ************************************************************************
-      function insideAnnulus(posn) result(inside)
+      function insideAnnulus(posn,params) result(inside)
  
 C     Subroutine: insideAnnulus
  
 C     Inputs: posn --- vector (length 2) of coordinates of point of interest
+C             params(1) --- x-coord of center of (both) circles
+C             params(2) --- y-coord of center of (both) circles
+C             params(3) --- radius**2 of inner circle
+C             params(4) --- radius**2 of outer circle    
  
-C     Outputs: inside --- logical indicating whether point is inside annulus
+C     Outputs: inside --- integer indicating whether point is:
+C                         0 --- within annulus (inside detection band)
+C                         1 --- inside inner circle (closer to atomistic)
+C                         -1 --- outside outer circle (closer to continuum)
  
-C     Purpose: Figure out if point is inside annulus with parameters:
-C     params(1) --- x-coord of center of (both) circles
-C     params(2) --- y-coord of center of (both) circles
-C     params(3) --- radius**2 of inner circle
-C     params(4) --- radius**2 of outer circle      
+C     Purpose: Figure out where point is with respect to annulus (detection band)
          
       implicit none
          
 C     input variables
       real(dp) :: posn(2)
+      real(dp) :: params(:)
       
 C     output variables
-      logical :: inside
+      integer :: inside
       
 C     local variables
       real(dp) :: dx, dy
       real(dp) :: rsq
 
-      dx = posn(1) - detection%params(1)
-      dy = posn(2) - detection%params(2)
+      dx = posn(1) - params(1)
+      dy = posn(2) - params(2)
       rsq = dx**2 + dy**2
       
-      inside = .false.
-      if (rsq >= detection%params(3)) then
-          inside = (rsq <= detection%params(4))
-      end if    
+      inside = -1
+      if (rsq < params(3)) then
+          inside = 1
+      else if (rsq < params(4)) then
+          inside = 0
+      end if   
       
       end function insideAnnulus
 ************************************************************************
-      function insideRectAnnulus(posn) result(inside)
+      function getPaddedParamsAnnulus(params,padding)
+     &                                             result(paramspadded)
+ 
+C     Function: getPaddedParamsAnnulus
+ 
+C     Inputs: params --- parameters for old detection band (annulus). See insideAnnulus, above.
+ 
+C     Outputs: paramspadded --- parameters for new detection band that is slightly larger
+ 
+C     Purpose: Generate parameters for new, "padded" detection band (so that we grab atoms close to edge of band)
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: params(:)
+      real(dp) :: padding
+      
+C     output variables
+      real(dp), allocatable :: paramspadded(:)
+      
+C     local variables
+      real(dp) :: rinner, router
+      
+      paramspadded = params
+      rinner = sqrt(paramspadded(3)) - padding
+      router = sqrt(paramspadded(4)) + padding
+      paramspadded(3) = rinner**2
+      paramspadded(4) = router**2
+      
+      end function getPaddedParamsAnnulus
+************************************************************************
+      function insideRectAnnulus(posn,params) result(inside)
  
 C     Subroutine: insideRectAnnulus
  
 C     Inputs: posn --- vector (length 2) of coordinates of point of interest
+C             params(1) --- x-coord of center of (both) rectangles
+C             params(2) --- y-coord of center of (both) rectangles
+C             params(3) --- Lx/2 for inner rectangle
+C             params(4) --- Lx/2 for outer rectangle
+C             params(5) --- Ly/2 for inner rectangle
+C             params(6) --- Ly/2 for outer rectangle
  
-C     Outputs: inside --- logical indicating whether point is inside rectangular annulus
-C     (space between two rectangles, assuming symmetry in both x- and y- directions)
+C     Outputs: inside --- integer indicating whether point is:
+C                         0 --- within rectangular annulus (within detection band)
+C                         1 --- inside inner box (closer to atomistic)
+C                         -1 --- outside outer box (closer to continuum)
+C                         
+C     (Rectangular annulus is like space between two rectangles, assuming symmetry in both x- and y- directions)
 C     (Like "rectangular hollow section" beam)
  
-C     Purpose: Figure out if point is inside rectangular annulus with parameters:
-C     params(1) --- x-coord of center of (both) rectangles
-C     params(2) --- y-coord of center of (both) rectangles
-C     params(3) --- Lx/2 for inner rectangle
-C     params(4) --- Lx/2 for outer rectangle
-C     params(5) --- Ly/2 for inner rectangle
-C     params(6) --- Ly/2 for outer rectangle     
+C     Purpose: Figure out where point is with respect to rectangular annulus (detection band)
       
       implicit none
       
 C     input variables
       real(dp) :: posn(2)
+      real(dp) :: params(:)
       
 C     output variables
-      logical :: inside
+      integer :: inside
       
 C     local variables
       real(dp) :: dx, dy
       
-      dx = abs(posn(1) - detection%params(1))
-      dy = abs(posn(2) - detection%params(2))
+      dx = abs(posn(1) - params(1))
+      dy = abs(posn(2) - params(2))
       
-      inside = .false.
-      if (dx > detection%params(3)) then
-          if (dx < detection%params(4)) then
-              inside = (dy < detection%params(6))
-          end if    
-      else
-          if (dy > detection%params(5)) then
-              inside = (dy < detection%params(6))
+      inside = -1
+      if (dx < params(3)) then
+          if (dy < params(5)) then
+              inside = 1
+              return
+          end if
+      end if
+      
+      if (dx < params(4)) then
+          if (dy < params(6)) then
+              inside = 0
           end if
       end if
       
       end function insideRectAnnulus
+************************************************************************
+      function getPaddedParamsRectAnnulus(params,padding)
+     &                                             result(paramspadded)
+ 
+C     Function: getPaddedParamsRectAnnulus
+ 
+C     Inputs: params --- parameters for old detection band (rect. annulus). See insideRectAnnulus, above.
+ 
+C     Outputs: paramspadded --- parameters for new detection band that is slightly larger
+ 
+C     Purpose: Generate parameters for new, "padded" detection band (so that we grab atoms close to edge of band)
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: params(:)
+      real(dp) :: padding
+      
+C     output variables
+      real(dp), allocatable :: paramspadded(:)
+      
+      paramspadded = params
+      paramspadded(3) = paramspadded(3) - padding
+      paramspadded(4) = paramspadded(4) + padding
+      paramspadded(5) = paramspadded(5) - padding
+      paramspadded(6) = paramspadded(6) + padding
+      
+      end function getPaddedParamsRectAnnulus
 ************************************************************************
       subroutine getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
  
@@ -448,8 +564,6 @@ C     Purpose: Determine branch cut of dislocation from attributes of the disloc
 C     (the burgers circuit alone does not tell us this). For a crack problem,
 C     we assume that the cut points towards the crack.
 
-C     Notes/TODO: Fix ycrack = 0 bit, and resolve case where dislocation is at 0 or 180 degrees
-
       implicit none
       
 C     input variables
@@ -460,67 +574,10 @@ C     input variables
 C     output variables
       integer :: bcut
       
-C     local variables
-      real(dp) :: cutvec(2)
-      real(dp) :: ycut, ycrack, ypos
-      
-      bcut = 0 ! default
-      
-      if ((misc%iscrackproblem).and.(detection%lattice=='hex')) then
-          ycrack = 0.0_dp ! assume crack plane is roughly at y = 0 (this should probably be fixed later)
-          cutvec = -slipsys(mnumfe)%trig(:,isys) ! default cut points in opposite direction to slip plane tangent
-                                                 ! however, actual cut should point toward crack plane (whence the dislocation came)
-          ycut = cutvec(2)                                                 
-          if (abs(ycut) > tolconst) then
-              ypos = posn(2) - ycrack
-              if (sameSign(ycut,ypos)) then
-                  bcut = 1
-              end if   
-          else
-              write(*,*) 'Warning, detected dislocation at 0 or
-     &                                                     180 degrees'
-              write(*,*) 'Assigning bcut = 0'
-          end if
-      end if    
+      bcut = 0 ! anything else would require problem specific information
+               ! this only fails (in 2D) for emitted dislocations that are traveling backwards, which seems unlikely
       
       end function getDislBranchCut
-************************************************************************
-      function getDislTravelDirection(mnumfe,isys,bcut)
-     &                                                 result(travelvec)
-      
-C     Function: getDislTravelDirection
-
-C     Inputs: mnumfe --- fe material number
-C             isys --- number of slip system of dislocation
-C             bcut --- branch cut of dislocation
-
-C     Outputs: travelvec --- vector indicating direction of travel of dislocation
-
-C     Purpose: Determine travel direction of dislocation from attributes of the dislocation detected in the atomistic region
-C     (the burgers circuit alone does not tell us this). For a crack problem,
-C     we assume the dislocation travels away from the crack
-
-C     Notes/TODO: Are there more general ways to do this?
-      
-      implicit none
-      
-C     input variables
-      integer :: mnumfe
-      integer :: isys
-      integer :: bcut
-      
-C     output variables
-      real(dp) :: travelvec(2)      
-      
-      if ((misc%iscrackproblem).and.(detection%lattice=='hex')) then
-          travelvec = slipsys(mnumfe)%trig(:,isys) ! dislocation travels in opposite direction of cut vec
-                                                   ! since cut vec points towards crack
-          if (bcut == 1) then ! flip for opposite cut
-              travelvec = -travelvec
-          end if
-      end if
-      
-      end function getDislTravelDirection
 ************************************************************************
       subroutine detectAndPassDislocations(detected)
       
@@ -534,7 +591,7 @@ C     Purpose: Loop over all triangles in detection band triangulation,
 C     find dislocations (if any), pass them to continuum
  
       implicit none
-      
+     
       logical :: detected ! FIX
      
 C     local variables
@@ -543,7 +600,7 @@ C     local variables
       integer :: mnumfe
       real(dp), allocatable :: circuit(:,:)
       real(dp) :: burgersinfnorm
-      real(dp) :: burgersvec(2), disldisp(2), dislpos(2)
+      real(dp) :: burgersvec(2), dislpos(2)
       integer :: bcut, bsgn, isys
     
 C     regen delaunay, if necessary (note: neighbors%delaunayregen set to .true. whenever neighbor list is updated)
@@ -560,34 +617,33 @@ C     regen delaunay, if necessary (note: neighbors%delaunayregen set to .true. 
 C     compute burgers circuits
       mnumfe = detection%mnumfe
       circuit = computeCircuits()
-      detected = .false. ! FIX
+      detected = .false.
       do i = 1, delaunay%numtri
-          if (delaunay%trigood(i)) then
-              burgersvec = circuit(:,i)
-              burgersinfnorm = maxval(abs(burgersvec))
-              if (burgersinfnorm > tolconst) then
+      if (delaunay%trigood(i)) then
+          burgersvec = circuit(:,i)
+          burgersinfnorm = maxval(abs(burgersvec))
+          if (burgersinfnorm > TOLCONST) then
+              dislpos = getTriCenter(i)
+              if (insideDetectionBand_ptr(dislpos,
+     &                                    detection%params) == 0) then ! dislocation must be inside actual detection band (not padded one)
                   write(*,*) 'Found dislocation'
                   detected = .true.
                   call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
-                  dislpos = getTriCenter(i)
                   write(*,*) 'Dislocation position', dislpos
                   bcut = getDislBranchCut(mnumfe,isys,dislpos)
-                  disldisp = getDislTravelDirection(mnumfe,isys,bcut)
-                  call passAtomisticToContinuum(dislpos,disldisp,
-     &                                          bsgn,bcut,isys)
+                  call passAtomisticToContinuum(dislpos,bsgn,bcut,isys)
               end if
           end if
+      end if
       end do
       
       end subroutine detectAndPassDislocations
 ************************************************************************
-      subroutine passAtomisticToContinuum(dislpos,disldisp,bsgn,bcut,
-     &                                    isys)
+      subroutine passAtomisticToContinuum(detectpos,bsgn,bcut,isys)
       
 C     Subroutine: passAtomisticToContinuum
  
-C     Inputs: dislpos --- position (length 2) of detected dislocation
-C             disldisp --- vector (length 2) indicating direction of movement of disl.
+C     Inputs: detectpos --- position (length 2) of detected dislocation
 C             bsgn --- sign of dislocation (+1 or -1)
 C             bcut --- branch cut of dislocation (0 if to the left, 1 if to the right)
 C             isys --- number of slip system
@@ -596,73 +652,86 @@ C     Outputs: None
  
 C     Purpose: Pass a detected dislocation from the atomistic region to the
 C              continuum region
-
-C     Notes/TODO: Are all of these constants (distfudge) necessary?
       
       implicit none
       
 C     input variables
-      real(dp) :: dislpos(2)
-      real(dp) :: disldisp(2)
+      real(dp) :: detectpos(2)
       integer :: bsgn
       integer :: bcut
       integer :: isys
       
 C     local variables
-      real(dp), allocatable :: disldispnorm(:)
-      real(dp) :: dislposnew(2)
-      real(dp) :: pint(2)
-      logical :: isint
-      integer :: edgenum
       integer :: mnumfe
-      integer :: element
-      real(dp) :: burgers
+      real(dp) :: dispnorm(2)
       real(dp) :: cost, sint
+      real(dp) :: pintdummy(2), pint(2), pintcrack(2)
+      logical :: isint
+      real(dp) :: trypos(2), posnew(2)
+      integer :: edgenum, elguess
+      real(dp) :: burgers
+      integer, allocatable :: impedges(:,:)
+      
+C     figure out direction that dislocation is moving by determining where it exits the detection band
+      mnumfe = detection%mnumfe
+      dispnorm = slipsys(mnumfe)%trig(:,isys)
+      cost = dispnorm(1)
+      sint = dispnorm(2)
+      call placeOutsideDetection(detectpos,dispnorm,pintdummy,isint)
  
-C     place end of dislocation path well within continuum
-C     tacit assumption that continuum is sufficiently "thick"
-C     (so there aren't multiple intersections)
-C     if this is an issue, findInterfaceIntersection should be modified
-C     to find *nearest* intersection
-      disldispnorm = normalizeVec(disldisp)
-      dislposnew = dislpos +
-     &                    disldispnorm*detection%passdistance*distfudge
-      call findInterfaceIntersectionUndeformed(interfaceedges%array,
-     &                           dislpos,dislposnew,pint,isint,edgenum)
-      mnumfe = interfaceedges%array(3,edgenum)
-      element = interfaceedges%array(4,edgenum)
+C     place end of dislocation path past interface, find intersection with interface
+      trypos = detectpos + dispnorm*detection%maxdisttointerface       
+      call findInterfaceIntersectionDeformed(interfaceedges%array,
+     &                             detectpos,trypos,pint,isint,edgenum)
       if (.not.isint) then ! if no intersection, something went wrong
-          call errorInterface(1,dislpos,dislposnew)
+          call errorInterface(1,detectpos,trypos)
+      end if
+      mnumfe = interfaceedges%array(3,edgenum)
+      elguess = interfaceedges%array(4,edgenum)
+      
+C     is this path permissible? (e.g. does it cross a crack surface)
+      impedges = detection%impermissibleedges
+      call findInterfaceIntersectionDeformed(impedges,detectpos,
+     &                                     pint,pintcrack,isint,edgenum)
+      if (isint) then ! if path crosses crack face, leave dislocation where it is --- it will eventually exit by crossing crack surface
+          return
       end if
       
-C     determine actual new position of dislocation
-      burgers = detection%burgers
-      dislposnew = pint + disldispnorm*distfudge2*burgers
+C     otherwise, place dislocation away from interface, by an amount passdistanceatoc
+      trypos = pint + dispnorm*detection%passdistanceatoc
       
-C     add discrete dislocation to DD array
-      call addDislocation(mnumfe,element,dislposnew(1),dislposnew(2),
+C     is this path permissible? (e.g. does it cross a crack surface)
+      call findInterfaceIntersectionDeformed(impedges,pint,
+     &                                   trypos,pintcrack,isint,edgenum)
+      if (isint) then
+          posnew = 0.5_dp*(pint + pintcrack) ! place disl halfway between interface and crack surface
+      else
+          posnew = trypos ! otherwise place it normally
+      end if
+      
+C     finally, place dislocation in continuum
+      call addDislocation(mnumfe,elguess,posnew(1),posnew(2),
      &                    isys,bsgn,bcut)
       
 C     Add ghost dislocation with *opposite* sign at *old* location, inside
 C     atomistic region (Must cancel out dislocation in continuum.)
-      call addGhostDislocation(dislpos(1),dislpos(2),
+      call addGhostDislocation(detectpos(1),detectpos(2),
      &                         isys,-bsgn,bcut,mnumfe)
       
 C     update atom positions, including imposing dipole displacements
 C     and minimizing atomic positions near core
-      cost = slipsys(mnumfe)%trig(1,isys)
-      sint = slipsys(mnumfe)%trig(2,isys)
-      call updateAtomsPassing(dislpos,dislposnew,
+      burgers = detection%burgers
+      call updateAtomsPassing(detectpos,posnew,
      &                        burgers,bsgn,bcut,cost,sint)
       
       end subroutine passAtomisticToContinuum
 ************************************************************************
-      subroutine passContinuumToAtomistic(dislpos,pint,mnumfe,isys,
+      subroutine passContinuumToAtomistic(posold,pint,mnumfe,isys,
      &                                    iplane,iobj)
       
 C     Subroutine: passContinuumToAtomistic
 
-C     Inputs: dislpos --- position (length 2) of discrete dislocation (before movement)
+C     Inputs: posold --- position (length 2) of discrete dislocation (before movement)
 C             pint --- position (length 2) of intersection of dislocation path
 C                      with interface between atomistic/continuum regions
 C             mnumfe --- number of fe material
@@ -674,66 +743,245 @@ C     Outputs: None
 
 C     Purpose: Pass a discrete dislocation from the continuum region to the
 C              atomistic region
-
-C     Notes/TODO: Are all of these constants (distfudge) necessary?
       
       implicit none
       
 C     input variables
-      real(dp) :: dislpos(2)
+      real(dp) :: posold(2)
       real(dp) :: pint(2)
       integer :: mnumfe
       integer :: isys, iplane, iobj
       
 C     local variables
       integer :: dislnum
-      real(dp) :: disldisp(2)
-      real(dp), allocatable :: disldispnorm(:)
-      real(dp) :: dislposnew(2)
-      real(dp) :: pintnew(2)
-      real(dp) :: burgers
       integer :: bsgn, bcut
+      real(dp) :: burgers
       real(dp) :: cost, sint
-      logical :: isint
+      real(dp) :: disp(2), dispnorm(2)
+      real(dp) :: pintdetect(2), pintfudge(2), pint2(2), pintcrack(2)
+      real(dp) :: trypos(2), posnew(2)
+      logical :: isint, isintdetect, isintcrack, isintcrack2
       integer :: edgenum
-    
+      integer :: elguess
+      integer, allocatable :: impedges(:,:)
+
       dislnum = disl(mnumfe)%splanes(isys)%splane(iplane)%objnum(iobj)
       bsgn = disl(mnumfe)%list(dislnum)%sgn
       bcut = disl(mnumfe)%list(dislnum)%cut
-
-C     determine intersection of disl. path with detection band      
-      disldisp = pint - dislpos
-      disldispnorm = normalizeVec(disldisp)
-      dislposnew = pint + disldispnorm*detection%passdistance*distfudge
-      call findInterfaceIntersectionDeformed(detection%interfaceedges,
-     &                           pint,dislposnew,pintnew,isint,edgenum)
-      if (.not.isint) then ! if no intersection, something went wrong
-          call errorInterface(2,pint,dislposnew)
-      end if    
-      
-C     place dislocation just inside detection band
       burgers = detection%burgers
-      dislposnew = pintnew + disldispnorm*distfudge2*burgers
+      cost = slipsys(mnumfe)%trig(1,isys)
+      sint = slipsys(mnumfe)%trig(2,isys)
+      impedges = detection%impermissibleedges
       
-C     delete discrete dislocation from DD array
+C     dislocation travel direction
+      disp = pint - posold
+      dispnorm = normalizeVec(disp)
+
+C     try to place dislocation inside detection band
+      call placeInsideDetection(pint,dispnorm,pintdetect,isintdetect)
+      if (.not.isintdetect) then
+      
+C         dislocation might be cutting the band obliquely or exiting crack surface in atomistic domain
+C         check first possibility by finding second intersection with interface
+          pintfudge = pint + dispnorm*burgers*0.1_dp ! fudge position slightly to avoid multiple intersections
+          trypos = pintfudge + dispnorm*detection%maxdisttointerface
+          call findInterfaceIntersectionDeformed(interfaceedges%array,
+     &                       pintfudge,trypos,pint2,isint,edgenum)
+          if (isint) then ! place dislocation in continuum. Need to figure out where, though
+              trypos = pint2 + dispnorm*detection%passdistanceatoc
+              call findInterfaceIntersectionDeformed(impedges,
+     &                        pint2,trypos,pintcrack,isintcrack,edgenum)
+              if (isintcrack) then
+                  posnew = 0.5_dp*(pint2 + trypos) ! place disl halfway between interface and crack surface
+              else
+                  posnew = trypos
+              end if
+C             Finally, move dislocation to new location
+C             Easiest to delete old one (see below) and add new one
+              mnumfe = interfaceedges%array(3,edgenum)
+              elguess = interfaceedges%array(4,edgenum)
+              call addDislocation(mnumfe,elguess,posnew(1),
+     &                            posnew(2),isys,bsgn,bcut)
+          else
+              call errorInterface(2,pintfudge,trypos)
+          end if          
+      else    
+C         we need to figure out where in the atomistic region to place disl.
+C         first, figure out if we've crossed crack
+          call findInterfaceIntersectionDeformed(impedges,
+     &                     pint,pintdetect,pintcrack,isintcrack,edgenum)
+          if (isintcrack) then
+C             place dislocation just beyond crack surface, in (hopefully) empty space
+              posnew = pintcrack + dispnorm*burgers*0.1_dp
+          else
+C             try to place dislocation past detection band by some amount
+              trypos = pintdetect + dispnorm*detection%passdistancectoa
+C             does this new path intersect the crack?
+              call findInterfaceIntersectionDeformed(impedges,
+     &                  pintdetect,trypos,pintcrack,isintcrack2,edgenum)
+              if (isintcrack2) then
+                  posnew = 0.5_dp*(pintdetect + pintcrack) ! place halfway between detection band and crack
+              else
+                  posnew = trypos
+              end if
+          end if
+          
+C         Add ghost dislocation with *same* sign, at *new*
+C         location (inside atomistic region)
+          call addGhostDislocation(posnew(1),posnew(2),
+     &                             isys,bsgn,bcut,mnumfe)
+     
+      end if
+      
+C     delete old dislocation
       call deleteDislocation(mnumfe,isys,iplane,iobj)
-      
-C     Add ghost dislocation with *same* sign, at *new*
-C     location (inside atomistic region)
-      call addGhostDislocation(dislposnew(1),dislposnew(2),
-     &                         isys,bsgn,bcut,mnumfe)
       
 C     update atom positions, including imposing dipole displacements
 C     and minimizing atomic positions near core
-      cost = slipsys(mnumfe)%trig(1,isys)
-      sint = slipsys(mnumfe)%trig(2,isys)
-      call updateAtomsPassing(dislpos,dislposnew,
-     &                        burgers,bsgn,bcut,cost,sint)
+      call updateAtomsPassing(posold,posnew,burgers,bsgn,bcut,cost,sint)
       
       end subroutine passContinuumToAtomistic
 ************************************************************************
+      subroutine placeInsideDetection(pint,dispnorm,pintnew,isint)
+      
+C     Subroutine: placeInsideDetection
+
+C     Inputs: pint --- old intersection point (between dislocation path and interface between atomistic and continuum region
+C             dispnorm --- normalized vector indicating dislocation travel direction
+      
+C     Outputs: pintnew --- coordinates of new intersection point (between dislocation path and interface between detection band and "inside")
+C              isint --- boolean indicating whether this intersection exists
+
+C     Purpose: Find intersection of dislocation path with inner boundary of the detection band
+
+      implicit none
+      
+C     input variables
+      real(dp) :: pint(2)
+      real(dp) :: dispnorm(2)
+      
+C     output variables
+      real(dp) :: pintnew(2)
+      logical :: isint
+      
+C     local variables
+      real(dp) :: dispmax
+      logical :: failed
+      real(dp) :: step
+      integer :: regdesired, regfailed
+      
+      step = detection%burgers
+      dispmax = detection%maxdisttointerface
+      regdesired = 1 ! inside detection
+      regfailed = 2 ! fake region
+           
+      call placeDetectionSub(pint,dispnorm,regdesired,
+     &                      regfailed,step,dispmax,pintnew,isint,failed)
+      
+      end subroutine placeInsideDetection
+************************************************************************
+      subroutine placeOutsideDetection(posold,dispnorm,
+     &                                 pintnew,isint)
+     
+C     Subroutine: placeOutsideDetection
+
+C     Inputs: posold --- old position of dislocation
+C     
+C     In/out: dispnorm --- vector along which dislocation travels (in --- guessed direction; out --- actual direction)
+      
+C     Outputs: pintnew --- coordinates of new intersection point (between dislocation path and interface between detection band and "outside")
+C              isint --- boolean indicating whether this intersection exists
+
+C     Purpose: Find intersection of dislocation path with outer boundary of the detection band
+
+      implicit none
+      
+C     input variables
+      real(dp) :: posold(2)
+      
+C     in/out variables
+      real(dp) :: dispnorm(2)
+      
+C     output variables
+      real(dp) :: pintnew(2)
+      logical :: isint
+      
+C     local variables
+      real(dp) :: step, dispmax
+      integer :: regdesired, regfailed
+      logical :: failed
+
+      step = detection%burgers
+      dispmax = detection%maxdisttointerface
+      regdesired = -1 ! outside detection
+      regfailed = 1 ! inside detection
+      
+C     first try moving dislocation in direction disldispnorm      
+      call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                       step,dispmax,pintnew,isint,failed)
+C     if that failed, move it in the opposite direction
+      if (failed) then
+          dispnorm = -dispnorm
+          call placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                      step,dispmax,pintnew,isint,failed)
+      end if
+      if (failed) then
+          write(*,*) 'Could not place dislocation outside detection'
+          stop
+      end if
+      
+      end subroutine placeOutsideDetection
+************************************************************************
+      subroutine placeDetectionSub(posold,dispnorm,regdesired,regfailed,
+     &                             step,dispmax,pint,isint,failed)
+     
+C     Subroutine: placeDetectionSub
+
+C     Inputs: posold --- old position of dislocation
+C             dispnorm --- unit vector along which dislocation travels
+C             regdesired --- desired region that dislocation ends up in (0 - detection band, 1 - inside, -1 - outside)
+C             regfailed --- if disl. path crosses this region, test fails ((0 - detection band, 1 - inside, -1 - outside)
+C             step --- step along path in increments of this
+C             dispmax --- maximum distance to step
+      
+C     Outputs: pint --- coordinates of intersection point (where search terminates)
+C              isint --- boolean indicating whether this intersection exists
+C              failed --- boolean indicating that path hit regfailed first
+
+C     Purpose: Helper for place[Inside/Outside]Detection. Travel along a path,
+C     try to hit desired region before hitting failed one; find intersection
+C     with desired region boundary.
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: posold(2)
+      real(dp) :: dispnorm(2)
+      integer :: regdesired, regfailed
+      real(dp) :: step
+      real(dp) :: dispmax
+      
+C     output variables
+      real(dp) :: mag
+      real(dp) :: pint(2)
+      logical :: isint, failed
+      integer :: region
+      
+      isint = .false.
+      failed = .false.
+      mag = 0.0_dp
+      do while (((.not.failed).and.(.not.isint)).and.(mag < dispmax))
+          mag = mag + step
+          pint = posold + mag*dispnorm
+          region = insideDetectionBand_ptr(pint,detection%params)
+          isint = (region == regdesired)
+          failed = (region == regfailed)
+      end do
+      
+      end subroutine placeDetectionSub
+************************************************************************
       subroutine findInterfaceIntersectionDeformed(interfaceedgesarray,
-     &                                         p0,p1,pint,isint,edgenum)
+     &                             p0,p1,pint,isint,edgenum)
 
 C     Subroutine: findInterfaceIntersectionDeformed
       
@@ -744,87 +992,16 @@ C     Outputs: pint --- coordinates of intersection point (if it exists) (vector
 C              isint --- boolean indicating whether intersection exists
 C              edgenum --- number of intersected edge
 
-C     Purpose: Find where a line between p0 and p1 (i.e. a path of a dislocation) intersects
-C     an edge in the array edgesarray, using *deformed* coordinates. If search is successful,
-C     return pint (intersection point) and edgenum
-      
-C     Notes: Assumes multiple intersections are not possible...
+C     Purpose: Finds *closest* intersection between line from p0 and p1 (e.g. a path of a dislocation) and an interface
+C     described by the array edgesarray, in the *deformed* coordinate system. If search is successful,
+C     return pint (intersection point) and edgenum. "Closest" is defined as being the intersection point (pint)
+C     closest to p0.
 
       implicit none
       
 C     input variables
       integer :: interfaceedgesarray(:,:)
       real(dp) :: p0(2), p1(2)
-      
-C     output variables
-      real(dp) :: pint(2)
-      logical :: isint
-      integer :: edgenum
-      
-      call findInterfaceIntersectionSub(interfaceedgesarray,
-     &                                p0,p1,pint,isint,edgenum,.false.)
-
-      end subroutine findInterfaceIntersectionDeformed
-************************************************************************
-      subroutine findInterfaceIntersectionUndeformed(
-     &                     interfaceedgesarray,p0,p1,pint,isint,edgenum)
-
-C     Subroutine: findInterfaceIntersectionDeformed
-      
-C     Inputs: interfaceedgesarray --- array containing interface edges (either of detection band, or of fe elements)
-C             p0, p1 --- coordinates (vector, length 2) of points defining line
-      
-C     Outputs: pint --- coordinates of intersection point (if it exists) (vector, length 2)
-C              isint --- boolean indicating whether intersection exists
-C              edgenum --- number of intersected edge
-
-C     Purpose: Find where a line between p0 and p1 (i.e. a path of a dislocation) intersects
-C     an edge in the array edgesarray, using *deformed* coordinates. If search is successful,
-C     return pint (intersection point) and edgenum
-      
-C     Notes: Assumes multiple intersections are not possible...
-
-      implicit none
-      
-C     input variables
-      integer :: interfaceedgesarray(:,:)
-      real(dp) :: p0(2), p1(2)
-      
-C     output variables
-      real(dp) :: pint(2)
-      logical :: isint
-      integer :: edgenum
-      
-      call findInterfaceIntersectionSub(interfaceedgesarray,
-     &                                p0,p1,pint,isint,edgenum,.true.)
-
-      end subroutine findInterfaceIntersectionUndeformed
-************************************************************************
-      subroutine findInterfaceIntersectionSub(interfaceedgesarray,
-     &                             p0,p1,pint,isint,edgenum,undeformed)
-
-C     Subroutine: findInterfaceIntersectionSub
-      
-C     Inputs: interfaceedgesarray --- array containing interface edges (either of detection band, or of fe elements)
-C             p0, p1 --- coordinates (vector, length 2) of points defining line
-C             undeformed --- flag indicating whether undeformed coordinates should be used
-      
-C     Outputs: pint --- coordinates of intersection point (if it exists) (vector, length 2)
-C              isint --- boolean indicating whether intersection exists
-C              edgenum --- number of intersected edge
-
-C     Purpose: Find where a line between p0 and p1 (i.e. a path of a dislocation) intersects
-C     an edge in the array edgesarray, using *undeformed coordinates*. If search is successful,
-C     return pint (intersection point) and edgenum
-      
-C     Notes: Assumes multiple intersections are not possible...
-
-      implicit none
-      
-C     input variables
-      integer :: interfaceedgesarray(:,:)
-      real(dp) :: p0(2), p1(2)
-      logical :: undeformed
       
 C     output variables
       real(dp) :: pint(2)
@@ -835,34 +1012,39 @@ C     local variables
       integer :: i
       integer :: node1, node2
       real(dp) :: posn1(2), posn2(2)
+      real(dp) :: distsq, distsqnew
+      real(dp) :: pintnew(2)
+      logical :: isintnew
 
+      distsq = huge(0.0_dp)
+      isint = .false.
+      
 C     loop over interface edges
       do i = 1, size(interfaceedgesarray,2)
           node1 = interfaceedgesarray(1,i)
           node2 = interfaceedgesarray(2,i)
           posn1 = nodes%posn(1:2,node1)
-          posn2 = nodes%posn(1:2,node2)
-          if (undeformed) then
-              posn1 = posn1 - nodes%posn(4:5,node1)
-              posn2 = posn2 - nodes%posn(4:5,node2)
-          end if    
-          call getIntersectionTwoLines(p0,p1,posn1,posn2,pint,isint)
-          if (isint) then
-              edgenum = i
-              return
+          posn2 = nodes%posn(1:2,node2) 
+          call getIntersectionTwoLines(p0,p1,posn1,posn2,
+     &                                 pintnew,isintnew)
+          if (isintnew) then
+              distsqnew = sum((pintnew - p0)**2)
+              if (distsqnew < distsq) then
+                  edgenum = i
+                  distsq = distsqnew
+                  pint = pintnew
+                  isint = .true.
+              end if
           end if    
       end do
-      
-C     if we have gotten here, no intersection was found
-      isint = .false.
 
-      end subroutine findInterfaceIntersectionSub
+      end subroutine findInterfaceIntersectionDeformed
 ************************************************************************
       subroutine errorInterface(option,dislposold,dislposnew)
 
 C     Subroutine: errorInterface
       
-C     Inputs: option --- 1 for actual interface, 2 for detection band interface
+C     Inputs: option --- 1 for atomistic to continuum, 2 for continuum to atomistic
 C             dislposold --- old position of dislocation
 C             dislposnew --- new position of dislocation (having apparently crossed interface)
       
@@ -883,8 +1065,7 @@ C     input variables
           write(*,*) 'Dislocation intersection with interface'
           write(*,*) 'between atomistic and FE regions'
       else if (option == 2) then
-          write(*,*) 'Dislocation intersection with detection band'
-          write(*,*) 'interface'
+          write(*,*) 'Cannot place dislocation in the atomistic region'
       end if    
       write(*,*) 'could not be found.'
       write(*,*) 'Disl. path from', dislposold
@@ -922,16 +1103,18 @@ C     input variables
       
 C     local variables
       real(dp) :: xmin, xmax, ymin, ymax
+      real(dp) :: boxwidth
 
 C     create group of atoms for dislocation dipole displacements
 C     we only need to get displacements correct for atoms sufficiently close to dipole...
 C     (since dipole field decays rapidly in space)
 C     so, we define a box around dipole with a "fudge" of boxfudge*burgers
-C     (this is a bit hackish),
-      xmin = min(dislposnew(1),dislposold(1)) - boxfudge*burgers
-      xmax = max(dislposnew(1),dislposold(1)) + boxfudge*burgers
-      ymin = min(dislposnew(2),dislposold(2)) - boxfudge*burgers
-      ymax = max(dislposnew(2),dislposold(2)) + boxfudge*burgers          
+C     (this is a bit hackish)
+      boxwidth = BOXWIDTHNORM*burgers
+      xmin = min(dislposnew(1),dislposold(1)) - boxwidth
+      xmax = max(dislposnew(1),dislposold(1)) + boxwidth
+      ymin = min(dislposnew(2),dislposold(2)) - boxwidth
+      ymax = max(dislposnew(2),dislposold(2)) + boxwidth      
       call getAtomsInBoxGroupTemp(xmin,xmax,ymin,ymax)
       
 C     add dislocation dipole displacements (subtract disp. for dislposold; add for dislposnew)

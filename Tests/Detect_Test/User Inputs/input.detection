@@ -1,5 +1,5 @@
 bandtype: rect_annulus
-files_interfaceedges: detection.interfaceedges
+files_impermissibleedges: detection.impermissibleedges
 params:
 0.0
 0.0
@@ -8,7 +8,9 @@ params:
 2.0
 2.25
 end
-passdistance: 0.75
+maxdisttointerface: 0.75
+passdistancectoa: 1.0
+passdistanceatoc: 2.0
 mdnincrements: 200
 mdtimestep: 0.02
 mnumfe: 1

@@ -9,19 +9,41 @@ C     TODO: Need to time algorithm, see if it's fast enough.
 C     TODO: Also, change brute force algorithm to generate guess in a smarter way
 C     TODO: Also, need to check if there are problems with crossing over "internal boundaries" (e.g. crack face)
 C     TODO: Need to fix findInOneMatSub to deal with points lying on corners/edges
+C     TODO: Check pad atom local positions after deformation.
 
-C     Long note: Why don't we use deformed positions? Few reasons:
-C     1) They are expensive to calculate --- we'd have to compute
+C     Long note: Merits of finding deformed vs. undeformed positions
+      
+C     1) Deformed positions are expensive to calculate --- we have to compute
 C     dislocation displacement fields at every single FE node. In other words, we only want to calculate
-C     the nodal displacements when needed (i.e. before a dump or restart)
-C     2) If the mesh becomes highly distorted (e.g., near the interface), the mesh finding algorithm could
-C     break down.
-C     3) The goal of finding the local position of a dislocation is in order to calculate the stresses
-C     on it. So, there is an inconsistency if the FE stresses are calculated
-C     with respect to the undeformed mesh and the DD stresses with respect to the deformed mesh.
-C     I think the only want to circumvent this problem would be to reassemble/decompose the stiffness matrix
-C     using the deformed coordinates every iteration, which is quite costly.
-
+C     the nodal displacements when needed (i.e. before a dump or restart).
+C     2) I think there might be an inconsistency in using local positions (e.g, for dislocations)
+C     in the deformed coordinate system if the stiffness matrix is assembled
+C     using positions in the undeformed coordinate system. But perhaps
+C     this is fine under the small strain assumption.
+C     3) Dislocations can be "lost" or present in the atomistic region 
+C     if undeformed positions are used.
+C     4) Passing becomes extremely tricky if
+C     undeformed positions for the interface are used. The dislocation
+C     can be within the (original) mesh in the undeformed coordinates,
+C     but actually in empty space (having crossed the crack plane)
+C     in the deformed coordinates. This makes passing the dislocation
+C     from the continuum to the atomistic region basically impossible.
+      
+C     So, I have adopted the following solution:
+C     1) Pad atom positions are found once and for all at the beginning
+C     of the program (during initialization). Presumably, displacements are zero
+C     at this point, so there is no difference between deformed and undeformed positions.
+C     Even assuming the elements deform, the pad atom local position
+C     in the element should remain constant (since the pad atom deformation
+C     tracks that of the surrounding nodes), so this approach should work
+C     even for restart files (for instance). (This needs to be checked.)
+C     2) Dislocation positions are found at every DD timestep with respect
+C     to the deformed elements. This should be fine even if these elements
+C     become highly distorted.
+C     3) A dislocation is passed or escaped if it leaves the deformed mesh,
+C     e.g., by crossing the deformed interface. Since all of the passing
+C     is done with respect to the deformed coordinates (e.g., of the atoms),
+C     everything should be self-consistent, and no dislocations should be "lost"
 
       use mod_types, only: dp
       use mod_fe_elements, only: feelements, nfematerials
@@ -97,6 +119,8 @@ C     Purpose: Used for initialization, where no information is available about 
 C              a point might be. Search over FE mesh using brute force search. Return
 C              error if point is not found.
       
+      implicit none
+      
 C     input variables
       real(dp) :: xp, yp
       
@@ -125,6 +149,8 @@ C              badflip --- flag indicating that search was unsuccessful
 C     Purpose: Helper routine for findInAllInitially and findInAllWithGuess.
 C     Loops over materials. For each, generates guess using brute force,
 C     and then tries to find point using findInOneMat
+      
+      implicit none
       
 C     input variables
       integer :: alreadysearched(:)
@@ -170,8 +196,10 @@ C              r, s --- local (element-level) coordinates of point
 C              badflip --- flag indicating that search was unsuccessful
 
 C     Purpose: Helper routine for findInAllInitially and findInAllWithGuess.
-C     Loops over materials. For each, generates guess using brute force,
-C     and then tries to find point using findInOneMat
+C     Generates guess for element using brute force,
+C     and then tries to find point using findInOneMat.
+      
+      implicit none
       
 C     input variables
       integer :: mnumfe
@@ -190,6 +218,21 @@ C     search in material
       end subroutine findInOneMatInitially
 ************************************************************************
       subroutine findInOneMat(mnumfe,elguess,xp,yp,r,s,badflip)
+
+C     Subroutine: findInOneMat
+
+C     Inputs: mnumfe --- material to search in
+C             xp, yp --- coordinates of point to search
+
+C     In/out: elguess --- (in) guess for starting element; (out) element that point was found in 
+
+C     Outputs: r, s --- local (element-level) coordinates of point
+C              badflip --- flag indicating that search was unsuccessful
+
+C     Purpose: Tries to find point in mesh using elguess as the starting element.
+C     Calls either findInOneMatSub or findInOneMatSubAlt (jump-and-walk algorithms)
+
+      implicit none
       
 C     input variables
       integer:: mnumfe
@@ -204,7 +247,7 @@ C     local variables
       integer:: eltypenum
       
       eltypenum = feelements(mnumfe)%eltypenum      
-      call findInOneMatSubAlt(mnumfe,eltypenum,elguess,
+      call findInOneMatSub(mnumfe,eltypenum,elguess,
      &                        xp,yp,r,s,badflip)
       
       end subroutine findInOneMat
@@ -216,11 +259,11 @@ C     Subroutine: findInOneMatSub
 
 C     Inputs: mnumfe --- material to search in
 C             eltypenum --- number of element type in fe element library
-C             elguess --- guess for starting element
 C             xp, yp --- coordinates of point to search
 
-C     Outputs: elguess --- element that point was found in
-C              r, s --- local (element-level) coordinates of point
+C     In/out: elguess --- (in) guess for starting element; (out) element that point was found in
+
+C     Outputs: r, s --- local (element-level) coordinates of point
 C              badflip --- flag indicating whether search was unsuccessful
 
 C     Purpose: Search over FE mesh for one material (mnumfe) to
@@ -266,7 +309,7 @@ C     local variables
       do counter = 1, COUNTERMAX
           do i = 1, felib(eltypenum)%nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
-              posn(i,:) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed positions
+              posn(i,:) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! deformed positions
           end do
           r = 0.0_dp
           s = 0.0_dp
@@ -296,7 +339,7 @@ C     local variables
       end do
       
 C     if we've gotten to this point, search was unsuccessful
-      write(*,*) 'Search in findInOneMatSub took way too long'
+      write(*,*) 'WARNING: Search in findInOneMatSub took way too long'
       badflip = .true.
       
       end subroutine findInOneMatSub
@@ -308,11 +351,11 @@ C     Subroutine: findInOneMatSubAlt
 
 C     Inputs: mnumfe --- material to search in
 C             eltypenum --- number of element type in fe element library
-C             elguess --- guess for starting element
 C             xp, yp --- coordinates of point to search
 
-C     Outputs: elguess --- element that point was found in
-C              r, s --- local (element-level) coordinates of point
+C     In/out: elguess --- (in) guess for starting element; (out) element that point was found in
+
+C     Outputs: r, s --- local (element-level) coordinates of point
 C              badflip --- flag indicating whether search was successful
 
 C     Purpose: Search over FE mesh for one material (mnumfe) to
@@ -364,7 +407,7 @@ C     local variables
       do counter = 1, COUNTERMAX
           do i = 1, nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
-              posn(:,i) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! undeformed positions
+              posn(:,i) = nodes%posn(1:2,node) ! deformed positions
           end do
           proceed = .true.
           badflip = .false.
@@ -398,7 +441,8 @@ C     local variables
       end do
       
 C     if we've gotten to this point, search was unsuccessful
-      write(*,*) 'Search in findInOneMatSubAlt took way too long'
+      write(*,*) 'WARNING: Search in findInOneMatSubAlt
+     &            took way too long'
       badflip = .true. 
       
       end subroutine findInOneMatSubAlt
@@ -516,7 +560,7 @@ C     local variables
       distsq = huge(0.0_dp)
       do j = 1, size(feelements(mnumfe)%nodelist)
           node = feelements(mnumfe)%nodelist(j)
-          posn = nodes%posn(1:2,node) - nodes%posn(4:5,node)
+          posn = nodes%posn(1:2,node) ! deformed positions
           distsqtry = sum((posn-pt)**2)
           if (distsqtry < distsq) then
               distsq = distsqtry

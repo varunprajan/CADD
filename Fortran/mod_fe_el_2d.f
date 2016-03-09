@@ -111,6 +111,8 @@ C     Outputs: eltypenum --- number of the element type in felib structure
 C     Purpose: Convert element type name into element type number; return
 C     error if name is not found
 
+      implicit none
+
 C     input variables
       character(len=*) :: elname
       

@@ -34,5 +34,16 @@ C     write dump
       call updateMiscIncrementCurr(2)
       call writeDump_ptr()
 
-Output: See atomistic_3.2.dump
+Output:
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+ Updated neighbors
+
+See atomistic_3.2.dump
 ******************************************************

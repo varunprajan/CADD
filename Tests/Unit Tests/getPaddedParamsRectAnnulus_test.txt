@@ -1,0 +1,18 @@
+******************************************************
+Test #1:
+
+Code:
+
+      real(dp), allocatable :: paramspadded(:)
+      real(dp), allocatable :: params(:)
+      real(dp) :: padding
+      
+      params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      padding = 0.5_dp
+      paramspadded = getPaddedParamsRectAnnulus(params,padding)
+      write(*,*) 'paramspadded', paramspadded
+
+Output: 
+ paramspadded   0.0000000000000000        0.0000000000000000        2.5000000000000000        4.5000000000000000        3.5000000000000000        5.5000000000000000     
+
+******************************************************

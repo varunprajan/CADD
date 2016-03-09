@@ -3,21 +3,24 @@ Test #1:
  
 Code:
 
-integer :: i
-call initSimulation('detect_test_1','dd')
-call initDetectionData('detect_test_1_detection')
-call prettyPrintMat(detection%interfaceedges,'neighbors')
-call prettyPrintVec(detection%params,'params')
-write(*,*) 'mnumfe', detection%mnumfe
-do i = 1, 6
-  write(*,*) 'i', i
-  write(*,*) 'isys', detection%comp(i)%isys
-  write(*,*) 'bsgn', detection%comp(i)%bsgn
-  write(*,*) 'burgers vector', detection%comp(i)%burgersvec
-end do
+      integer :: i
+      call initSimulation('detect_test_1','dd')
+      call initDetectionData('detect_test_1_detection')
+      call prettyPrintMat(detection%impermissibleedges,
+     & 'impermissibleedges')
+      call prettyPrintVec(detection%params,'params')
+      write(*,*) 'pass distance, cont. -> atom.',
+     & detection%passdistancectoa
+      write(*,*) 'mnumfe', detection%mnumfe
+      do i = 1, 6
+        write(*,*) 'i', i
+        write(*,*) 'isys', detection%comp(i)%isys
+        write(*,*) 'bsgn', detection%comp(i)%bsgn
+        write(*,*) 'burgers vector', detection%comp(i)%burgersvec
+      end do
 
 Output:   
- neighbors
+ impermissibleedges
            3          11          24
           11          24           8
  params
@@ -27,6 +30,7 @@ Output:
    2.7500000000000000     
    2.0000000000000000     
    2.2500000000000000     
+ pass distance, cont. -> atom.   1.0000000000000000     
  mnumfe           1
  i           1
  isys           1

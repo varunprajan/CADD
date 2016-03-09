@@ -89,7 +89,7 @@ Output:
  Local coords  -2.0000000000000000        2.0000000000000000     
  Not successful? T
 ******************************************************
-Test #4: Bad result
+Test #4: Bad result (undeformed positions, findInOneMatSub
 
 Code:
 
@@ -103,7 +103,7 @@ Code:
       
       call initSimulation('cadd_k_test_medium_restart','dd')
       posn = [-17.999999999999993_dp, 24.133974596215559_dp]
-      call findInOneMatSub(1,posn(1),posn(2),element,r,s,badflip)
+      call findInOneMatInitially(1,posn(1),posn(2),element,r,s,badflip)
       write(*,*) 'element', element
       write(*,*) 'r', r, 's', s
       write(*,*) 'badflip', badflip

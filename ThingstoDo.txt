@@ -1,22 +1,15 @@
 Things to do:
 
-http://scicomp.stackexchange.com/questions/6961/f2py-with-allocatable-and-assumed-shape-arrays
-
 Algorithmic issues:
     Issue with initial positions along crack surfaces being slightly different from 0
         (Slip plane probably shouldn't lie on y = 0 either for crack problem)
     Test whether dislocation can spuriously cross crack surfaces
-    Look into integration of equations of dislocation motion...velocity correction?
-    Better procedure for exiting damped dynamics loop...forces near old dislocation?
+    Problem with assigning "crack region" to dislocation originating from atomistic region
+        More general problem with accounting for fields from escaped dislocation if only one has escaped (Add note!)
+    Fix findInOneMatSub
+    Moving mesh
     
 Testing:
-    Unit tests
-    Larger scale tests
-        Run small/moderate-size CADD simulation, no sources/obstacles/pre-existing dislocations
-        Run dislocation dipole in a rectangular bar (pure FEM)
-        Run moderate-size pure FE simulation
-            Check that memory requirements are not excessive...
-        Figure out clean tests for dislocation passing...
         
 Misc:
     Code improvement:
@@ -30,7 +23,7 @@ Misc:
     Code functionality:
         Implement 3D support for dislocations
             Detection
-                (Requires triangulation)
+                (Requires tetr-angulation)
             Disl. fields
                 (Anisotropy?)
         Multipole
@@ -38,6 +31,9 @@ Misc:
 
 Other notes: 
 How do positions of interface atoms get updated? - by atomistics; they are fixed for the continuum part; conversely, pad atoms are fixed for the atomistics, but their positions are unchanged when the continuum problem is solved
+
+F2py:
+http://scicomp.stackexchange.com/questions/6961/f2py-with-allocatable-and-assumed-shape-arrays
 
 Obsolete:
 FE difficulties:
