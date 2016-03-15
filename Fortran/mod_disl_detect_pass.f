@@ -101,7 +101,8 @@ C     module variables (private)
       procedure(Dummy), pointer :: insideDetectionBand_ptr    
 
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: BOXWIDTHNORM = 7.5_dp ! see updateAtomsPassing
+      real(dp), parameter :: BOXWIDTHNORM = 12.0_dp ! see updateAtomsPassing
+      real(dp), parameter :: BOXWIDTHNORM2 = 4.0_dp ! see updateAtomsPassing      
       real(dp), parameter :: DISTPAD = 1.5_dp ! see paramspadded/processDetectionData
       real(dp), parameter :: STEPFAC = 0.01_dp ! passing constants (not too important)
       real(dp), parameter :: FUDGEFAC = 0.02_dp ! passing constants (not too important)
@@ -673,6 +674,7 @@ C     local variables
       integer :: edgenum, elguess
       real(dp) :: burgers
       integer, allocatable :: impedges(:,:)
+      real(dp) :: atompos(2)
       
 C     figure out direction that dislocation is moving by determining where it exits the detection band
       mnumfe = detection%mnumfe
@@ -723,7 +725,8 @@ C     atomistic region (Must cancel out dislocation in continuum.)
 C     update atom positions, including imposing dipole displacements
 C     and minimizing atomic positions near core
       burgers = detection%burgers
-      call updateAtomsPassing(detectpos,posnew,
+      atompos = detectpos ! position of atomic dislocation core
+      call updateAtomsPassing(detectpos,posnew,atompos,
      &                        burgers,bsgn,bcut,cost,sint)
       
       end subroutine passAtomisticToContinuum
@@ -769,6 +772,7 @@ C     local variables
       integer :: edgenum
       integer :: elguess
       integer, allocatable :: impedges(:,:)
+      real(dp) :: atompos(2)
 
       dislnum = disl(mnumfe)%splanes(isys)%splane(iplane)%objnum(iobj)
       bsgn = disl(mnumfe)%list(dislnum)%sgn
@@ -857,7 +861,9 @@ C     delete old dislocation
       
 C     update atom positions, including imposing dipole displacements
 C     and minimizing atomic positions near core
-      call updateAtomsPassing(posold,posnew,burgers,bsgn,bcut,cost,sint)
+      atompos = posnew ! position of atomic dislocation core
+      call updateAtomsPassing(posold,posnew,atompos,
+     &                        burgers,bsgn,bcut,cost,sint)
       
       end subroutine passContinuumToAtomistic
 ************************************************************************
@@ -1131,13 +1137,14 @@ C     input variables
       
       end subroutine errorInterface
 ************************************************************************
-      subroutine updateAtomsPassing(dislposold,dislposnew,burgers,
-     &                              bsgn,bcut,cost,sint)
+      subroutine updateAtomsPassing(dislposold,dislposnew,atompos,
+     &                              burgers,bsgn,bcut,cost,sint)
 
 C     Subroutine: updateAtomsPassing
 
 C     Inputs: dislposold --- old position (length 2) of dislocation
 C             dislposnew --- new position (length 2) of dislocation
+C             atompos --- position of atomic dislocation core (= either dislposold or dislposnew)
 C             burgers --- magnitude of burgers vector
 C             bsgn --- sign of dislocation (+1 or -1)
 C             bcut --- branch cut of dislocation (0 if to the left, 1 if to the right)
@@ -1154,6 +1161,7 @@ C     passContinuumtoAtomistic
 C     input variables
       real(dp) :: dislposold(2)
       real(dp) :: dislposnew(2)
+      real(dp) :: atompos(2)
       real(dp) :: burgers
       integer :: bsgn, bcut
       real(dp) :: cost, sint
@@ -1165,20 +1173,28 @@ C     local variables
 C     create group of atoms for dislocation dipole displacements
 C     we only need to get displacements correct for atoms sufficiently close to dipole...
 C     (since dipole field decays rapidly in space)
-C     so, we define a box around dipole with a "fudge" of boxfudge*burgers
+C     so, we define a box around dipole with a "fudge"
 C     (this is a bit hackish)
       boxwidth = BOXWIDTHNORM*burgers
       xmin = min(dislposnew(1),dislposold(1)) - boxwidth
       xmax = max(dislposnew(1),dislposold(1)) + boxwidth
       ymin = min(dislposnew(2),dislposold(2)) - boxwidth
-      ymax = max(dislposnew(2),dislposold(2)) + boxwidth      
+      ymax = max(dislposnew(2),dislposold(2)) + boxwidth           
       call getAtomsInBoxGroupTemp(xmin,xmax,ymin,ymax)
       
 C     add dislocation dipole displacements (subtract disp. for dislposold; add for dislposnew)
       call imposeDipoleDispOnAtoms(dislposnew,dislposold,
      &                             bsgn,bcut,cost,sint,tempgroupname)
 
-C     run damped dynamics to relax atoms (neighbor list automatically regenerated)
+C     create group of atoms for damped dynamics to relax atoms near atomistic core
+      boxwidth = BOXWIDTHNORM2*burgers
+      xmin = atompos(1) - boxwidth
+      xmax = atompos(1) + boxwidth
+      ymin = atompos(2) - boxwidth
+      ymax = atompos(2) + boxwidth                
+      call getAtomsInBoxGroupTemp(xmin,xmax,ymin,ymax)
+
+C     run damped dynamics (neighbor list automatically regenerated)
       call loopVerlet(detection%mdnincrements,detection%mdtimestep,
      &                tempgroupname,detection%damp)
       

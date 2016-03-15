@@ -208,7 +208,7 @@ Output:
  New position  -18.427269660279137       -1.5590834638872855     
  See cadd_k_test_medium.4.dump and cadd_k_test_medium.5.dump
 ******************************************************
-Test #4: No room to place (this is problematic --- dislocation doesn't stay where placed)
+Test #4: No room to place
  
 Code:
 
@@ -277,7 +277,7 @@ Output:
  New position  -14.530229490801327        15.583092954198364  
  See cadd_k_test_medium.6.dump and cadd_k_test_medium.7.dump
 ******************************************************
-Test #5: No room to place (this is problematic --- dislocation doesn't stay where placed)
+Test #5: No room to place
  
 Code:
 
@@ -342,8 +342,8 @@ C     move dislocation
 Output:
  Badflip T
  Passed dislocation, c -> a
- Old position  -8.6053203230275539        25.845336663013168     
- New position  -14.530229490801327        15.583092954198364  
+ Old position  -22.053937290040885       -14.768859291075541     
+ New position  -14.330530586068972       -1.3915264722781122
  See cadd_k_test_medium.8.dump and cadd_k_test_medium.9.dump
 ******************************************************
 
