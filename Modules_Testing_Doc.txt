@@ -12,9 +12,9 @@ Check:
             
 To be checked:            
     mod_dd_main
-        Various
+        Passing, reverse passing
     mod_disl_detect_pass
-        Various
+        Passing, reverse passing
     mod_disl_fields
         Ghost dislocation stuff
     mod_fe_main_2d

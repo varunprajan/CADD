@@ -1,0 +1,349 @@
+******************************************************
+Test #1: Normal passing
+ 
+Code:
+
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
+      
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
+      
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
+
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
+      
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+      
+C     create dipole
+      dislpos = [16.2_dp,25.0_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos + slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(0)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = -5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
+      end do
+      
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
+Output:
+ Badflip T
+ Passed dislocation, c -> a
+ Old position   15.979968245269454        25.127035392823945     
+ New position   9.4403891234971749        13.800152093797699     
+ See cadd_k_test_medium.0.dump and cadd_k_test_medium.1.dump
+******************************************************
+Test #2: Double intersection
+ 
+Code:
+
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
+      
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
+      
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
+
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
+      
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+
+C     create dipole      
+      dislpos = [-16.85_dp,25.4_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos + slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(2)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = -5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
+      end do
+      
+C     dump
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
+Output:
+ Badflip T
+ Passed dislocation, c -> a
+ Old position  -16.859326673973658        25.405384757729330     
+ New position  -24.456328723914595        12.246991222026729     
+ See cadd_k_test_medium.2.dump and cadd_k_test_medium.3.dump
+******************************************************
+Test #3: Cutting crack
+ 
+Code:
+
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
+      
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
+      
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
+
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
+      
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+      
+C     create dipole
+      dislpos = [-23.0_dp,-9.7_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(4)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = 5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
+      end do
+      
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
+Output:
+ Badflip T
+ Passed dislocation, c -> a
+ Old position  -23.095572510390564       -9.6448211853988788     
+ New position  -18.427269660279137       -1.5590834638872855     
+ See cadd_k_test_medium.4.dump and cadd_k_test_medium.5.dump
+******************************************************
+Test #4: No room to place (this is problematic --- dislocation doesn't stay where placed)
+ 
+Code:
+
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
+      
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
+      
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
+
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
+      
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+      
+C     create dipole
+      dislpos = [-8.7_dp,25.9_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos + slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(6)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = -5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
+      end do
+      
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
+Output:
+ Badflip T
+ Passed dislocation, c -> a
+ Old position  -8.6053203230275539        25.845336663013168     
+ New position  -14.530229490801327        15.583092954198364  
+ See cadd_k_test_medium.6.dump and cadd_k_test_medium.7.dump
+******************************************************
+Test #5: No room to place (this is problematic --- dislocation doesn't stay where placed)
+ 
+Code:
+
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
+      
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
+      
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
+
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
+      
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+      
+C     create dipole
+      dislpos = [-22.0_dp,-14.8_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(8)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = 5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
+      end do
+      
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
+Output:
+ Badflip T
+ Passed dislocation, c -> a
+ Old position  -8.6053203230275539        25.845336663013168     
+ New position  -14.530229490801327        15.583092954198364  
+ See cadd_k_test_medium.8.dump and cadd_k_test_medium.9.dump
+******************************************************
+

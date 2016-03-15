@@ -142,20 +142,64 @@
      & writeDumpNodesUndefElementsChunk
      
       implicit none
+
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
       
-      logical :: detected
-      real(dp) :: posn(2)
-      real(dp) :: r, s
-      integer :: element
-      logical :: badflip
-      integer :: i
-      integer :: mnumfe
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
       
-      call initSimulation('cadd_k_test_medium_restart','dd')
-      posn = [-17.999999999999993_dp, 24.133974596215559_dp]
-      call findInOneMatInitially(1,posn(1),posn(2),element,r,s,badflip)
-      write(*,*) 'element', element
-      write(*,*) 'r', r, 's', s
-      write(*,*) 'badflip', badflip
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
+
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
+      
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+      
+C     create dipole
+      dislpos = [-22.0_dp,-14.8_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(8)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = 5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
+      end do
+      
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
+
       
       end program

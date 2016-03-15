@@ -101,8 +101,10 @@ C     module variables (private)
       procedure(Dummy), pointer :: insideDetectionBand_ptr    
 
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: BOXWIDTHNORM = 10.0_dp ! see updateAtomsPassing
+      real(dp), parameter :: BOXWIDTHNORM = 7.5_dp ! see updateAtomsPassing
       real(dp), parameter :: DISTPAD = 1.5_dp ! see paramspadded/processDetectionData
+      real(dp), parameter :: STEPFAC = 0.01_dp ! passing constants (not too important)
+      real(dp), parameter :: FUDGEFAC = 0.02_dp ! passing constants (not too important)
       real(dp), parameter :: CIRCUMSQFACHEX = 2.0_dp ! see identifyLargeTri/processDetectionData
 C                                                    ! ratio of circumradius**2 in largest dislocated triangle to circumradius**2 in equilibrium triangle
                                                      ! (must be less than 3, because otherwise edge triangles would be counted as "good")
@@ -759,8 +761,11 @@ C     local variables
       real(dp) :: cost, sint
       real(dp) :: disp(2), dispnorm(2)
       real(dp) :: pintdetect(2), pintfudge(2), pint2(2), pintcrack(2)
+      real(dp) :: pintcrack2(2), pintdetect2(2), pintactual(2)
       real(dp) :: trypos(2), posnew(2)
-      logical :: isint, isintdetect, isintcrack, isintcrack2
+      logical :: isint, isintdetect, isintcrack
+      logical :: isintcrack2, isintdetect2, isintactual
+      real(dp) :: distactual, disttry
       integer :: edgenum
       integer :: elguess
       integer, allocatable :: impedges(:,:)
@@ -779,10 +784,11 @@ C     dislocation travel direction
 
 C     try to place dislocation inside detection band
       call placeInsideDetection(pint,dispnorm,pintdetect,isintdetect)
+      
       if (.not.isintdetect) then
       
-C         dislocation might be cutting the band obliquely or exiting crack surface in atomistic domain
-C         check first possibility by finding second intersection with interface
+C         dislocation is cutting the band obliquely
+C         try to find second intersection with interface
           pintfudge = pint + dispnorm*burgers*0.1_dp ! fudge position slightly to avoid multiple intersections
           trypos = pintfudge + dispnorm*detection%maxdisttointerface
           call findInterfaceIntersectionDeformed(interfaceedges%array,
@@ -810,19 +816,28 @@ C         we need to figure out where in the atomistic region to place disl.
 C         first, figure out if we've crossed crack
           call findInterfaceIntersectionDeformed(impedges,
      &                     pint,pintdetect,pintcrack,isintcrack,edgenum)
+     
           if (isintcrack) then
 C             place dislocation just beyond crack surface, in (hopefully) empty space
-              posnew = pintcrack + dispnorm*burgers*0.1_dp
+              posnew = pintcrack + dispnorm*burgers*FUDGEFAC
           else
 C             try to place dislocation past detection band by some amount
               trypos = pintdetect + dispnorm*detection%passdistancectoa
 C             does this new path intersect the crack?
               call findInterfaceIntersectionDeformed(impedges,
-     &                  pintdetect,trypos,pintcrack,isintcrack2,edgenum)
+     &                 pintdetect,trypos,pintcrack2,isintcrack2,edgenum)
               if (isintcrack2) then
-                  posnew = 0.5_dp*(pintdetect + pintcrack) ! place halfway between detection band and crack
+                  posnew = pintcrack2 + dispnorm*burgers*FUDGEFAC
               else
-                  posnew = trypos
+C                 does the path intersect the detection band again?
+                  call recrossDetection(pintdetect,dispnorm,
+     &                                  pintdetect2,isintdetect2)
+                  if (isintdetect2) then
+                      posnew = 0.5_dp*(pintdetect + pintdetect2) ! place halfway between detection band and other detection intersection
+                                                                 ! I'm worried about possible oscillations back and forth, though
+                  else
+                      posnew = trypos
+                  end if
               end if
           end if
           
@@ -833,6 +848,10 @@ C         location (inside atomistic region)
      
       end if
       
+      write(*,*) 'Passed dislocation, c -> a'
+      write(*,*) 'Old position', posold
+      write(*,*) 'New position', posnew
+      
 C     delete old dislocation
       call deleteDislocation(mnumfe,isys,iplane,iobj)
       
@@ -841,6 +860,44 @@ C     and minimizing atomic positions near core
       call updateAtomsPassing(posold,posnew,burgers,bsgn,bcut,cost,sint)
       
       end subroutine passContinuumToAtomistic
+************************************************************************
+      subroutine recrossDetection(pint,dispnorm,pintnew,isint)
+      
+C     Subroutine: recrossDetection
+
+C     Inputs: pint --- old intersection point (between dislocation path and interface between atomistic and continuum region
+C             dispnorm --- normalized vector indicating dislocation travel direction
+      
+C     Outputs: pintnew --- coordinates of new intersection point (between dislocation path and interface between detection band and "inside")
+C              isint --- boolean indicating whether this intersection exists
+
+C     Purpose: Find second intersection of dislocation path with detection band, if it exists. (Dislocation starts inside detection band)
+
+      implicit none
+      
+C     input variables
+      real(dp) :: pint(2)
+      real(dp) :: dispnorm(2)
+      
+C     output variables
+      real(dp) :: pintnew(2)
+      logical :: isint
+      
+C     local variables
+      real(dp) :: dispmax
+      logical :: failed
+      real(dp) :: step
+      integer :: regdesired, regfailed
+      
+      step = STEPFAC*detection%burgers
+      dispmax = detection%passdistancectoa
+      regdesired = 0 ! within band
+      regfailed = 2 ! fake region
+           
+      call placeDetectionSub(pint,dispnorm,regdesired,
+     &                      regfailed,step,dispmax,pintnew,isint,failed)
+      
+      end subroutine recrossDetection
 ************************************************************************
       subroutine placeInsideDetection(pint,dispnorm,pintnew,isint)
       
@@ -870,7 +927,7 @@ C     local variables
       real(dp) :: step
       integer :: regdesired, regfailed
       
-      step = detection%burgers
+      step = STEPFAC*detection%burgers
       dispmax = detection%maxdisttointerface
       regdesired = 1 ! inside detection
       regfailed = 2 ! fake region
@@ -911,7 +968,7 @@ C     local variables
       integer :: regdesired, regfailed
       logical :: failed
 
-      step = detection%burgers
+      step = STEPFAC*detection%burgers
       dispmax = detection%maxdisttointerface
       regdesired = -1 ! outside detection
       regfailed = 1 ! inside detection

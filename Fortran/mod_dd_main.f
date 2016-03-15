@@ -579,6 +579,7 @@ C     then, figure out if dislocation is still in mesh
      &                        mnumfenew,element,r,s,badflip)
       
       if (badflip) then ! not in mesh
+          write(*,*) 'Badflip', badflip
 C         Few possibilities:
 C         1) Crossed back to atomistic region
 C              a) Can be placed properly in atomistic region (past detection band)
