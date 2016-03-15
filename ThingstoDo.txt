@@ -1,15 +1,19 @@
 Things to do:
 
 Algorithmic issues:
-    (Slip plane probably shouldn't lie on y = 0 either for crack problem)
-    Test whether dislocation can spuriously cross crack surfaces
-    Problem with assigning "crack region" to dislocation originating from atomistic region
-        More general problem with accounting for fields from escaped dislocation if only one has escaped (Add note!)
-    Check all corner cases for passing
-    Fix findInOneMatSub
+    Mesh find
+        (Slip plane probably shouldn't lie on y = 0 either for crack problem)
+        Test whether dislocation can spuriously cross crack surfaces
+        Fix findInOneMatSub
+    Dislocation passing
+        Problem with assigning "crack region" to dislocation originating from atomistic region
+            More general problem with accounting for fields from escaped dislocation if only one has escaped (Add note!)
+        Dipole displacements of atoms may be too large if atom is close to dislocation center
+        Dislocation core can move significantly during relaxation...need to modify 
     Moving mesh
-    Dipole displacements of atoms may be too large if atom is close to dislocation center
-    Is there an issue with mismatch between slip planes (fixed in space, undeformed configuration) and dislocation motion through atomistics (not confined to disl. path in undeformed configuration)
+        Devise algorithm, implement
+    Other
+        Is there an issue with mismatch between slip planes (fixed in space, undeformed configuration) and dislocation motion through atomistics (not confined to disl. path in undeformed configuration)
     
 Testing:
         

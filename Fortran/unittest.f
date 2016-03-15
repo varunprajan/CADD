@@ -175,7 +175,7 @@ C     apply field
       call updatePad() ! step 4
       
 C     create dipole
-      dislpos = [-22.0_dp,-14.8_dp]
+      dislpos = [-30.7_dp,-4.4_dp]
       isys = 2 ! 60 degrees
       dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
       elguess = 0 ! initial element is unknown
@@ -187,7 +187,7 @@ C     create dipole
      &                    isys,-bsgn,bcut)
      
 C     dump
-      call updateMiscIncrementCurr(8)
+      call updateMiscIncrementCurr(10)
       call writeDump_ptr()
      
 C     move dislocation
@@ -200,6 +200,7 @@ C     move dislocation
       
       call updateMiscIncrementCurr(1)
       call writeDump_ptr()
+      call writeRestart_ptr()
 
       
       end program

@@ -11,10 +11,6 @@ Check:
     mod_utils
             
 To be checked:            
-    mod_dd_main
-        Passing, reverse passing
-    mod_disl_detect_pass
-        Passing, reverse passing
     mod_disl_fields
         Ghost dislocation stuff
     mod_fe_main_2d
@@ -131,7 +127,7 @@ mod_dd_main
         Test: Done! (also see rmesh for badflip = True)
     updateDislPosSub
         Doc: Done!
-        Test: Half done...awaits CADD simulation with reverse passing
+        Test: Done (see also cadd_k_test for badflip = True)
     updateDislPosSub
         Doc: Done!
         Test: Done! (also see rmesh for badflip = True)
@@ -209,10 +205,10 @@ mod_disl_detect_pass
         Test: Implicitly, through cadd_k_test
     passAtomisticToContinuum
         Doc: Done!
-        Test: Awaits CADD simulation...
+        Test: Implicitly, through cadd_k_test
     passContinuumToAtomistic
         Doc: Done!
-        Test: Awaits CADD simulation...
+        Test: Done!
     placeInsideDetection
         Doc: Done!
         Test: Done!
