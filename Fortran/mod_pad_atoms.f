@@ -10,7 +10,7 @@ C     there, they appear to claim that just the FE displacements are needed.
       use mod_nodes, only: nodes
       use mod_fe_elements, only: nfematerials, feelements
       use mod_fe_main_2d_assign, only: getTotalDispAtPoint_ptr
-      use mod_mesh_find, only: findInAllInitially
+      use mod_mesh_find, only: findInAllInitiallyDef
       implicit none
       
       private
@@ -28,8 +28,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initPad()
-      
-C     Subroutine: initPad
 
 C     Inputs: None
 
@@ -55,7 +53,7 @@ C     local variables
           node = nodes%padatomlist(i)
           xp = nodes%posn(1,node) ! deformed positions
           yp = nodes%posn(2,node) ! deformed positions
-          call findInAllInitially(xp,yp,mnumfe,element,r,s,badflip)
+          call findInAllInitiallyDef(xp,yp,mnumfe,element,r,s,badflip)
           if (badflip) then
               write(*,*) 'Unable to locate pad atom at', xp, yp
               stop
@@ -66,8 +64,6 @@ C     local variables
       end subroutine initPad
 ************************************************************************
       subroutine assignPad(padatom,mnumfe,element,r,s)
-      
-C     Subroutine: assignPad
 
 C     Inputs: padatom --- container for a particular pad atom
 C             mnumfe --- fe material number for pad atom
@@ -96,8 +92,6 @@ C     in/out variables
       end subroutine assignPad
 ************************************************************************
       subroutine updatePad()
-      
-C     Subroutine: updatePad
 
 C     Inputs: None
 

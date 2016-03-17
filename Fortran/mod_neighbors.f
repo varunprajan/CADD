@@ -71,8 +71,6 @@ C     (see initNeighbors and genNeighList)
 ************************************************************************      
       subroutine initNeighborData(neighborfile)
 
-C     Subroutine: initNeighborData
-
 C     Inputs: neighborfile - name of file containing neighbors information
 C     (e.g. example_fortran_neighbors)
 
@@ -92,8 +90,6 @@ C     input variables
       end subroutine initNeighborData
 ************************************************************************      
       subroutine readNeighborData(neighborfile)
-      
-C     Subroutine: readNeighborData
 
 C     Inputs: neighborfile - name of file containing neighbors information
 C     (e.g. example_fortran_neighbors)
@@ -127,8 +123,6 @@ C     use explicit integer -> logical conversion
       end subroutine readNeighborData
 ************************************************************************      
       subroutine processNeighborData()
-      
-C     Subroutine: processNeighborData
 
 C     Inputs: None
 
@@ -187,8 +181,6 @@ C     initialize neighbor list (this takes care of timestep initialization, dela
       end subroutine processNeighborData
 ************************************************************************      
       subroutine writeNeighborData(neighborfile)
-      
-C     Subroutine: writeNeighborData
 
 C     Inputs: neighborfile - name of file containing neighbors information
 C     (e.g. example_fortran_neighbors)
@@ -223,8 +215,6 @@ C     use explicit logical -> integer conversion
       end subroutine writeNeighborData
 ************************************************************************
       subroutine updateNeighIncrementCurr(deltaincrement)
-      
-C     Subroutine: updateNeighIncrementCurr
 
 C     Inputs: deltaincrement --- change in incrementcurr (incrementcurrnew - incrementcurrold)
 
@@ -242,8 +232,6 @@ C     input variables
       end subroutine updateNeighIncrementCurr
 ************************************************************************
       subroutine updateNeighborsCheck()
-
-C     Subroutine: updateNeighborsCheck
 
 C     Outputs: None
 
@@ -285,8 +273,6 @@ C     and update displacements since last check array
 ************************************************************************
       subroutine updateNeighborsNoCheck()
 
-C     Subroutine: updateNeighborsNoCheck
-
 C     Outputs: None
 
 C     Purpose: Regenerates neighbor list, pos since last check (for displacement check)
@@ -305,8 +291,6 @@ C     write(*,*) 'Updated neighbors'
       end subroutine
 ************************************************************************
       subroutine updatePosSinceLastCheck()
-      
-C     Subroutine: updatePosSinceLastCheck
 
 C     Inputs: None
 
@@ -330,8 +314,6 @@ C     local variables
       end subroutine updatePosSinceLastCheck
 ************************************************************************
       function checkDisp() result(dispcheck)
-      
-C     Function: checkDisp
 
 C     Inputs: None
 
@@ -377,8 +359,6 @@ C     goal: get two largest displacements since last check
       end function checkDisp
 ************************************************************************
       subroutine genAtomBins()
-      
-C     Subroutine: genAtomBins
 
 C     Inputs: None
 
@@ -443,8 +423,6 @@ C     assign atoms to bins
       end subroutine genAtomBins
 ************************************************************************
       subroutine genNeighList()
-      
-C     Subroutine: genNeighList
 
 C     Inputs: None
 
@@ -521,8 +499,6 @@ C                 use symmetry (if i is neigh. of j, j is neigh. of i)
       end subroutine genNeighList
 ************************************************************************
       subroutine getAtomsInBoxGroupTemp(xmin,xmax,ymin,ymax)
-      
-C     Subroutine: getAtomsInBoxGroup
 
 C     Inputs: xmin, xmax --- x-bounds of box
 C             ymin, ymax --- y-bounds of box

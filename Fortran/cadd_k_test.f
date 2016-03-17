@@ -30,7 +30,7 @@
       integer :: iunit
       integer :: i
       integer :: mnumfe, mnum
-      real(dp) :: KIstart, KIincr, KIend, KIapply, KIcurr, KII
+      real(dp) :: KIstart, KIincr, KIend, KIapply, KII
       real(dp) :: xc, yc
       real(dp) :: mu, nu
       integer :: nstepsK, natomisticsteps, natomisticstepstot
@@ -79,19 +79,13 @@ C     file
       
 C     apply K, equilibrate, dump
       do i = 0, nstepsK
-          if (i == 0) then
-              KIapply = KIstart
-          else
-              KIapply = KIincr
-          end if
-          
-          KIcurr = KIstart + i*KIincr
-          write(*,*) 'Current KI', KIcurr
+          KIapply = KIstart + i*KIincr
+          write(*,*) 'Current KI', KIapply
           
           call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
           call equilibrateCADD(natomisticsteps,dt,dtdd,normaldamping,
      &                    counter,forcetol,natomisticstepstot)
-          write(iunit,*) KIcurr, counter, natomisticstepstot
+          write(iunit,*) KIapply, counter, natomisticstepstot
           call updateMiscIncrementCurr(1)
           call writeDump_ptr()
       end do

@@ -32,8 +32,6 @@ C     module variables (global)
       contains
 ************************************************************************     
       subroutine initInteractionData(interactionfile)
-      
-C     Subroutine: initInteractionData
 
 C     Inputs: interactionfile --- filename where interaction data is stored
 C     (should be something like '[filepref]_interactions')
@@ -54,8 +52,6 @@ C     input variables
       end subroutine initInteractionData
 ************************************************************************     
       subroutine readInteractionData(interactionfile)
-      
-C     Subroutine: readInteractionData
 
 C     Inputs: interactionfile --- filename where interaction data is stored
 C     (should be something like '[filepref]_interactions')
@@ -81,8 +77,6 @@ C     local variables
       end subroutine readInteractionData      
 ************************************************************************
       subroutine processInteractionData()
-      
-C     Subroutine: processInteractionData
 
 C     Inputs: None
 
@@ -122,8 +116,6 @@ C     check for uninitialized entries
       end subroutine processInteractionData
 ************************************************************************
       subroutine writeInteractionData(interactionfile)
-      
-C     Subroutine: writeInteractionData
 
 C     Inputs: interactionfile --- filename where misc data is stored
 C     (should be something like '[filepref]_interactions')

@@ -31,8 +31,6 @@ C     (processed)
       contains
 ************************************************************************
       subroutine initDislIdentData()
-      
-C     Subroutine: initDislIdentData
 
 C     Inputs: None
 
@@ -70,8 +68,6 @@ C     local variables
       end subroutine initDislIdentData
 ************************************************************************
       function computeCircuits() result(circuits)
-      
-C     Function: computeCircuits
 
 C     Inputs: None
 
@@ -122,8 +118,6 @@ C     local variables
       end function computeCircuits
 ************************************************************************
       function getIdealVector(vec) result(idealvec)
-      
-C     Function: getIdealVector
 
 C     Inputs: vec --- actual vector (length 2) connecting two atoms
 

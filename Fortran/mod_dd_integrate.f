@@ -23,8 +23,6 @@ C     HARD-CODED CONSTANTS
 ************************************************************************
       subroutine assignDispFromPKOneMat(gradientcorr)
 
-C     Subroutine: assignDispFromPKOneMat
-
 C     Inputs: gradientcorr --- true if gradient correction method is to be used
 
 C     Outputs: None
@@ -49,8 +47,6 @@ C     input variables
 ************************************************************************
       subroutine dispFromPK(dt)
 
-C     Subroutine: dispFromPK
-
 C     Inputs: dt --- time increment for DD update
 
 C     Outputs: None
@@ -72,8 +68,6 @@ C     local variables
       end subroutine dispFromPK
 ************************************************************************
       subroutine dispFromPKOneMat(mnumfe,dt)
-
-C     Subroutine: dispFromPKOneMat
 
 C     Inputs: mnumfe --- material in which to update dislocation positions
 C             dt --- time increment for DD update
@@ -116,8 +110,6 @@ C     local variables
       end subroutine dispfromPKOneMat
 ************************************************************************
       subroutine dispFromPKOneMatVCorr(mnumfe,dt)
-
-C     Subroutine: dispFromPKOneMat
 
 C     Inputs: mnumfe --- material in which to update dislocation positions
 C             dt --- time increment for DD update
@@ -229,8 +221,6 @@ C     input variables
       end subroutine
 ************************************************************************
       function getResolvedStressOnDisl(mnumfe,i) result(tau)
-      
-C     Function: getResolvedStressOnDisl
 
 C     Inputs: mnumfe --- fe material number for dislocation
 C             i --- index of dislocation in disl(mnumfe)%list
@@ -265,8 +255,6 @@ C     local variables
       end function getResolvedStressOnDisl
 ************************************************************************
       function velFromTau(tau,bfac) result(v)
-      
-C     Function: velFromTau
 
 C     Inputs: tau --- resolved shear stress on dislocation
 C             bfac --- = b/B, b = burgers (signed), B = mobility/drag coefficient
@@ -290,8 +278,6 @@ C     output variables
       end function velfromTau
 ************************************************************************
       function velFromTauCorr(tau,dtauds,bfac,dt) result(v)
-      
-C     Function: velFromTauCorr
 
 C     Inputs: tau --- resolved shear stress on dislocation
 C             dtauds --- derivative of resolved shear stress on dislocation
@@ -343,8 +329,6 @@ C     construct uncorrected, corrected, actual velocity
       end function velFromTauCorr
 ************************************************************************
       function dispFromVel(v,dt,vmax) result(disp)
-      
-C     Function: dispFromVel
 
 C     Inputs: v --- velocity of dislocation along slip plane
 C             dt --- DD timestep

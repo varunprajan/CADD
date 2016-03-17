@@ -78,8 +78,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initSimulation(simname,simtype)
-      
-C     Subroutine: initSimulation
 
 C     Inputs: simname --- name of simulation
 C             simtype --- simulation type: atomistic, fe, dd, cadd_nodisl, or cadd
@@ -103,8 +101,6 @@ C     input variables
       end subroutine initSimulation
 ************************************************************************
       subroutine assignInitAndWrite(simtype)
-      
-C     Subroutine: initSimulation
 
 C     Inputs: simtype --- simulation type: atomistic, fe, dd, cadd_nodisl, or cadd
 
@@ -158,8 +154,6 @@ C     input variables
       end subroutine Dummy3
 ************************************************************************
       subroutine writeOutput()
-      
-C     Subroutine: writeOutput
 
 C     Inputs: None
 
@@ -180,8 +174,6 @@ C     Write dump/restart file if current increment is multiple of dumpincrement/
       end subroutine writeOutput
 ************************************************************************       
       subroutine initCADD()
-      
-C     Subroutine: initCADD
 
 C     Inputs: None
 
@@ -205,8 +197,6 @@ C     local variables
       end subroutine initCADD
 ************************************************************************
       subroutine initCADDNoDisl()
-      
-C     Subroutine: initCADDNoDisl
 
 C     Inputs: None
 
@@ -228,8 +218,6 @@ C     local variables
       end subroutine initCADDNoDisl
 ************************************************************************
       subroutine initFE()
-      
-C     Subroutine: initFE
 
 C     Inputs: None
 
@@ -249,8 +237,6 @@ C     local variables
       end subroutine initFE     
 ************************************************************************
       subroutine initDD()
-      
-C     Subroutine: initDD
 
 C     Inputs: None
 
@@ -271,8 +257,6 @@ C     local variables
       end subroutine initDD    
 ************************************************************************    
       subroutine initAtomistic()
-      
-C     Subroutine: initAtomistic
 
 C     Inputs: None
 
@@ -292,8 +276,6 @@ C     local variables
       end subroutine initAtomistic
 ************************************************************************
       subroutine initGeneralChunk(pref)
-      
-C     Subroutine: initGeneralChunk
 
 C     Inputs: pref --- file prefix (= misc%simname)
 
@@ -316,8 +298,6 @@ C     input variables
       end subroutine initGeneralChunk
 ************************************************************************
       subroutine initAtomisticChunk(pref)
-      
-C     Subroutine: initAtomisticChunk
 
 C     Inputs: pref --- file prefix (= misc%simname)
 
@@ -340,8 +320,6 @@ C     input variables
       end subroutine initAtomisticChunk
 ************************************************************************
       subroutine initFEChunk(pref)
-      
-C     Subroutine: initFEChunk
 
 C     Inputs: pref --- file prefix (= misc%simname)
 
@@ -365,8 +343,6 @@ C     input variables
       end subroutine initFEChunk
 ************************************************************************
       subroutine initDDChunk(pref)
-      
-C     Subroutine: initDDChunk
 
 C     Inputs: pref --- file prefix (= misc%simname)
 
@@ -395,8 +371,6 @@ C     input variables
       end subroutine initDDChunk
 ************************************************************************
       subroutine initCADDNoDislChunk()
-      
-C     Subroutine: initCADDNoDislChunk
 
 C     Inputs: None
 
@@ -411,8 +385,6 @@ C     Purpose: Initialize data needed for simulations with pad atoms
       end subroutine initCADDNoDislChunk
 ************************************************************************
       subroutine initCADDChunk(pref)
-      
-C     Subroutine: initCADDChunk
 
 C     Inputs: None
 
@@ -431,8 +403,6 @@ C     input variables
       end subroutine initCADDChunk
 ************************************************************************
       subroutine getRestartPrefSuff(pref,suff)
-      
-C     Subroutine: getRestartPrefSuff
 
 C     Inputs: None
 
@@ -452,8 +422,6 @@ C     Purpose: Generate prefix and suffix for restart file name
       end 
 ************************************************************************
       subroutine writeRestartCADD()
-      
-C     Subroutine: writeRestartCADD
 
 C     Inputs: None
 
@@ -480,8 +448,6 @@ C     local variables
       end subroutine writeRestartCADD
 ************************************************************************
       subroutine writeRestartCADDNoDisl()
-      
-C     Subroutine: writeRestartCADDNoDisl
 
 C     Inputs: None
 
@@ -506,8 +472,6 @@ C     local variables
       end subroutine writeRestartCADDNoDisl
 ************************************************************************
       subroutine writeRestartFE()
-      
-C     Subroutine: writeRestartFE
 
 C     Inputs: None
 
@@ -531,8 +495,6 @@ C     local variables
       end subroutine writeRestartFE
 ************************************************************************
       subroutine writeRestartDD()
-      
-C     Subroutine: writeRestartDD
 
 C     Inputs: None
 
@@ -557,8 +519,6 @@ C     local variables
       end subroutine writeRestartDD
 ************************************************************************
       subroutine writeRestartAtomistic()
-      
-C     Subroutine: writeRestartAtomistic
 
 C     Inputs: None
 
@@ -582,8 +542,6 @@ C     local variables
       end subroutine writeRestartAtomistic
 ************************************************************************
       subroutine writeRestartGeneralChunk(pref,suff)
-      
-C     Subroutine: writeRestartGeneralChunk
 
 C     Inputs: pref --- prefix for restart file name (= misc%simname)
 C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.restart')
@@ -608,8 +566,6 @@ C     input variables
       end subroutine writeRestartGeneralChunk
 ************************************************************************
       subroutine writeRestartAtomisticChunk(pref,suff)
-      
-C     Subroutine: writeRestartAtomisticChunk
 
 C     Inputs: pref --- prefix for restart file name (= misc%simname)
 C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.restart')
@@ -633,8 +589,6 @@ C     input variables
       end subroutine writeRestartAtomisticChunk
 ************************************************************************
       subroutine writeRestartFEChunk(pref,suff)
-      
-C     Subroutine: writeRestartFEChunk
 
 C     Inputs: pref --- prefix for restart file name (= misc%simname)
 C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.restart')
@@ -654,8 +608,6 @@ C     input variables
       end subroutine writeRestartFEChunk
 ************************************************************************
       subroutine writeRestartDDChunk(pref,suff)
-      
-C     Subroutine: writeRestartDDChunk
 
 C     Inputs: pref --- prefix for restart file name (= misc%simname)
 C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.restart')
@@ -684,8 +636,6 @@ C     input variables
       end subroutine writeRestartDDChunk
 ************************************************************************
       subroutine writeRestartCADDChunk(pref,suff)
-      
-C     Subroutine: writeRestartCADDChunk
 
 C     Inputs: pref --- prefix for restart file name (= misc%simname)
 C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.restart')

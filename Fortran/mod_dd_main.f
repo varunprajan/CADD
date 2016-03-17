@@ -12,7 +12,7 @@ C     opposite signed dislocations that cross, etc.
      & zeroObstacles, obstacles, zeroDislDisp, sources,
      & addDislocation, sortDislPlanes, sourcet
       use mod_disl_escaped, only: addEscapedDislocation
-      use mod_mesh_find, only: findInAllWithGuess
+      use mod_mesh_find, only: findInAllWithGuessDef
       use mod_disl_detect_pass, only: findInterfaceIntersectionDeformed,
      &   passContinuumtoAtomistic
       use mod_slip_sys, only: resolveStress, invResolveDisp, slipsys
@@ -42,8 +42,6 @@ C     HARD-CODED CONSTANTS
       contains
 ************************************************************************
       subroutine assignDD(simtype)
-
-C     Subroutine: assignDD
 
 C     Inputs: simtype --- simulation type: atomistic, fe, dd, cadd_nodisl, or cadd
 
@@ -77,8 +75,6 @@ C     input variables
 ************************************************************************
       subroutine runDDStep(dt)
 
-C     Subroutine: runDDStep
-
 C     Inputs: dt --- time increment for DD update
 
 C     Outputs: None
@@ -108,8 +104,6 @@ C     input variables
       end subroutine runDDStep
 ************************************************************************
       subroutine updateDislocations()
-      
-C     Subroutine: updateDislocations
 
 C     Inputs: None
 
@@ -154,8 +148,6 @@ C     local variables
       end subroutine updateDislocations
 ************************************************************************
       subroutine enforceObstacles(mnumfe,isys,iplane,splane)
-      
-C     Subroutine: enforceObstacles
 
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
@@ -226,8 +218,6 @@ C     local variables
       subroutine isObstacleBetween(pold,pnew,splane,
      &                             between,obsnum,pobs)
 
-C     Subroutine: isObstacleBetween
-
 C     Inputs: pold, pnew --- old and new relative positions along slip plane
 
 C     In/out: splane --- sorted plane structure, disl(mnumfe)%splanes(isys)%splane(iplane)
@@ -269,8 +259,6 @@ C     local variables
 ************************************************************************
       subroutine updateDislRelpos(mnumfe,splane)
 
-C     Subroutine: updateDislRelpos
-
 C     Inputs: mnumfe --- fe material number
 
 C     In/out: splane --- sorted plane structure containing dislocations
@@ -305,8 +293,6 @@ C     local variables
       end subroutine updateDislRelpos
 ************************************************************************
       subroutine insertionSortPlaneWithCrossing(mnumfe,isys,splane)
-
-C     Subroutine: insertionSortPlaneWithCrossing
 
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
@@ -381,8 +367,6 @@ C                     place dislocation back before annihilating
 ************************************************************************
       subroutine annihilateDislocations(mnumfe,isys,splane,lannih)
 
-C     Subroutine: annihilateDislocations
-
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
 C             lannih --- critical distance for annihilation of disl. of opposite signs
@@ -445,8 +429,6 @@ C     local variables
       subroutine annihilateDislocationsSub(mnumfe,isys,splane,
      &                                     iobj1,iobj2)
 
-C     Subroutine: annihilateDislocationsSub
-
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
 C             iobj1, iobj2 --- indices of dislocations along slip plane to be annihilated
@@ -494,8 +476,6 @@ C     might be dangerous to use deleteDislocation here because of side effects
 ************************************************************************
       subroutine updateDislPos(mnumfe,isys,iplane)
 
-C     Subroutine: updateDislPos
-
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
 C             iplane --- index of slip plane within slip system
@@ -535,8 +515,6 @@ C     input variables
 ************************************************************************
       subroutine updateDislPosSub(mnumfe,isys,iplane,iobj,dislnum)
 
-C     Subroutine: updateDislPosSub
-
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
 C             iplane --- index of slip plane within slip system
@@ -554,7 +532,7 @@ C     input variables
       integer :: isys, iplane, iobj, dislnum
      
 C     local variables
-      integer :: mnumfenew, element
+      integer :: mnumfenew, element, elementnew
       real(dp) :: r, s
       logical :: badflip
       real(dp) :: dislposold(2), dislposnew(2)
@@ -575,8 +553,9 @@ C     first, compute new position
       
 C     then, figure out if dislocation is still in mesh
       mnumfenew = mnumfe
-      call findInAllWithGuess(dislposnew(1),dislposnew(2),
-     &                        mnumfenew,element,r,s,badflip)
+      elementnew = element
+      call findInAllWithGuessDef(dislposnew(1),dislposnew(2),
+     &                           mnumfenew,elementnew,r,s,badflip)
       
       if (badflip) then ! not in mesh
           write(*,*) 'Badflip', badflip
@@ -602,12 +581,12 @@ C         3) If not, then second possibility has occurred: so, delete the discre
           end if
       else ! still in mesh
           if (mnumfenew /= mnumfe) then ! moved to different material
-              call addDislocation(mnumfenew,element,dislposnew(1),
+              call addDislocation(mnumfenew,elementnew,dislposnew(1),
      &                            dislposnew(2),isys,bsgn,bcut) ! assumes slip systems have same numbers (isys) in different materials
               call deleteDislocation(mnumfe,isys,iplane,iobj)
           else ! in the same material; simply update position
               disl(mnumfe)%list(dislnum)%posn = dislposnew
-              disl(mnumfe)%list(dislnum)%element = element
+              disl(mnumfe)%list(dislnum)%element = elementnew
               disl(mnumfe)%list(dislnum)%localpos = [r,s]
           end if
       end if    
@@ -616,8 +595,6 @@ C         3) If not, then second possibility has occurred: so, delete the discre
 ************************************************************************
       subroutine updateDislPosSubNoAtoms(mnumfe,isys,iplane,
      &                                   iobj,dislnum)
-
-C     Subroutine: updateDislPosSubNoAtoms.
 
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
@@ -637,7 +614,7 @@ C     input variables
       integer :: isys, iplane, iobj, dislnum
      
 C     local variables
-      integer :: mnumfenew, element
+      integer :: mnumfenew, element, elementnew
       real(dp) :: r, s
       logical :: badflip
       real(dp) :: dislposold(2), dislposnew(2)
@@ -655,8 +632,9 @@ C     first, compute new position
       
 C     then, figure out if dislocation is still in mesh
       mnumfenew = mnumfe
-      call findInAllWithGuess(dislposnew(1),dislposnew(2),
-     &                        mnumfenew,element,r,s,badflip)
+      elementnew = element
+      call findInAllWithGuessDef(dislposnew(1),dislposnew(2),
+     &                           mnumfenew,elementnew,r,s,badflip)
       
       if (badflip) then ! not in mesh
           call deleteDislocation(mnumfe,isys,iplane,iobj)
@@ -665,12 +643,12 @@ C     then, figure out if dislocation is still in mesh
           
       else ! still in mesh
           if (mnumfenew/=mnumfe) then ! moved to different material
-              call addDislocation(mnumfenew,element,dislposnew(1),
+              call addDislocation(mnumfenew,elementnew,dislposnew(1),
      &                            dislposnew(2),isys,bsgn,bcut) ! assumes slip systems have same numbers (isys) in different materials
               call deleteDislocation(mnumfe,isys,iplane,iobj)
           else ! in the same material; simply update position
               disl(mnumfe)%list(dislnum)%posn = dislposnew
-              disl(mnumfe)%list(dislnum)%element = element
+              disl(mnumfe)%list(dislnum)%element = elementnew
               disl(mnumfe)%list(dislnum)%localpos = [r,s]
           end if
       end if    
@@ -678,8 +656,6 @@ C     then, figure out if dislocation is still in mesh
       end subroutine updateDislPosSubNoAtoms
 ************************************************************************
       subroutine updateSources(dt)
-
-C     Subroutine: updateSources
 
 C     Inputs: dt --- time increment for DD update
 
@@ -706,8 +682,6 @@ C     local variables
       end subroutine updateSources
 ************************************************************************
       subroutine updateSource(dt,tau,mnumfe,source)
-
-C     Subroutine: updateSources
 
 C     Inputs: dt --- time increment for DD update
 C             tau --- resolved shear stress on source
@@ -763,8 +737,6 @@ C     local variables
 ************************************************************************
       subroutine createDipole(mnumfe,source,tau)
 
-C     Subroutine: createDipole
-
 C     Inputs: mnumfe --- fe material number
 C             tau --- local shear stress on source
 
@@ -774,6 +746,9 @@ C     Outputs: None
 
 C     Purpose: Create dislocation dipole corresponding to source, local shear stress
 C     (dipole separation depends on material properties for material mnumfe)
+
+C     Notes: Can lead to problems if source is too close to boundary
+C     (either external or between materials)
 
       implicit none
 
@@ -806,8 +781,6 @@ C     local variables
 ************************************************************************
       function getResolvedStressOnSource(mnumfe,sourcenum) result(tau)
 
-C     Function: getResolvedStressOnSource
-
 C     Inputs: mnumfe --- fe material number
 C             source --- number of dislocation source
 
@@ -838,8 +811,6 @@ C     local variables
       end function getResolvedStressOnSource
 ************************************************************************
       function getResolvedStressOnObstacle(mnumfe,obstacle) result(tau)
-
-C     Function: getResolvedStressOnSource
 
 C     Inputs: mnumfe --- fe material number
 C             obstacle --- dislocation obstacle (type obstaclet)

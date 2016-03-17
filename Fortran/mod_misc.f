@@ -33,8 +33,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initMiscData(miscfile)
-      
-C     Subroutine: initMiscData
 
 C     Inputs: miscfile --- filename where misc data is stored
 C     (should be something like '[filepref]_misc')
@@ -54,8 +52,6 @@ C     input variables
       end subroutine initMiscData
 ************************************************************************
       subroutine readMiscData(miscfile)
-      
-C     Subroutine: readMiscData
 
 C     Inputs: miscfile --- filename where misc data is stored
 C     (should be something like '[filepref]_misc')
@@ -89,8 +85,6 @@ C     use explicit integer -> logical conversion
       end subroutine readMiscData
 ************************************************************************
       subroutine writeMiscData(miscfile)
-      
-C     Subroutine: writeMiscData
 
 C     Inputs: miscfile --- filename where misc data is stored
 C     (should be something like '[filepref]_misc')
@@ -126,8 +120,6 @@ C     use explicit logical -> integer conversion
       end subroutine writeMiscData
 ************************************************************************
       subroutine updateMiscIncrementCurr(deltaincrement)
-      
-C     Subroutine: updateMiscIncrementCurr
 
 C     Inputs: deltaincrement --- change in incrementcurr (incrementcurrnew - incrementcurrold)
 

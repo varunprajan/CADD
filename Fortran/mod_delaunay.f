@@ -34,8 +34,6 @@ C     module variables (global)
       contains
 ************************************************************************
       subroutine genDelaunay()
-      
-C     Subroutine: genDelaunay
 
 C     Inputs: None
 
@@ -77,8 +75,6 @@ C     reset regen
       end subroutine genDelaunay
 ************************************************************************
       function getTriNodes(trinum) result(trinodes)
-      
-C     Function: getTriNodes
 
 C     Inputs: trinum --- index of triangle in triangulation
 
@@ -105,8 +101,6 @@ C     local variables
       end function getTriNodes
 ************************************************************************
       function getTriCenter(trinum) result(tricenter)
-      
-C     Function: getTriCenter
 
 C     Inputs: trinum --- index of triangle in triangulation
 
@@ -128,8 +122,6 @@ C     output variables
       end function getTriCenter
 ************************************************************************ 
       subroutine identifyLargeTri()
-      
-C     Subroutine: identifyLargeTri
 
 C     Inputs: None
 

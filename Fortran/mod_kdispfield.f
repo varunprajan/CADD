@@ -20,8 +20,6 @@ C     Possible extensions: Anisotropic K-fields
 
 ************************************************************************
       subroutine applyKDispIso(KI,KII,mu,nu,xc,yc,gname)
-      
-C     Subroutine: applyKDispIso
 
 C     Inputs: KI - mode I stress intensity factor
 C             KII - mode II stress intensity factor
@@ -35,7 +33,7 @@ C                    (displacements applied only to nodes in group)
 C     Outputs: None
       
 C     Purpose: Apply plane strain K field to group of nodes in isotropic body.
-C     Update both positions and displacements.
+C     Applies field based on undeformed positions; x_def = x_undef + K*sqrt(2*pi*r)*f(theta); y_def = y_undef + K*sqrt(2*pi*r)*g(theta)
       
       implicit none
       
@@ -48,7 +46,7 @@ C     input variables
 C     local variables
       integer :: gnum
       integer :: i
-      real(dp) :: nodepos(2)
+      real(dp) :: posnundef(2)
       real(dp) :: cost, sint
       real(dp) :: x, y, r, invr
       real(dp) :: prefac
@@ -66,9 +64,9 @@ C     valid only for plane strain
       do i = 1, nodes%nnodes
 C     only do operation for atoms in group
       if (groups(gnum)%maskall(i)) then
-          nodepos = nodes%posn(1:2,i)
-          x = nodepos(1) - xc
-          y = nodepos(2) - yc
+          posnundef = nodes%posn(1:2,i) - nodes%posn(4:5,i)
+          x = posnundef(1) - xc
+          y = posnundef(2) - yc
           r = sqrt(x*x + y*y)
           invr = 1.0_dp/r
           cost = x*invr
@@ -85,9 +83,9 @@ C         disp fields (again, see Bower) without prefactor
           uyIInorm = KII*(-1.0_dp + 2.0_dp*nu + sinthalfsq)*costhalf
           unorm(1) = uxInorm + uxIInorm
           unorm(2) = uyInorm + uyIInorm
-          u = sqrt(r)*prefac*unorm
-          nodes%posn(1:2,i) = nodepos + u
-          nodes%posn(4:5,i) = nodes%posn(4:5,i) + u
+          u = (sqrt(r)*prefac)*unorm
+          nodes%posn(1:2,i) = posnundef + u
+          nodes%posn(4:5,i) = u
       end if
       end do
       

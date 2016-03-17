@@ -9,7 +9,8 @@
      &    linearInterp, searchSortedBinary, searchSortedBrute,
      &    searchSortedSpecial, isMultiple, projectVec, getPerpDistance,
      &    sameSign, tolconst, findPointBetween, intToLogical,
-     &    getCircumradiusSqForTriangle, logicalToInt, getDeterminant2
+     &    getCircumradiusSqForTriangle, logicalToInt, getDeterminant2,
+     &    nearestMultiple
       use mod_nodes, only: nodes, initNodeData, readNodeData,
      &  processNodeData, writeNodeData, getXYAtomBounds, getXYBounds
       use mod_misc, only: misc, initMiscData, readMiscData,
@@ -78,8 +79,8 @@
      &  mergeSortColsReal, mergeSubColsReal
       use mod_mesh_find, only: getLocalCoords, findInOneMatSub,
      &   getElGuessBrute, getNodeGuessBrute,
-     &   findInOneMat, findinOneMatSubAlt, findInAllWithGuess,
-     &   findInAllInitially, findInAllSub, findInOneMatInitially
+     &   findInOneMat, findinOneMatSub, findInAllWithGuess,
+     &   findInAllSub, findInOneMatInitially
       use mod_fe_main_2d, only: solveAll, solveOneMat, countEqns,
      &  assembleAndFactorAll, assembleKNormal, assembleLagrange,
      &  getDislForceRHS, getDislForceSub, getDispRHS, initAssembly,
@@ -143,63 +144,27 @@
      
       implicit none
 
-      integer :: mnumfe, mnum
-      real(dp) :: KI, KII
-      real(dp) :: xc, yc
-      real(dp) :: mu, nu
-      real(dp) :: dislpos(2), dislpos2(2)
-      integer :: isys, elguess, bsgn, bcut
-      real(dp) :: disldisp
-      integer :: k
-      
-C     read, initialize
-      call initSimulation('cadd_k_test_medium','cadd')
-      
-C     material stuff
-      mnumfe = 1
-      mnum = fematerials%list(mnumfe)
-      mu = materials(mnum)%mu
-      nu = materials(mnum)%nu
+      integer :: mnumfe, iplane, isys
+      real(dp) :: relpos, pt(2), disp(2)
 
-C     crack center (slightly offset from atom)
-      xc = 0.5_dp
-      yc = 0.3_dp
       
-C     K-field
-      KI = 7.5_dp
-      KII = 0.0_dp  
+      call initSimulation('simple2_dd','dd')
+
+      pt = [1.0_dp,2.0_dp]
+      isys = 1
+      mnumfe = 1
+      disp = [3.0_dp,0.0_dp]
+      call getSlipPlane(pt,mnumfe,isys,iplane,relpos)
+      write(*,*) 'relpos', relpos
+      write(*,*) 'iplane', iplane
+      slipsys(mnumfe)%origin(:,isys) = slipsys(mnumfe)%origin(:,isys)
+     &                               - disp
+      pt = pt - disp
+      call getSlipPlane(pt,mnumfe,isys,iplane,relpos)
+      write(*,*) 'relpos', relpos
+      write(*,*) 'iplane', iplane
+
       
-C     apply field
-      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
-      call solveAll_ptr() ! step 3
-      call updatePad() ! step 4
-      
-C     create dipole
-      dislpos = [-22.0_dp,-14.8_dp]
-      isys = 2 ! 60 degrees
-      dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
-      elguess = 0 ! initial element is unknown
-      bsgn = 1
-      bcut = 0
-      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
-     &                    isys,bsgn,bcut)
-      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
-     &                    isys,-bsgn,bcut)
-     
-C     dump
-      call updateMiscIncrementCurr(8)
-      call writeDump_ptr()
-     
-C     move dislocation
-      disldisp = 5.0_dp
-      disl(mnumfe)%list(1)%disp = disldisp
-      disl(mnumfe)%list(2)%disp = 0.0_dp
-      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
-          call updateDislPos(mnumfe,isys,k)
-      end do
-      
-      call updateMiscIncrementCurr(1)
-      call writeDump_ptr()
 
       
       end program

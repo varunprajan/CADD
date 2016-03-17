@@ -2,15 +2,16 @@
 
 C     Purpose: Reads/writes/stores information about dislocations that have 
 C     escaped from continuum (but not into atomistic region), leaving a slip step.
-C     Also gives dislocation fields.
+C     Also gives fields associated with these dislocations.
 
 C     Newer note/TODO: A paper by Romero et al., MSMSE, 2008 discusses how to
 C     implement the escaped fields properly. But, their computational approach
-C     is somewhat involved, and the approach discussed below seems to work satisfactorily
-C     for a crack specimen.
+C     is somewhat involved and difficult to implement.
 
 C     Long note/TODO: Accounting for these fields properly is tricky, and I'm
-C     not quite sure my discussion below is completely correct. Regardless, I think the implementation
+C     not quite sure my discussion below is completely correct. In particular, I'm not sure
+C     if my fields are correct in the case of a cracked body where one dislocation has escaped
+C     but the other has not. Regardless, I think the implementation
 C     is substantially better than that in the previous version of the code (which, admittedly, is a low bar).
 
 C     The escaped "dislocations" are not real entities, and their purpose
@@ -43,11 +44,11 @@ C     (the latter of which I still don't have a satisfactory solution for).
 
 C     For the specific case of a cracked specimen, with the crack originally at x = 0, y = 0,
 C     and the crack plane extending along y = 0 for x < 0, I've implemented a solution
-C     that should work (although it's a bit hokey). It involves determining whether
-C     the slip plane that the dislocation lies on intersects the crack surface. If so,
-C     the dislocation is assigned to a "region", depending on whether it originated in the upper
-C     or lower half of the specimen (upper half = 1; lower half = -1; main body = 0).
-C     See also mod_disl_escaped_fields...
+C     that involves determining whether the slip plane that the dislocation
+C     lies on intersects the crack surface. If so, the dislocation is assigned to a "region",
+C     depending on whether it originated in the upper or lower half of the specimen
+C     (upper half = 1; lower half = -1; main body = 0). I think this solves the third error mentioned above,
+C     but I'm not sure if it solves the second error.
 
 C     All of this was satisfactorily handled in the original vdG/Needleman problem
 C     because the sample was convex (a rectangle)
@@ -108,8 +109,6 @@ C     region numbers
       contains
 ************************************************************************
       subroutine initEscapedDislData(escapeddislfile)
-      
-C     Subroutine: initEscapedDislData
 
 C     Inputs: escapeddislfile --- filename where escaped dislocation data is stored
 C     (should be something like '[filepref]_escapeddisl')
@@ -131,8 +130,6 @@ C     input variables
       end subroutine initEscapedDislData
 ************************************************************************
       subroutine readEscapedDislData(escapeddislfile)
-      
-C     Subroutine: readEscapedDislData
 
 C     Inputs: escapeddislfile --- filename where escaped dislocation data is stored
 C     (should be something like '[filepref]_escapeddisl')
@@ -200,8 +197,6 @@ C     this should be identical to nfematerials from mod_fe_elements!
       end subroutine readEscapedDislData
 ************************************************************************
       subroutine processEscapedDislData()
-      
-C     Subroutine: processEscapedDislData
 
 C     Inputs: None
 
@@ -229,6 +224,15 @@ C     (used to place escaped dislocation sufficiently far away from specimen)
       end subroutine processEscapedDislData
 ************************************************************************
       function getMaxLen() result(maxlen)
+
+C     Inputs: None
+
+C     Outputs: maxlen --- length of longest line in simulation box
+
+C     Purpose: Compute the length of the longest line in simulation box ---
+C     escaped dislocation is moved by an amount at least equal to this    
+      
+      implicit none
       
 C     output variables
       real(dp) :: maxlen
@@ -245,8 +249,6 @@ C     local variables
       end function getMaxLen
 ************************************************************************
       subroutine writeEscapedDislData(escapeddislfile)
-      
-C     Subroutine: writeEscapedDislData
 
 C     Inputs: escapeddislfile --- filename where data for escaped dislocations is stored
 C     (should be something like '[filepref]_escapeddisl')
@@ -314,8 +316,6 @@ C     local variables
       subroutine addEscapedDislocation(posnold,posnnew,isys,bsgn,bcut,
      &                                 mnumfe)
 
-C     Subroutine: addEscapedDislocation
-
 C     Inputs: posnold, posnnew --- old, new positions of dislocation that has escaped
 C             isys --- slip system for dislocation (in mnumfe)
 C             bsgn --- sign of dislocation (+1 or -1)
@@ -363,8 +363,6 @@ C     local variables
 ************************************************************************
       function getEscapedPos(posnold,posnnew) result(escapedpos)
 
-C     Subroutine: getEscapedPos
-
 C     Inputs: posnold, posnnew --- old, new positions of dislocation that has escaped
 
 C     Outputs: escapedpos --- position of escaped dislocation at "infinity"
@@ -399,8 +397,6 @@ C     output variables
 ************************************************************************
       function getEscapedRegion(posnold,posnnew) result(region)
 
-C     Function: getEscapedRegion
-
 C     Inputs: posnold, posnnew --- old, new positions of dislocation that has escaped
 
 C     Outputs: region --- region to assign dislocation to (= 0 by default)
@@ -420,8 +416,6 @@ C     output variables
       end function getEscapedRegion
 ************************************************************************
       function getEscapedRegionCrack(posnold,posnnew) result(region)
-
-C     Function: getEscapedRegionCrack
 
 C     Inputs: posnold, posnnew --- old, new positions of dislocation that has escaped
 
@@ -466,8 +460,6 @@ C     local variables
       end function getEscapedRegionCrack
 ************************************************************************
       function getEscapedDispAtPointAll(posn,mnumfe) result(disp)
-      
-C     Subroutine: getEscapedDispAtPointAll
 
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             mnumfe --- fe material in which point lies 
@@ -533,8 +525,6 @@ C     output variables
       function getEscapedDispAtPoint(posn,dislpos,cost,sint,bsgn,bcut,
      &                burgers,region) result(disp)
 
-C     Function: getEscapedDispAtPoint
-
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             dislpos - 2 by 1 vector of position of dislocation
 C             cost, sint - trig for angle of dislocation
@@ -593,8 +583,6 @@ C     rotate displacements back (by negative theta)
 ************************************************************************
       subroutine getEscapedDispAtPointSub(dxn,dyn,bsgn,burgers,uxn,uyn)
 
-C     Subroutine: getEscapedDispAtPointSub
-
 C     Inputs: dxn, dyn - (adjusted) relative coordinates of point w.r.t.
 C                         dislocation, in the dislocation coordinate system
 C             burgers - burgers vector of dislocation
@@ -647,8 +635,6 @@ C     have left the body.
 ************************************************************************
       function getEscapedDispAtPointCrack(posn,dislpos,cost,sint,
      &                 bsgn,bcut,burgers,region) result(disp)
-
-C     Function: getEscapedDispAtPointCrack
 
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             dislpos - 2 by 1 vector of position of dislocation
@@ -710,8 +696,6 @@ C     rotate displacements back (by negative theta)
 ************************************************************************
       subroutine getEscapedDispAtPointCrackSub(dxn,dyn,ydislo,yo,
      &                                   bsgn,burgers,region,uxn,uyn)
-
-C     Subroutine: getEscapedDispAtPointCrackSub
 
 C     Inputs: dxn, dyn - (adjusted) relative coordinates of point w.r.t.
 C                         dislocation, in the dislocation coordinate system

@@ -63,8 +63,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initGhostDislData(ghostdislfile)
-      
-C     Subroutine: initGhostDislData
 
 C     Inputs: ghostdislfile --- filename where ghost dislocation data is stored
 C     (should be something like '[filepref]_ghostdisl')
@@ -86,8 +84,6 @@ C     input variables
       end subroutine initGhostDislData
 ************************************************************************
       subroutine readGhostDislData(ghostdislfile)
-      
-C     Subroutine: readGhostDislData
 
 C     Inputs: ghostdislfile --- filename where dislocation data is stored
 C     (should be something like '[filepref]_ghostdisl')
@@ -150,8 +146,6 @@ C     this should be identical to nfematerials from mod_fe_elements!
       end subroutine readghostDislData
 ************************************************************************
       subroutine writeGhostDislData(ghostdislfile)
-      
-C     Subroutine: writeGhostDislData
 
 C     Inputs: ghostdislfile --- filename where data for ghost dislocations is stored
 C     (should be something like '[filepref]_ghostdisl')
@@ -211,8 +205,6 @@ C     local variables
       end subroutine writeGhostDislData
 ************************************************************************
       subroutine addGhostDislocation(x,y,isys,bsgn,bcut,mnumfe)
-
-C     Subroutine: addGhostDislocation
 
 C     Inputs: x, y --- global coordinates of dislocation
 C             isys --- slip system for dislocation (in mnumfe)

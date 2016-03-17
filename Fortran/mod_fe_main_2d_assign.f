@@ -30,8 +30,6 @@ C     (no dislocations)
 ************************************************************************
       subroutine assignFE(simtype)
 
-C     Subroutine: assignFE
-
 C     Inputs: simtype --- simulation type: atomistic, fe, dd, cadd_nodisl, or cadd
 
 C     Outputs: None

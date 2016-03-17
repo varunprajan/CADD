@@ -20,8 +20,6 @@ C     Possible extensions: Compute energies? Develop other poten_pair styles? (e
 
 ************************************************************************
       subroutine getPotForcesAllTable()
-      
-C     Subroutine: getPotForcesAllTable
 
 C     Inputs: None
 
@@ -94,8 +92,6 @@ C     local variables
       end subroutine getPotForcesAllTable
 ************************************************************************  
       function getPotForceTable(pnum,atompos,neighpos) result(forcevec)
-      
-C     Function: getPotForceTable
 
 C     Inputs: None
 

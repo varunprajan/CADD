@@ -24,8 +24,6 @@ C     http://rosettacode.org/wiki/Sorting_algorithms/Merge_sort#Fortran
 ************************************************************************
       subroutine insertionSortPlane(relpos,objnum,N)
 
-C     Subroutine: insertionSortPlane
-
 C     Inputs: relpos --- unsorted list of floats (relative positions)
 C             objnum --- object number corresponding to each relpos
 C             N --- relpos, objnum
@@ -73,8 +71,6 @@ C     local variables
 ************************************************************************
       recursive subroutine mergeSort(A,N)
 
-C     Subroutine: mergeSort
-
 C     Inputs: A --- (unsorted) list of integers
 C             N --- length of A
 
@@ -119,8 +115,6 @@ C     integer division (implicit rounding)
       end subroutine mergeSort
 ************************************************************************
       subroutine mergeSub(A,NA,B,NB,C,NC)
-      
-C     Subroutine: mergeSub
 
 C     Inputs: A --- sorted list of integers
 C             NA --- length of A
@@ -172,8 +166,6 @@ C     local variables
 ************************************************************************
       recursive subroutine mergeSortReal(A,N)
 
-C     Subroutine: mergeSortReal
-
 C     Inputs: A --- (unsorted) list of real numbers
 C             N --- length of A
 
@@ -218,8 +210,6 @@ C     integer division (implicit rounding)
       end subroutine mergeSortReal
 ************************************************************************
       subroutine mergeSubReal(A,NA,B,NB,C,NC)
-      
-C     Subroutine: mergeSubReal
 
 C     Inputs: A --- sorted list of real numbers
 C             NA --- length of A
@@ -270,8 +260,6 @@ C     local variables
       end subroutine mergeSubReal 
 ************************************************************************
       recursive subroutine mergeSortCols(A,N,ROWSORT,ROWTOT)
- 
-C     Subroutine: mergeSortCols
 
 C     Inputs: A --- (unsorted) array of integers, ROWTOT by N
 C             N --- number of columns of A
@@ -338,8 +326,6 @@ C         but prevents empty matrices in mergeSubCols and unnecessary recursion
       end subroutine mergeSortCols
 ************************************************************************
       subroutine mergeSubCols(A,NA,B,NB,C,NC,ROWSORT,ROWTOT)
- 
-C     Subroutine: mergeSubCols
 
 C     Inputs: A --- sorted array of integers, ROWTOT by NA
 C             NA --- columns of A
@@ -409,8 +395,6 @@ C     local variables
       end subroutine mergeSubCols
 ************************************************************************
       recursive subroutine mergeSortColsReal(A,N,ROWSORT,ROWTOT)
- 
-C     Subroutine: mergeSortColsReal
 
 C     Inputs: A --- (unsorted) array of real numbers, ROWTOT by N
 C             N --- number of columns of A
@@ -477,8 +461,6 @@ C         but prevents empty matrices in mergeSubCols and unnecessary recursion
       end subroutine mergeSortColsReal
 ************************************************************************
       subroutine mergeSubColsReal(A,NA,B,NB,C,NC,ROWSORT,ROWTOT)
- 
-C     Subroutine: mergeSubColsReal
 
 C     Inputs: A --- sorted array of real numbers, ROWTOT by NA
 C             NA --- columns of A
@@ -495,6 +477,8 @@ C                    ROWTOT by NC
 
 C     Purpose: Merge two sorted arrays of real numbers, A and B, into a
 C     sorted array of real numbers C. Helper routine for mergeSortCols.
+ 
+      implicit none
  
 C     input variables
       integer :: NA, NB, NC

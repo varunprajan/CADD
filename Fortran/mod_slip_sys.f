@@ -26,8 +26,6 @@ C     processed
       contains
 ************************************************************************
       subroutine initSlipSysData(slipsysfile)
-      
-C     Subroutine: initSlipSysData
 
 C     Inputs: slipsysfile --- filename where slip system data is stored
 C     (should be something like '[filepref]_slipsys')
@@ -48,8 +46,6 @@ C     input variables
       end subroutine initSlipSysData
 ************************************************************************
       subroutine readSlipSysData(slipsysfile)
-      
-C     Subroutine: readSlipSysData
 
 C     Inputs: slipsysfile --- filename where slip system data is stored
 C     (should be something like '[filepref]_slipsys')
@@ -87,8 +83,6 @@ C     local variables
 ************************************************************************
       subroutine processSlipSysData()
 
-C     Subroutine: processSlipSysData
-
 C     Inputs: None
 
 C     Outputs: None
@@ -116,8 +110,6 @@ C     local variables
       end subroutine processSlipSysData
 ************************************************************************
       subroutine getSlipPlane(pt,mnumfe,isys,iplane,relpos)
-      
-C     Subroutine: getSlipPlane
 
 C     Inputs: mnumfe --- material number that object belongs to
 C             isys --- index of slip system within mnumfe that object belongs to
@@ -172,8 +164,6 @@ C     local variables
       end subroutine getSlipPlane
 ************************************************************************
       function invResolveDisp(mnumfe,isys,relposdisp) result(disp)
-      
-C     Subroutine: invResolveDisp
 
 C     Inputs: mnumfe --- material number that object belongs to
 C             isys --- index of slip system within mnumfe that object belongs to
@@ -197,8 +187,6 @@ C     output variables
       end function invResolveDisp
 ************************************************************************
       function resolveStress(mnumfe,isys,stress) result(tau)
-      
-C     Subroutine: resolveStress
 
 C     Inputs: mnumfe --- material number that object belongs to
 C             isys --- index of slip system within mnumfe that object belongs to
@@ -230,8 +218,6 @@ C     local variables
       end function resolveStress
 ************************************************************************
       subroutine writeSlipSysData(slipsysfile)
-      
-C     Subroutine: writeSlipSysData
 
 C     Inputs: slipsysfile --- filename where slip system data is stored
 C     (should be something like '[filepref]_slipsys')

@@ -24,7 +24,7 @@
       integer :: iunit
       integer :: i
       integer :: mnumfe, mnum
-      real(dp) :: KIstart, KIincr, KIend, KIapply, KIcurr, KII
+      real(dp) :: KIstart, KIincr, KIend, KIapply, KII
       real(dp) :: xc, yc
       real(dp) :: mu, nu
       integer :: nstepsK, natomisticsteps, natomisticstepstot
@@ -71,20 +71,14 @@ C     file
 
       
 C     apply K, equilibrate, dump
-      do i = 0, nstepsK
-          if (i == 0) then
-              KIapply = KIstart
-          else
-              KIapply = KIincr
-          end if
-          
-          KIcurr = KIstart + i*KIincr
-          write(*,*) 'Current KI', KIcurr
+      do i = 0, nstepsK          
+          KIapply = KIstart + i*KIincr
+          write(*,*) 'Current KI', KIapply
           
           call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
           call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
      &                               forcetol,natomisticstepstot)
-          write(iunit,*) KIcurr, natomisticstepstot
+          write(iunit,*) KIapply, natomisticstepstot
           call updateMiscIncrementCurr(1)
           call writeDump_ptr()
       end do

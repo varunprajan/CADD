@@ -29,8 +29,6 @@ C     For the latter, have to distinguish between atomistic simtypes and not.
       contains
 ************************************************************************
       function getDumpFilename() result(filename)
-      
-C     Subroutine: getDumpFilename
 
 C     Inputs: None
 
@@ -52,8 +50,6 @@ C     e.g. if incrementcurr = 10, simname = test -> filename = 'test.10.dump'
       end function getDumpFilename
 ************************************************************************     
       subroutine writeDumpCADD()
-      
-C     Subroutine: writeDumpCADD
 
 C     Inputs: None
 
@@ -83,8 +79,6 @@ C     local variables
       end subroutine writeDumpCADD
 ************************************************************************
       subroutine writeDumpCADDNoDisl()
-      
-C     Subroutine: writeDumpCADDNoDisl
 
 C     Inputs: None
 
@@ -110,8 +104,6 @@ C     local variables
       end subroutine writeDumpCADDNoDisl
 ************************************************************************ 
       subroutine writeDumpFE()
-      
-C     Subroutine: writeDumpFE
 
 C     Inputs: None
 
@@ -139,8 +131,6 @@ C     local variables
       end subroutine writeDumpFE
 ************************************************************************
       subroutine writeDumpDD()
-      
-C     Subroutine: writeDumpDD
 
 C     Inputs: None
 
@@ -170,8 +160,6 @@ C     local variables
       end subroutine writeDumpDD
 ************************************************************************
       subroutine writeDumpAtomistic()
-      
-C     Subroutine: writeDumpAtomistic
 
 C     Inputs: None
 
@@ -198,8 +186,6 @@ C     local variables
       end subroutine writeDumpAtomistic
 ************************************************************************
       subroutine writeDumpNodesDefElementsChunk(iunit)
-      
-C     Subroutine: writeDumpNodesDefElementsChunkSub
 
 C     Inputs: iunit --- integer file specifier
 
@@ -223,8 +209,6 @@ C     input variables
       end subroutine writeDumpNodesDefElementsChunk
 ************************************************************************
       subroutine writeDumpNodesUndefElementsChunk(iunit)
-      
-C     Subroutine: writeDumpNodesUndefElementsChunkSub
 
 C     Inputs: iunit --- integer file specifier
 
@@ -248,8 +232,6 @@ C     input variables
       end subroutine writeDumpNodesUndefElementsChunk
 ************************************************************************
       subroutine writeDumpNodesElementsChunkSub(iunit,defoption)
-      
-C     Subroutine: writeDumpNodesElementsChunkSub
 
 C     Inputs: iunit --- integer file specifier
 C             defoption --- true if deformed positions are to be dumped; false if undeformed positions
@@ -282,8 +264,6 @@ C     input variables
       end subroutine writeDumpNodesElementsChunkSub
 ************************************************************************
       subroutine writeDumpDDChunk(iunit)
-      
-C     Subroutine: writeDumpDDChunk
 
 C     Inputs: iunit --- integer file specifier
 
@@ -305,8 +285,6 @@ C     input variables
       end subroutine writeDumpDDChunk
 ************************************************************************
       subroutine writeDumpNodesDefChunk(iunit)
-      
-C     Subroutine: writeDumpNodesDefChunk
 
 C     Inputs: iunit --- integer file specifier
 
@@ -326,8 +304,6 @@ C     input variables
       end subroutine writeDumpNodesDefChunk
 ************************************************************************
       subroutine writeDumpNodesUndefChunk(iunit)
-      
-C     Subroutine: writeDumpNodesUndefChunk
 
 C     Inputs: iunit --- integer file specifier
 
@@ -347,8 +323,6 @@ C     input variables
       end subroutine writeDumpNodesUndefChunk
 ************************************************************************
       subroutine writeDumpNodesDef(iunit)
-      
-C     Subroutine: writeDumpNodesDef
 
 C     Inputs: iunit --- integer file specifier
 
@@ -373,8 +347,6 @@ C     local variables
       end subroutine writeDumpNodesDef
 ************************************************************************
       subroutine writeDumpNodesUndef(iunit)
-      
-C     Subroutine: writeDumpNodesUndef
 
 C     Inputs: iunit --- integer file specifier
 
@@ -403,8 +375,6 @@ C     local variables
       end subroutine writeDumpNodesUndef
 ************************************************************************
       subroutine writeDumpNodesDisp(iunit)
-      
-C     Subroutine: writeDumpNodesDisp
 
 C     Inputs: iunit --- integer file specifier
 
@@ -427,8 +397,6 @@ C     local variables
       end subroutine writeDumpNodesDisp
 ************************************************************************
       subroutine writeDumpNodesTypes(iunit)
-      
-C     Subroutine: writeDumpNodesTypes
 
 C     Inputs: iunit --- integer file specifier
 
@@ -448,8 +416,6 @@ C     input variables
       end subroutine writeDumpNodesTypes
 ************************************************************************
       subroutine writeDumpFEElements(iunit)
-      
-C     Subroutine: writeDumpFEElements
 
 C     Inputs: iunit --- integer file specifier
 
@@ -476,8 +442,6 @@ C     local variables
       end subroutine writeDumpFEElements
 ************************************************************************
       subroutine writeDumpDisl(iunit)
-      
-C     Subroutine: writeDumpDisl
 
 C     Inputs: iunit --- integer file specifier
 
@@ -517,8 +481,6 @@ C     local variables
       end subroutine writeDumpDisl
 ************************************************************************
       subroutine writeDumpSources(iunit)
-      
-C     Subroutine: writeDumpSources
 
 C     Inputs: iunit --- integer file specifier
 
@@ -545,8 +507,6 @@ C     local variables
       end subroutine writeDumpSources
 ************************************************************************
       subroutine writeDumpObstacles(iunit)
-      
-C     Subroutine: writeDumpObstacles
 
 C     Inputs: iunit --- integer file specifier
 
@@ -573,8 +533,6 @@ C     local variables
       end subroutine writeDumpObstacles
 ************************************************************************
       subroutine writeDumpSlipSys(iunit)
-      
-C     Subroutine: writeDumpObstacles
 
 C     Inputs: iunit --- integer file specifier
 
@@ -599,8 +557,6 @@ C     local variables
       end subroutine writeDumpSlipSys
 ************************************************************************
       subroutine writeDumpCompute(iunit)
-      
-C     Subroutine: writeDumpCompute
 
 C     Inputs: iunit --- integer file specifier
 
@@ -622,8 +578,6 @@ C     input variables
       end subroutine writeDumpCompute
 ************************************************************************
       subroutine writeDumpCentro(iunit)
-      
-C     Subroutine: writeDumpCentro
 
 C     Inputs: iunit --- integer file specifier
 

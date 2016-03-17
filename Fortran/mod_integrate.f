@@ -25,8 +25,6 @@ C     non-uniform spatial damping (for pad).
 ************************************************************************
       subroutine loopVerlet(increments,dt,gname,damp)
 
-C     Subroutine: loopVerlet
-
 C     Inputs: increments --- number of increments to run velocityVerlet
 C             dt --- timestep
 C             gname --- name of group for verlet update
@@ -65,8 +63,6 @@ C     run verlet loop
 ************************************************************************    
       subroutine velocityVerletSubAll(dt,gname,damp)
       
-C     Subroutine: velocityVerletSubAll
-
 C     Inputs: dt --- timestep
 C             gname --- name of group for verlet update
 C             damp --- structure containing damping information (group name, gamma, etc.)
@@ -113,8 +109,6 @@ C     call getDampingForcesAll(dgnum,gamma,dampflag)
       end subroutine velocityVerletSubAll
 ************************************************************************
       subroutine velocityVerletSub1(dt,gnum)
-
-C     Subroutine: velocityVerletSub1
 
 C     Inputs: dt --- timestep
 C             gnum --- number of group (velocityVerlet is applied only
@@ -169,8 +163,6 @@ C             if y is fixed
       end subroutine velocityVerletSub1
 ************************************************************************
       subroutine velocityVerletSub2(dt,gnum)
-      
-C     Subroutine: velocityVerletSub2
 
 C     Inputs: dt --- timestep
 C             gnum --- number of group (velocityVerlet is applied only

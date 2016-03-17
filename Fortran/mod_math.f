@@ -21,7 +21,7 @@ C     of attaching const to the end of any parameters (e.g. pi -> piconst)
      &          searchSortedSpecial, isMultiple, getDeterminant2,
      &          checkSameSide, projectVec, getPerpDistance,
      &          findPointBetween, getCircumradiusSqForTriangle,
-     &          logicalToInt, intToLogical, linspace
+     &          logicalToInt, intToLogical, linspace, nearestMultiple
       
       real(dp), parameter :: TOLCONST = 1.0e-10_dp
       real(dp), parameter :: PICONST = 3.14159265358979323846_dp
@@ -30,7 +30,39 @@ C     of attaching const to the end of any parameters (e.g. pi -> piconst)
       
       contains
 ************************************************************************
+      function nearestMultiple(num,multiple) result(res)
+      
+C     Inputs: num --- original number (real)
+C             multiple --- desired multiple
+     
+C     Outputs: res --- integer multiple of multiple (real)
+     
+C     Purpose: Generate the closest real number to num that is an integer multiple of multiple
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: num
+      real(dp) :: multiple
+      
+C     output variables
+      real(dp) :: res
+      
+      res = nint(num/multiple)*multiple
+      
+      end function nearestMultiple
+************************************************************************
       function linspace(xstart,xend,n) result(xvec)
+      
+C     Inputs: xstart --- starting value (real)
+C             xend --- ending value (real)
+C             n --- number of points
+     
+C     Outputs: xvec --- (real) vector of evenly spaced points
+     
+C     Purpose: Generate vector of n evenly spaced points between xstart and xend
+      
+      implicit none
       
 C     input variables
       real(dp) :: xstart
@@ -65,6 +97,8 @@ C     Outputs: res --- integer
      
 C     Purpose: Convert logical to integer: true -> 1, false -> 0,
 C     so intToLogical(logicalToInt(bool)) = bool    
+
+      implicit none
 
 C     input variables
       logical :: bool
@@ -525,6 +559,8 @@ C     (detecting whether/where a dislocation has crossed the interface)
 C     are: 1) a "T-Intersection" and 2) parallel, non-coincident lines.
 C     I have checked these cases...
       
+      implicit none
+      
 C     input variables
       real(dp) :: p0(2), p1(2)
       real(dp) :: p2(2), p3(2)
@@ -739,6 +775,8 @@ C                        by vert1 and vert2
 C     Purpose: Determine whether pt1 and pt2 lie on same side of line formed
 C              by vert1 and vert2. Used as helper for findInOneMatAlt
       
+      implicit none
+      
 C     input variables
       real(dp) :: pt1(2), pt2(2)
       real(dp) :: vert1(2), vert2(2)
@@ -772,6 +810,8 @@ C             pt --- point of interest
 C     Outputs: pdist --- perpendicular distance
 
 C     Purpose: Get (perpendicular) distance from pt to line defined by ptline1, ptline2 
+      
+      implicit none
       
 C     input variables
       real(dp) :: ptline1(2), ptline2(2)

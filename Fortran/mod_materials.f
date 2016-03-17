@@ -48,8 +48,6 @@ C     module variables (private)
       contains
 ************************************************************************      
       subroutine initMaterialData(materialfile)
-      
-C     Subroutine: initMaterialData
 
 C     Inputs: materialfile --- filename where material data is stored
 C     (should be something like '[filepref]_materials')
@@ -69,8 +67,6 @@ C     input variables
       end subroutine initMaterialData
 ************************************************************************      
       subroutine readMaterialData(materialfile)
-      
-C     Subroutine: readMaterialData
 
 C     Inputs: materialfile --- filename where material data is stored
 C     (should be something like '[filepref]_materials')
@@ -109,8 +105,6 @@ C         read
       end subroutine readMaterialData
 ************************************************************************
       subroutine processMaterialData()
-      
-C     Subroutine: processMaterialData
 
 C     Inputs: None
 
@@ -141,8 +135,6 @@ C     local variables
       end subroutine processMaterialData
 ************************************************************************
       subroutine writeMaterialData(materialfile)
-
-C     Subroutine: writeMaterialData
 
 C     Inputs: materialfile --- filename where material data is stored
 C     (should be something like '[filepref]_materials')
@@ -182,8 +174,6 @@ C     local variables
       end subroutine writeMaterialData
 ************************************************************************
       subroutine getMuNuApprox(elconst,mu,nu)
-      
-C     Subroutine: getMuNuApprox
 
 C     Inputs: elconst - 3 by 3 plane-strain stiffness matrix (Voigt notation)
 
@@ -214,8 +204,6 @@ C     local variables
       end subroutine getMuNuApprox
 ************************************************************************
       function getNucleationLength(mnumfe,taucr) result(lnuc)
-      
-C     Function: getNucleationLength
 
 C     Inputs: mnumfe --- fe material number of source
 C             taucr --- critical shear stress for source

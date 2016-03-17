@@ -38,8 +38,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initNodeData(nodefile)
-      
-C     Subroutine: initNodeData
 C     
 C     Inputs: nodefile - name of file containing node information
 C     (e.g. example_fortran_nodes)
@@ -59,8 +57,6 @@ C     input variables
       end subroutine initNodeData
 ************************************************************************
       subroutine readNodeData(nodefile)
-      
-C     Subroutine: readNodeData
 
 C     Inputs: nodefile - name of file containing node information
 C     (e.g. example_fortran_nodes)
@@ -88,8 +84,6 @@ C     local variables
       end subroutine readNodeData
 ************************************************************************
       subroutine processNodeData()
-
-C     Subroutine: processNodeData
 
 C     Inputs: None
 
@@ -152,8 +146,6 @@ C     misc. arrays
       end subroutine processNodeData
 ************************************************************************
       subroutine getXYAtomBounds(xmin,xmax,ymin,ymax)
-      
-C     Subroutine: getXYAtomBounds
 
 C     Inputs: None
 
@@ -188,8 +180,6 @@ C     get x, y bounds by looping over all atoms
       end subroutine getXYAtomBounds
 ************************************************************************
       subroutine getXYBounds(xmin,xmax,ymin,ymax)
-      
-C     Subroutine: getXYBounds
 
 C     Inputs: None
 
@@ -227,8 +217,6 @@ C     could use min, max, but this would result in two loops
       end subroutine getXYBounds
 ************************************************************************
       subroutine writeNodeData(nodefile)
-      
-C     Subroutine: writeNodeData
 
 C     Inputs: nodefile --- name of file containing node information
 C     (e.g. example_fortran_nodes)

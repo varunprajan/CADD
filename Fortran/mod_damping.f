@@ -30,8 +30,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initDampingData(dampingfile)
-      
-C     Subroutine: initDampingData
 
 C     Inputs: dampingfile --- filename where damping data is stored
 C     (should be something like '[filepref]_damping')
@@ -50,8 +48,6 @@ C     input variables
       end subroutine initDampingData
 ************************************************************************
       subroutine readDampingData(dampingfile)
-
-C     Subroutine: readDampingData
 
 C     Inputs: dampingfile --- filename where damping data is stored
 C     (should be something like '[filepref]_damping')
@@ -77,8 +73,6 @@ C     local variables
       end subroutine readDampingData
 ************************************************************************
       subroutine readDampingDataSub(iunit,damp)
-
-C     Subroutine: readDampingData
 
 C     Inputs: iunit --- integer file specifier
              
@@ -109,8 +103,6 @@ C     use explicit integer -> logical conversion
 ************************************************************************
       subroutine writeDampingData(dampingfile)
 
-C     Subroutine: writeDampingData
-
 C     Inputs: dampingfile --- filename where damping data is stored
 C     (should be something like '[filepref]_damping')
 
@@ -138,8 +130,6 @@ C     local variables
 ************************************************************************
       subroutine writeDampingDataSub(iunit,damp)
 
-C     Subroutine: readDampingData
-
 C     Inputs: iunit --- integer file specifier
              
 C     In/out: damp --- structure containing damping data
@@ -166,8 +156,6 @@ C     use explicit logical -> integer conversion
       end subroutine
 ************************************************************************
       subroutine getDampingForcesAll(damp)
-
-C     Subroutine: getDampingForcesAll
 
 C     Inputs: damp --- structure containing damping information (group name, gamma, etc.)
 
@@ -204,8 +192,6 @@ C         only do operation for atoms in group
       end subroutine getDampingForcesAll
 ************************************************************************     
       function getDampingForce(posn,vel,gamma) result(force)
-      
-C     Function: getDampingForce
 
 C     Inputs: posn --- vector, 2 by 1 [x, y]
 C             vel --- vector, 2 by 1 [vx,vy]

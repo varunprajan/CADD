@@ -44,8 +44,6 @@ C     can add more computes here as needed; need to add corresponding line to re
       contains
 ************************************************************************
       subroutine initComputeData(computefile)
-      
-C     Subroutine: initComputeData
 
 C     Inputs: computefile --- filename where compute data is stored
 C     (should be something like '[filepref]_compute')
@@ -66,8 +64,6 @@ C     input variables
       end subroutine initComputeData
 ************************************************************************
       subroutine readComputeData(computefile)
-      
-C     Subroutine: readComputeData
 
 C     Inputs: dislfile --- filename where dislocation data is stored
 C     (should be something like '[filepref]_disl')
@@ -94,8 +90,6 @@ C     add additional line for each additional compute
       end subroutine readComputeData
 ************************************************************************
       subroutine readComputeDataSub(iunit,comp)
-      
-C     Subroutine: readComputeDataSub
 
 C     Inputs: iunit --- integer file specifier
 C             comp --- structure (type cdata) containing data for individual compute
@@ -120,8 +114,6 @@ C     local variables
 ************************************************************************
       subroutine processComputeData()
 
-C     Subroutine: processComputeData
-
 C     Inputs: None
 
 C     Outputs: None
@@ -134,8 +126,6 @@ C     add additional line for each additional compute
       end subroutine processComputeData
 ************************************************************************
       subroutine writeComputeData(computefile)
-      
-C     Subroutine: writeComputeData
 
 C     Inputs: computefile --- filename where compute data is stored
 C     (should be something like '[filepref]_compute')
@@ -163,8 +153,6 @@ C     add additional line for each additional compute
       end subroutine writeComputeData
 ************************************************************************
       subroutine writeComputeDataSub(iunit,comp)
-      
-C     Subroutine: writeComputeDataSub
 
 C     Inputs: iunit --- integer file specifier
 C             comp --- structure (type cdata) containing data for individual compute
@@ -188,8 +176,6 @@ C     local variables
       end subroutine writeComputeDataSub
 ************************************************************************
       subroutine getCentroAtoms()
-      
-C     Subroutine: getCentroAtoms
 
 C     Inputs: None
 
@@ -221,8 +207,6 @@ C     loop over neighborlist
       end subroutine getCentroAtoms
 ************************************************************************
       function getCentroAtom(i,n) result(centro)
-      
-C     Function: getCentroAtom
 
 C     Inputs: i --- index of atom in nodes%atomlist
 C             n --- number of nearest neighbors to use in calculation
@@ -232,6 +216,8 @@ C     Outputs: centro --- centrosymmetry of atom
 C     Purpose: Compute centrosymmetry for an individual atom, using
 C     n nearest neighbors. Uses algorithm described in LAMMPS manual.
 C     (http://lammps.sandia.gov/doc/compute_centro_atom.html)
+
+      implicit none
 
 C     input variables
       integer :: i

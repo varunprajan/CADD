@@ -53,9 +53,12 @@ C     everything should be self-consistent, and no dislocations should be "lost"
       implicit none
       
       private
-      public :: findInAllWithGuess, findInAllSub, findInAllInitially,
-     &   getLocalCoords, getElGuessBrute, findInOneMat, findInOneMatSub,
-     &   findinOneMatSubAlt, getNodeGuessBrute, findInOneMatInitially
+      public :: findInAllWithGuess, findInAllSub,
+     &   getLocalCoords, getElGuessBrute, findInOneMat,
+     &   findinOneMatSub, getNodeGuessBrute, findInOneMatInitially,
+     &   findInAllWithGuessDef, findInAllWithGuessUndef,
+     &   findInAllInitiallyDef, findInAllInitiallyUndef,
+     &   findInOneMatInitiallyDef
 
 C     module variables (private)
 C     HARD-CODED CONSTANTS
@@ -65,12 +68,71 @@ C     HARD-CODED CONSTANTS
       
       contains
 ************************************************************************
-      subroutine findInAllWithGuess(xp,yp,mnumfeguess,elguess,
-     &                               r,s,badflip)
-      
-C     Subroutine: findInAllWithGuess
+      subroutine findInAllWithGuessUndef(xp,yp,
+     &                                  mnumfeguess,elguess,r,s,badflip)
 
 C     Inputs: xp, yp --- coordinates of point to search
+
+C     In/Out: mnumfeguess --- material to search in/material point was found in
+C             elguess --- guess for starting element/element point was found in
+
+C     Outputs: r, s --- local (element-level) coordinates of point
+C              badflip --- flag indicating whether search was unsuccessful
+
+C     Purpose: findInAllWithGuess, using *undeformed* coordinates
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: xp, yp
+      
+C     in/out variables
+      integer :: mnumfeguess, elguess
+      
+C     output variables
+      real(dp) :: r, s
+      logical :: badflip
+      
+      call findInAllWithGuess(.true.,xp,yp,
+     &                        mnumfeguess,elguess,r,s,badflip)
+      
+      end subroutine findInAllWithGuessUndef
+************************************************************************
+      subroutine findInAllWithGuessDef(xp,yp,
+     &                                  mnumfeguess,elguess,r,s,badflip)
+
+C     Inputs: xp, yp --- coordinates of point to search
+
+C     In/Out: mnumfeguess --- material to search in/material point was found in
+C             elguess --- guess for starting element/element point was found in
+
+C     Outputs: r, s --- local (element-level) coordinates of point
+C              badflip --- flag indicating whether search was unsuccessful
+
+C     Purpose: findInAllWithGuess, using *deformed* coordinates
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: xp, yp
+      
+C     in/out variables
+      integer :: mnumfeguess, elguess
+      
+C     output variables
+      real(dp) :: r, s
+      logical :: badflip
+      
+      call findInAllWithGuess(.false.,xp,yp,
+     &                        mnumfeguess,elguess,r,s,badflip)
+      
+      end subroutine findInAllWithGuessDef
+************************************************************************       
+      subroutine findInAllWithGuess(undeformed,xp,yp,
+     &                              mnumfeguess,elguess,r,s,badflip)
+
+C     Inputs: undeformed --- flag indicating whether undeformed coordinates should be used
+C             xp, yp --- coordinates of point to search
 
 C     In/Out: mnumfeguess --- material to search in/material point was found in
 C             elguess --- guess for starting element/element point was found in
@@ -86,6 +148,7 @@ C              force search if point has left material mnumfeguess.
       implicit none
       
 C     input variables
+      logical :: undeformed
       real(dp) :: xp, yp
       
 C     in/out variables
@@ -95,18 +158,18 @@ C     output variables
       real(dp) :: r, s
       logical :: badflip
       
-      call findInOneMat(mnumfeguess,elguess,xp,yp,r,s,badflip)
+      call findInOneMat(mnumfeguess,undeformed,
+     &                  elguess,xp,yp,r,s,badflip)
 C     if search was unsuccessful
       if (badflip) then
-          call findInAllSub([mnumfeguess],xp,yp,mnumfeguess,elguess,
-     &                                    r,s,badflip)
+          call findInAllSub([mnumfeguess],undeformed,
+     &                      xp,yp,mnumfeguess,elguess,r,s,badflip)
       end if
       
       end subroutine findInAllWithGuess
 ************************************************************************
-      subroutine findInAllInitially(xp,yp,mnumfe,element,r,s,badflip)
-
-C     Subroutine: findInAllInitially
+      subroutine findInAllInitiallyUndef(
+     &                                 xp,yp,mnumfe,element,r,s,badflip)
 
 C     Inputs: xp, yp --- coordinates of point to search
 
@@ -117,7 +180,7 @@ C              badflip --- flag indicating whether search was unsuccessful
 
 C     Purpose: Used for initialization, where no information is available about where
 C              a point might be. Search over FE mesh using brute force search. Return
-C              error if point is not found.
+C              error if point is not found. Uses *undeformed* coordinates.
       
       implicit none
       
@@ -129,16 +192,42 @@ C     output variables
       logical :: badflip
       integer :: mnumfe, element
       
-      call findInAllSub([0],xp,yp,mnumfe,element,r,s,badflip)   
+      call findInAllSub([0],.true.,xp,yp,mnumfe,element,r,s,badflip)   
       
-      end subroutine findInAllInitially
+      end subroutine findInAllInitiallyUndef
 ************************************************************************
-      subroutine findInAllSub(alreadysearched,xp,yp,mnumfe,element,
-     &                                        r,s,badflip)
+      subroutine findInAllInitiallyDef(xp,yp,mnumfe,element,r,s,badflip)
 
-C     Subroutine: findInAllSub
+C     Inputs: xp, yp --- coordinates of point to search
+
+C     Outputs: mnumfe --- material that point was found in
+C              element --- element that point was found in
+C              r, s --- local (element-level) coordinates of point
+C              badflip --- flag indicating whether search was unsuccessful
+
+C     Purpose: Used for initialization, where no information is available about where
+C              a point might be. Search over FE mesh using brute force search. Return
+C              error if point is not found. Uses *deformed* coordinates
+      
+      implicit none
+      
+C     input variables
+      real(dp) :: xp, yp
+      
+C     output variables
+      real(dp) :: r, s
+      logical :: badflip
+      integer :: mnumfe, element
+      
+      call findInAllSub([0],.false.,xp,yp,mnumfe,element,r,s,badflip)   
+      
+      end subroutine findInAllInitiallyDef
+************************************************************************
+      subroutine findInAllSub(alreadysearched,undeformed,
+     &                        xp,yp,mnumfe,element,r,s,badflip)
 
 C     Inputs: alreadysearched --- list of materials *not* to search in
+C             undeformed --- flag indicating whether undeformed coordinates should be used
 C             xp, yp --- coordinates of point to search
 
 C     Outputs: mnumfe --- material that point was found in
@@ -154,6 +243,7 @@ C     and then tries to find point using findInOneMat
       
 C     input variables
       integer :: alreadysearched(:)
+      logical :: undeformed
       real(dp) :: xp, yp
       
 C     output variables
@@ -174,7 +264,8 @@ C     loop over all materials, except the ones that have been searched already
               end if
           end do    
           if (search) then
-              call findInOneMatInitially(i,xp,yp,element,r,s,badflip)
+              call findInOneMatInitially(i,undeformed,
+     &                                   xp,yp,element,r,s,badflip)
               if (.not.badflip) then
                   mnumfe = i
                   return
@@ -184,9 +275,8 @@ C     loop over all materials, except the ones that have been searched already
       
       end subroutine findInAllSub
 ************************************************************************
-      subroutine findInOneMatInitially(mnumfe,xp,yp,element,r,s,badflip)
-
-C     Subroutine: findInOneMatInitially
+      subroutine findInOneMatInitiallyDef(mnumfe,
+     &                                 xp,yp,element,r,s,badflip)
 
 C     Inputs: mnumfe --- material to search in
 C             xp, yp --- coordinates of point to search
@@ -210,18 +300,50 @@ C     output variables
       real(dp) :: r, s
       logical :: badflip
       
+      call findInOneMatInitially(mnumfe,.false.,
+     &                           xp,yp,element,r,s,badflip)
+     
+      end subroutine findInOneMatInitiallyDef
+************************************************************************
+      subroutine findInOneMatInitially(mnumfe,undeformed,
+     &                                 xp,yp,element,r,s,badflip)
+
+C     Inputs: mnumfe --- material to search in
+C             undeformed --- flag indicating whether undeformed coordinates should be used
+C             xp, yp --- coordinates of point to search
+
+C     Outputs: element --- element that point was found in
+C              r, s --- local (element-level) coordinates of point
+C              badflip --- flag indicating that search was unsuccessful
+
+C     Purpose: Helper routine for findInAllInitially and findInAllWithGuess.
+C     Generates guess for element using brute force,
+C     and then tries to find point using findInOneMat.
+      
+      implicit none
+      
+C     input variables
+      integer :: mnumfe
+      logical :: undeformed
+      real(dp) :: xp, yp
+      
+C     output variables
+      integer :: element
+      real(dp) :: r, s
+      logical :: badflip
+      
 C     get a (very good) guess
-      element = getElGuessBrute(mnumfe,xp,yp)
+      element = getElGuessBrute(mnumfe,undeformed,xp,yp)
 C     search in material
-      call findInOneMat(mnumfe,element,xp,yp,r,s,badflip)
+      call findInOneMat(mnumfe,undeformed,element,xp,yp,r,s,badflip)
      
       end subroutine findInOneMatInitially
 ************************************************************************
-      subroutine findInOneMat(mnumfe,elguess,xp,yp,r,s,badflip)
-
-C     Subroutine: findInOneMat
+      subroutine findInOneMat(mnumfe,undeformed,
+     &                        elguess,xp,yp,r,s,badflip)
 
 C     Inputs: mnumfe --- material to search in
+C             undeformed --- flag indicating whether undeformed coordinates should be used         
 C             xp, yp --- coordinates of point to search
 
 C     In/out: elguess --- (in) guess for starting element; (out) element that point was found in 
@@ -230,12 +352,13 @@ C     Outputs: r, s --- local (element-level) coordinates of point
 C              badflip --- flag indicating that search was unsuccessful
 
 C     Purpose: Tries to find point in mesh using elguess as the starting element.
-C     Calls either findInOneMatSub or findInOneMatSubAlt (jump-and-walk algorithms)
+C     Calls jump-and-walk algorithm.
 
       implicit none
       
 C     input variables
       integer:: mnumfe
+      logical :: undeformed    
       integer :: elguess
       real(dp) :: xp, yp
       
@@ -247,110 +370,17 @@ C     local variables
       integer:: eltypenum
       
       eltypenum = feelements(mnumfe)%eltypenum      
-      call findInOneMatSub(mnumfe,eltypenum,elguess,
-     &                        xp,yp,r,s,badflip)
+      call findInOneMatSub(mnumfe,eltypenum,undeformed,
+     &                     elguess,xp,yp,r,s,badflip)
       
       end subroutine findInOneMat
-************************************************************************      
-      subroutine findInOneMatSub(mnumfe,eltypenum,
-     &                           elguess,xp,yp,r,s,badflip)
-
-C     Subroutine: findInOneMatSub
-
-C     Inputs: mnumfe --- material to search in
-C             eltypenum --- number of element type in fe element library
-C             xp, yp --- coordinates of point to search
-
-C     In/out: elguess --- (in) guess for starting element; (out) element that point was found in
-
-C     Outputs: r, s --- local (element-level) coordinates of point
-C              badflip --- flag indicating whether search was unsuccessful
-
-C     Purpose: Search over FE mesh for one material (mnumfe) to
-C              determine if point is located in the mesh of that material.
-C              If so, return element in which it is located and the
-C              local coordinates of point in the element. If not, 
-C              set badflip = .true. (flag indicating failure)
-
-C     Algorithm: Based on the algorithm described in Allievi and Bermejo, JCP, 1997
-C     Similar to a jump and walk algorithm:
-C       1) start with an element,
-C       2) determine approximate local coordinates of point w.r.t. element
-C       3) if points lie within bounds, then iterate to find correct local coordinates
-C       4) if not, flip to adjacent element (from neighbor list), depending on local coordinates
-      
-C     Notes: Supplying a good guess is very important, especially
-C            for non-convex domains (where getting stuck is a possibility)
-
-C     IMPORTANT NOTE: This algorithm appears to be flawed for points lying on element
-C                     vertices...not sure how to fix. See bad result in findInOneMatSub_test.txt
-      
-      implicit none
-      
-C     input variables
-      integer :: mnumfe
-      integer :: eltypenum
-      real(dp) :: xp, yp
-
-C     output variables
-      real(dp) :: r, s
-      logical :: badflip
-      
-C     in/out variables
-      integer :: elguess
-      
-C     local variables
-      integer :: counter, i
-      real(dp) :: posn(felib(eltypenum)%nelnodes,2)
-      integer :: node
-      logical :: proceed, check
-      integer :: eltry
-
-      do counter = 1, COUNTERMAX
-          do i = 1, felib(eltypenum)%nelnodes
-              node = feelements(mnumfe)%connect(i,elguess)
-              posn(i,:) = nodes%posn(1:2,node) - nodes%posn(4:5,node) ! deformed positions
-          end do
-          r = 0.0_dp
-          s = 0.0_dp
-          call felib(eltypenum)%findinElement_ptr(posn,xp,yp,r,s)
-          proceed = .true.
-          badflip = .false.
-          do i = 1, felib(eltypenum)%nedges
-              if (proceed) then
-                  check = felib(eltypenum)%checkElement_ptr(i,r,s)
-                  if (.not.check) then ! try to flip to adjacent element
-                      eltry = feelements(mnumfe)%neighbors(i,elguess)
-                      proceed = (eltry == 0) ! if element doesn't exist, proceed
-                      if (proceed) then
-                          badflip = .true.
-                      else
-                          elguess = eltry
-                      end if
-                  end if
-              end if
-          end do
-          if (proceed) then ! we're either inside the element or a bad flip happened
-              if (.not.badflip) then ! inside the element
-                  call getLocalCoords(posn,eltypenum,xp,yp,r,s)
-              end if
-              return
-          end if
-      end do
-      
-C     if we've gotten to this point, search was unsuccessful
-      write(*,*) 'WARNING: Search in findInOneMatSub took way too long'
-      badflip = .true.
-      
-      end subroutine findInOneMatSub
 ************************************************************************
-      subroutine findInOneMatSubAlt(mnumfe,eltypenum,
+      subroutine findInOneMatSub(mnumfe,eltypenum,undeformed,
      &                              elguess,xp,yp,r,s,badflip)
 
-C     Subroutine: findInOneMatSubAlt
-
 C     Inputs: mnumfe --- material to search in
 C             eltypenum --- number of element type in fe element library
+C             undeformed --- flag indicating whether undeformed coordinates should be used
 C             xp, yp --- coordinates of point to search
 
 C     In/out: elguess --- (in) guess for starting element; (out) element that point was found in
@@ -383,6 +413,7 @@ C            initially using a brute force search (mod_mesh_find_brute).
 C     input variables
       integer :: mnumfe
       integer :: eltypenum
+      logical :: undeformed
       real(dp) :: xp, yp
 
 C     output variables
@@ -407,7 +438,10 @@ C     local variables
       do counter = 1, COUNTERMAX
           do i = 1, nelnodes
               node = feelements(mnumfe)%connect(i,elguess)
-              posn(:,i) = nodes%posn(1:2,node) ! deformed positions
+              posn(:,i) = nodes%posn(1:2,node)
+              if (undeformed) then
+                  posn(:,i) = posn(:,i) - nodes%posn(4:5,node)
+              end if    
           end do
           proceed = .true.
           badflip = .false.
@@ -441,15 +475,13 @@ C     local variables
       end do
       
 C     if we've gotten to this point, search was unsuccessful
-      write(*,*) 'WARNING: Search in findInOneMatSubAlt
+      write(*,*) 'WARNING: Search in findInOneMatSub
      &            took way too long'
       badflip = .true. 
       
-      end subroutine findInOneMatSubAlt
+      end subroutine findInOneMatSub
 ************************************************************************
       subroutine getLocalCoords(posn,eltypenum,xp,yp,r,s)
-
-C     Subroutine: getLocalCoords
 
 C     Inputs: posn --- array, nelnodes by 2, of nodal positions (each row
 C                      is a coordinate pair)
@@ -490,11 +522,10 @@ C     local variables
       
       end subroutine getLocalCoords
 ************************************************************************
-      function getElGuessBrute(mnumfe,xp,yp) result(elguess)
-      
-C     Subroutine: getElGuessBrute
+      function getElGuessBrute(mnumfe,undeformed,xp,yp) result(elguess)
 
 C     Inputs: xp, yp --- coordinates of point to search
+C             undeformed --- flag indicating whether undeformed coordinates should be used
 C             mnumfe --- continuum material to search in
 
 C     Outputs: elguess --- element that is reasonably close to point
@@ -508,6 +539,7 @@ C              point finding schemes)
       
 C     input variables
       integer :: mnumfe
+      logical :: undeformed    
       real(dp) :: xp, yp
       
 C     output variables
@@ -517,7 +549,7 @@ C     local variables
       integer :: j, k
       integer :: closestnode
 
-      closestnode = getNodeGuessBrute(mnumfe,xp,yp)
+      closestnode = getNodeGuessBrute(mnumfe,undeformed,xp,yp)
       do j = 1, size(feelements(mnumfe)%connect,2)
           do k = 1, size(feelements(mnumfe)%connect,1)
               if (feelements(mnumfe)%connect(k,j) == closestnode) then
@@ -529,12 +561,12 @@ C     local variables
       
       end function getElGuessBrute
 ************************************************************************
-      function getNodeGuessBrute(mnumfe,xp,yp) result(closestnode)
+      function getNodeGuessBrute(mnumfe,undeformed,xp,yp)
+     &                                              result(closestnode)
 
-C     Subroutine: getNodeGuessBrute
-
-C     Inputs: xp, yp --- coordinates of point to search
-C             mnumfe --- continuum material to search in
+C     Inputs: mnumfe --- continuum material to search in
+C             undeformed --- flag indicating whether undeformed coordinates should be used
+C             xp, yp --- coordinates of point to search 
 
 C     Outputs: closestnode --- number of node closest to point of interest
 
@@ -544,8 +576,9 @@ C     (in the deformed configuration)
       implicit none
 
 C     input variables
-      real(dp) :: xp, yp
       integer :: mnumfe
+      logical :: undeformed  
+      real(dp) :: xp, yp  
       
 C     output variables
       integer :: closestnode
@@ -561,6 +594,9 @@ C     local variables
       do j = 1, size(feelements(mnumfe)%nodelist)
           node = feelements(mnumfe)%nodelist(j)
           posn = nodes%posn(1:2,node) ! deformed positions
+          if (undeformed) then
+              posn = posn - nodes%posn(4:5,node)
+          end if    
           distsqtry = sum((posn-pt)**2)
           if (distsqtry < distsq) then
               distsq = distsqtry

@@ -58,8 +58,6 @@ C     module variables (private)
 ************************************************************************ 
       subroutine initFEElementData(feelementfile)
 
-C     Subroutine: initFEElementData
-
 C     Inputs: feelementfile --- filename where finite element data is stored
 C     (should be something like '[filepref]_feelements')
 
@@ -84,8 +82,6 @@ C     input variables
       end subroutine initFEElementData
 ************************************************************************
       subroutine readFEElementData(feelementfile)
-
-C     Subroutine: readFEElementData
 
 C     Inputs: feelementfile --- filename where feelement data is stored
 C     (should be something like '[filepref]_feelements')
@@ -120,8 +116,6 @@ C     local variables
 ************************************************************************
       subroutine processFEElementData()
 
-C     Subroutine: processFEElementData
-
 C     Inputs: None
 
 C     Outputs: None
@@ -144,8 +138,6 @@ C     local variables
       end subroutine processFEElementData
 ************************************************************************
       subroutine processEdges()
-
-C     Subroutine: processEdges
 
 C     Inputs: None
 
@@ -260,8 +252,6 @@ C         loop through bdedges, populate boundary array
 ************************************************************************
       subroutine processInterfaceEdges()
 
-C     Subroutine: processInterfaceEdges
-
 C     Inputs: None
 
 C     Outputs: None
@@ -312,8 +302,6 @@ C     loop over bdedges
 ************************************************************************
       subroutine processNodeLists()
 
-C     Subroutine: processNodeLists
-
 C     Inputs: None
 
 C     Outputs: None
@@ -345,8 +333,6 @@ C     numbering with nodes%fenodes
 ************************************************************************
       subroutine processMaterialList()
 
-C     Subroutine: processMaterialList
-
 C     Inputs: None
 
 C     Outputs: None
@@ -354,6 +340,8 @@ C     Outputs: None
 C     Purpose: Generate forwards and backwards lists, relating the
 C     numbering of the fematerials to that of the overall materials
 C     (in the materials struct)
+      
+      implicit none
       
 C     local variables
       integer :: i, mnum
@@ -370,8 +358,6 @@ C     local variables
       end subroutine processMaterialList
 ************************************************************************
       subroutine writeFEElementData(feelementfile)
-
-C     Subroutine: writeFEElementData
 
 C     Inputs: feelementfile --- filename where finite element data is stored
 C     (should be something like '[filepref]_feelements')

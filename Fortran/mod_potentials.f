@@ -37,8 +37,6 @@ C     module variables (global)
 ************************************************************************
       subroutine initPotentialData(potentialfile)
 
-C     Subroutine: initPotentialData
-
 C     Inputs: potentialfile - filename where potential data is stored
 C     (should be something like '[filepref]_potentials')
 
@@ -60,8 +58,6 @@ C     input variables
       end subroutine initPotentialData      
 ************************************************************************      
       subroutine readPotentialData(potentialfile)
-      
-C     Subroutine: readPotentialData
 
 C     Inputs: potentialfile - filename where potential data is stored
 C     (should be something like '[filepref]_potentials')
@@ -93,8 +89,6 @@ C     local variables
       end subroutine readPotentialData
 ************************************************************************
       subroutine processPotentialData()
-      
-C     Subroutine: processPotentialData
 
 C     Inputs: None
 
@@ -114,8 +108,6 @@ C     local variables
       end subroutine processPotentialData
 ************************************************************************      
       subroutine writePotentialData(potentialfile)
-      
-C     Subroutine: writePotentialData
 
 C     Inputs: potentialfile --- filename where potential data is stored
 C     (should be something like '[filepref]_potentials')

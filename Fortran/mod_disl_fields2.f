@@ -48,8 +48,6 @@ C     those in material i for a point (x,y) in material i.
       contains
 ************************************************************************
       function getTildeDispAtPointAll(posn,mnumfe) result(disp)
-      
-C     Function: getTildeDispAtPointAll
 
 C     Inputs: posn --- position at which tilde displacement field is sought
 C                      (vector, length 2)
@@ -79,8 +77,6 @@ C     output variables
       end function getTildeDispAtPointAll
 ************************************************************************
       function getTildeStressAtPointAll(posn,mnumfe) result(stress)
-      
-C     Function: getTildeStressAtPointAll
 
 C     Inputs: posn --- position at which tilde displacement field is sought
 C                      (vector, length 2)
@@ -109,8 +105,6 @@ C     output variables
       end function getTildeStressAtPointAll
 ************************************************************************
       function getPKTildeStressAll(dislnum,mnumfe) result(stress)
-      
-C     Function: getPKTildeStressAll
 
 C     Inputs: dislnum --- number of dislocation for which Peach-Koehler stress is sought
 C             mnumfe --- fe material in which point lies
@@ -145,8 +139,6 @@ C     (no contributions from ghost or escaped dislocations, since they're not re
 ************************************************************************
       function getTildeStressOnSourceAll(sourcenum,mnumfe)
      &                                                   result(stress)
-      
-C     Function: getTildeStressOnSourceAll
 
 C     Inputs: sourcenum --- number of source for which stress is sought
 C             mnumfe --- fe material in which point lies
@@ -181,14 +173,14 @@ C     local variables
 ************************************************************************
       function getRealDispAtPointAll(posn,mnumfe) result(disp)
 
-C     Function: getRealDispAtPointAll
-
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             mnumfe --- fe material in which point lies 
 
 C     Outputs: disp --- displacement at point (vector, 2 by 1)
 
 C     Purpose: Get displacement at point from *all* real dislocations in material
+      
+      implicit none
       
 C     input variables
       real(dp) :: posn(2)
@@ -226,8 +218,6 @@ C     an actual dislocation
       end function getRealDispAtPointAll
 ************************************************************************
       function getRealStressAtPointAll(posn,mnumfe) result(stress)
-      
-C     Function: getRealStressAtPointAll
 
 C     Inputs: posn - 2 by 1 vector of position of point at which stress is sought
 C             mnumfe --- fe material in which point lies 
@@ -235,6 +225,8 @@ C             mnumfe --- fe material in which point lies
 C     Outputs: stress --- stress at point (vector, 3 by 1)
  
 C     Purpose: Get stress at point from *all* real dislocations in material
+      
+      implicit none
       
 C     input variables
       real(dp) :: posn(2)
@@ -271,8 +263,6 @@ C     an actual dislocation
       end function getRealStressAtPointAll
 ************************************************************************
       function getRealPKStressAll(dislnum,mnumfe) result(stress)
-      
-C     Function: getRealPKStressAll
 
 C     Inputs: dislnum --- number of dislocation within fe material
 C             mnumfe --- fe material in which point lies 
@@ -280,6 +270,8 @@ C             mnumfe --- fe material in which point lies
 C     Outputs: stress --- stress at point (vector, 3 by 1)
 
 C     Purpose: Get PK stress at point from *all* real dislocations in material
+      
+      implicit none
       
 C     input variables
       integer :: dislnum
@@ -321,14 +313,14 @@ C         no self force
 ************************************************************************
       function getGhostDispAtPointAll(posn,mnumfe) result(disp)
 
-C     Function: getGhostDispAtPointAll
-
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             mnumfe --- fe material in which point lies 
 
 C     Outputs: disp --- displacement at point (vector, 2 by 1)
 
 C     Purpose: Get displacement at point from *all* ghost dislocations associated with material
+      
+      implicit none
       
 C     input variables
       real(dp) :: posn(2)
@@ -363,8 +355,6 @@ C     local variables
       end function getGhostDispAtPointAll
 ************************************************************************
       function getGhostStressAtPointAll(posn,mnumfe) result(stress)
-      
-C     Function: getGhostStressAtPointAll
 
 C     Inputs: posn - 2 by 1 vector of position of point at which stress is sought
 C             mnumfe --- fe material in which point lies 
@@ -407,8 +397,6 @@ C     local variables
       end function getGhostStressAtPointAll
 ************************************************************************
       function getLatentDispAtPointAll(posn,mnumfe) result(disp)
-      
-C     Function: getLatentDispAtPointAll
 
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             mnumfe --- fe material in which point lies 
@@ -466,8 +454,6 @@ C     local variables
       end function getLatentDispAtPointAll
 ************************************************************************
       function getLatentStressAtPointAll(posn,mnumfe) result(stress)
-      
-C     Function: getLatentStressAtPointAll
 
 C     Inputs: posn - 2 by 1 vector of position of point at which stress is sought
 C             mnumfe --- fe material in which point lies 
@@ -524,8 +510,6 @@ C     local variables
 ************************************************************************
       function getLatentStressOnSourceAll(sourcenum,mnumfe)
      &                                                   result(stress)
-      
-C     Function: getLatentStressOnSourceAll
 
 C     Inputs: sourcenum --- number of source
 C             mnumfe --- fe material in which point lies 
@@ -534,6 +518,8 @@ C     Outputs: stress --- stress at point (vector, 3 by 1)
 
 C     Purpose: Get stress on source at point from *all* latent dislocations in materials (from sources)
 C     *except* latent dislocations from source itself (basically, no "self" stress)
+      
+      implicit none
       
 C     input variables
       integer :: sourcenum
@@ -586,8 +572,6 @@ C     local variables
 ************************************************************************
       function getDispAtPoint(posn,dislpos,cost,sint,bsgn,bcut,
      &                       mnum,bfudge) result(disp)
-
-C     Function: getDispAtPoint
 
 C     Inputs: posn - 2 by 1 vector of position of point at which displacement is sought
 C             dislpos - 2 by 1 vector of position of dislocation
@@ -653,8 +637,6 @@ C     rotate displacements back (by negative theta)
       function getStressAtPoint(posn,dislpos,cost,sint,bsgn,mnum,bfudge)
      &                             result(stress)
 
-C     Function: getStressAtPoint
-
 C     Inputs: posn - 2 by 1 vector of position of point at which stress is sought
 C             dislpos - 2 by 1 vector of position of dislocation
 C             cost, sint - trig for angle of dislocation
@@ -712,8 +694,6 @@ C     rotate stresses back (by negative theta)
       end function getStressAtPoint
 ************************************************************************
       subroutine adjustDxnDyn(dxn,dyn,rcoresq)
-     
-C     Subroutine: adjustDxnDyn
 
 C     Inputs: dxn, dyn - relative coordinates of point w.r.t. dislocation,
 C                        in the dislocation coordinate system
@@ -759,8 +739,6 @@ C
       end subroutine adjustDxnDyn
 ************************************************************************
       subroutine getDispAtPointSub(dxn,dyn,bsgn,mnum,bfudge,uxn,uyn)
-
-C     Subroutine: getDispAtPointSub
 
 C     Inputs: dxn, dyn - (adjusted) relative coordinates of point w.r.t.
 C                         dislocation, in the dislocation coordinate system
@@ -830,8 +808,6 @@ C     CADD code and the old DD code.
 ************************************************************************
       subroutine getStressAtPointSub(dxn,dyn,bsgn,mnum,bfudge,
      &                               sig11n,sig22n,taun)
-
-C     Subroutine: getStressAtPointSub
 
 C     Inputs: dxn, dyn - (adjusted) relative coordinates of point w.r.t.
 C                         dislocation, in the dislocation coordinate system

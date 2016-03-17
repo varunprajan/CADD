@@ -17,8 +17,6 @@ C     of additional potential styles in modules (like mod_poten_pair_table).
 ************************************************************************
       subroutine initPotentialStyle()
  
-C     Subroutine: initPotentialStyle
- 
 C     Inputs: None
  
 C     Outputs: None

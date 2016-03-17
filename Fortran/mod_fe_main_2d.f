@@ -53,8 +53,6 @@ C     module variables (local)
 ************************************************************************ 
       subroutine solveAll()
 
-C     Subroutine: solveAll
-
 C     Inputs: None
 
 C     Outputs: None
@@ -78,8 +76,6 @@ C     local variables
       end subroutine solveAll
 ************************************************************************
       subroutine initAssembly()
-
-C     Subroutine: initAssembly
 
 C     Inputs: None
 
@@ -111,8 +107,6 @@ C     local variables
 ************************************************************************
       subroutine assembleAndFactorAll()
 
-C     Subroutine: assembleAndFactorAll
-
 C     Inputs: None
 
 C     Outputs: None
@@ -139,8 +133,6 @@ C     local variables
 ************************************************************************
       subroutine updateFENodalPosnAll()
 
-C     Subroutine: updateFENodalPosnAll
-
 C     Inputs: None
 
 C     Outputs: None
@@ -162,8 +154,6 @@ C     local variables
       end subroutine updateFENodalPosnAll
 ************************************************************************  
       subroutine solveOneMat(mnumfe)
-
-C     Subroutine: solveOneMat
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 
@@ -213,8 +203,6 @@ C     local variables
       end subroutine solveOneMat
 ************************************************************************
       subroutine factorOneMat(mnumfe)
-
-C     Subroutine: factorOneMat
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 
@@ -269,8 +257,6 @@ C     local variables
 ************************************************************************
       subroutine countEqns(mnumfe,neqnsnormal,nentriesnormal,
      &                            neqnstot,nentriestot)
-
-C     Subroutine: countEqns
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 
@@ -340,8 +326,6 @@ C         interface atom or disp. fixed
 ************************************************************************      
       subroutine assembleKNormal(mnumfe,eltypenum,C)
 
-C     Subroutine: assembleKNormal
-
 C     Inputs: mnumfe --- number of continuum (FE) material
 C             eltypenum --- number of element type in fe element library
 C             C --- stiffness matrix of material
@@ -394,8 +378,6 @@ C             just upper triangle
 ************************************************************************
       subroutine assembleLagrange(mnumfe)
 
-C     Subroutine: assembleLagrange
-
 C     Inputs: mnumfe --- number of continuum (FE) material
 
 C     Outputs: None
@@ -444,8 +426,6 @@ C         interface atom or disp. fixed
       end subroutine assembleLagrange
 ************************************************************************    
       subroutine getDislForceRHS(mnumfe,eltypenum)
-      
-C     Subroutine: getDislForceSub
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 C             eltypenum --- number of element type in fe element library
@@ -523,8 +503,6 @@ C                 y-direction is unconstrained
       subroutine getDislForceSub(mnumfe,nedgenodes,nedgeip,
      &                           sedgegauss,wedgegauss,posn,fx,fy)
 
-C     Subroutine: getDislForceSub
-
 C     Inputs: mnumfe --- number of continuum (FE) material
 C             nedgenodes --- number of FE nodes per edge
 C             nedgeip --- number of integration poitns per edge
@@ -583,8 +561,6 @@ C     local variables
 ************************************************************************      
       subroutine getDispRHS(mnumfe)
 
-C     Subroutine: getDispRHS
-
 C     Inputs: mnumfe --- number of continuum (FE) material
 
 C     Outputs: None
@@ -638,8 +614,6 @@ C             hat field
       function getTotalDispAtPoint(posn,mnumfe,eltypenum,element,r,s)
      &                                                      result(disp)
 
-C     Function: getTotalDispAtPoint
-
 C     Inputs: posn --- (undeformed) coordinates of point (vector of length 2)
 C             mnumfe --- number of continuum (FE) material
 C             eltypenum --- number of element type in fe element library              
@@ -670,8 +644,6 @@ C     output variables
 ************************************************************************
       function getFEDispAtPoint(mnumfe,eltypenum,element,r,s)
      &                                                      result(disp)
-
-C     Function: getFEDispAtPoint
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 C             eltypenum --- number of element type in fe element library              
@@ -715,8 +687,6 @@ C     local variables
 ************************************************************************
       function getFEStressAtPoint(mnumfe,element,r,s) result(stress)
 
-C     Function: getFEStressAtPoint
-
 C     Inputs: mnumfe --- number of continuum (FE) material 
 C             element --- number of FE element
 C             r, s --- local coordinates of point of interest w.r.t. element
@@ -751,8 +721,6 @@ C     local variables
 ************************************************************************
       function getFEStrainAtPoint(mnumfe,eltypenum,element,r,s)
      &                                                   result(strain)
-
-C     Function: getFEStrainAtPoint
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 C             eltypenum --- number of element type in fe element library 
@@ -797,8 +765,6 @@ C     local variables
       end function getFEStrainAtPoint
 ************************************************************************
       subroutine updateFENodalPosn(mnumfe)
-
-C     Subroutine: updateFENodalPosn
 
 C     Inputs: mnumfe --- number of continuum (FE) material
 

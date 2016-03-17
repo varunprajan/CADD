@@ -1,14 +1,15 @@
 Things to do:
 
 Algorithmic issues:
-    Mesh find
-        Fix findInOneMatSub
-    Dislocation passing
-        Problem with assigning "crack region" to dislocation originating from atomistic region
-            More general problem with accounting for fields from escaped dislocation if only one has escaped (Add note!)
-        Dipole displacements of atoms may be too large if atom is close to dislocation center 
     Moving mesh
         Devise algorithm, implement
+        May need to implement crack finding algorithm
+    Dislocation passing
+        Problem with assigning "crack region" to dislocation originating from atomistic region
+        Dipole displacements of atoms may be too large if atom is close to dislocation center 
+    Mesh find
+        Fix findInOneMatSub
+
     
 Notes:
     (Slip plane probably shouldn't lie on y = 0 for crack problem --- problem assigning dislocation region)

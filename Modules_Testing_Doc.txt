@@ -6,6 +6,7 @@ Fix test:
     annihilateDislocations (counter issue)
     createDipole (sign issue)
     isObstacleBetween (zero obstacles)
+    updateDislPosSub
 
 Check:
     mod_utils
@@ -17,6 +18,8 @@ To be checked:
         Dislocation fields on boundary, in element
     mod_mesh_find
         findInOneMatSub (after reworking)
+        
+
         
 
 mod_compute
@@ -866,6 +869,12 @@ mod_materials
         Test: Done!
 mod_math
     Doc: Done!
+    nearestMultiple
+        Doc: Done!
+        Test: Done!
+    linspace
+        Doc: Done!
+        Test:
     intToLogical
         Doc: Done!
         Test: Done!

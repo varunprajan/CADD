@@ -48,8 +48,6 @@ C     functions
 ************************************************************************
       subroutine initFELibrary()
 
-C     Subroutine: initFELibrary()
-
 C     Inputs: None
 
 C     Outputs: None
@@ -102,8 +100,6 @@ C     CPE3
 ************************************************************************
       function getElTypeNum(elname) result(eltypenum)
 
-C     Function: getElTypeNum
-
 C     Inputs: elname --- name of element type, following ABAQUS convention
 
 C     Outputs: eltypenum --- number of the element type in felib structure
@@ -140,8 +136,6 @@ C     if we've gotten here, we didn't find the element
       end function getElTypeNum
 ************************************************************************      
       function getK_2d(posn,dsde,eltypenum) result(K)
-
-C     Subroutine: getK_2d
 
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
@@ -181,8 +175,6 @@ C     local variables
 ************************************************************************
       subroutine getB_2d(posn,r,s,eltypenum,B,J)
 
-C     Subroutine: getB_2d
-
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
 C             r, s --- local (element-level) coordinates
@@ -221,8 +213,6 @@ C     local variables
 ************************************************************************
       subroutine getBAlt_2d(posn,r,s,eltypenum,Balt,J)
 
-C     Subroutine: getBAlt_2d
-
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
 C             r, s --- local (element-level) coordinates
@@ -257,8 +247,6 @@ C     local variables
       end subroutine getBAlt_2d
 ************************************************************************
       subroutine getBSub_2d(posn,r,s,eltypenum,dNuglob,dNvglob,J)
-
-C     Subroutine: getBSub_2d
 
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
@@ -310,8 +298,6 @@ C     local variables
 ************************************************************************
       function getJ_2d(posn,dNdr,dNds) result(J)
 
-C     Subroutine: getJ_2d
-
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
 C             dNdr, dNds --- vector of shape functions derivatives,
@@ -343,9 +329,7 @@ C     local variables
       end function getJ_2d
 ************************************************************************
       subroutine getdN_2d(r,s,dNdr,dNds)
-
-C     Subroutine: getdN_2d
-
+      
 C     Purpose: Interface for getdN (shape function derivative evaluation)
 C              for various element types (see below)
 
@@ -392,8 +376,6 @@ C     local variables
 ************************************************************************
       subroutine getdN_CPE3_2d(r,s,dNdr,dNds)
 
-C     Subroutine: getdN_CPE3_2d
-
 C     Inputs: r, s --- local (element-level) coordinates
 
 C     Outputs: dNdr, dNds --- vector of shape functions derivatives, evaluated at r, s
@@ -415,8 +397,6 @@ C     output variables
 ************************************************************************
       function getN_2d(r,s) result(N)
 
-C     Function: getN_2d
-
 C     Purpose: Interface for getN (shape function evaluation) for various element types (see below)
 
       implicit none
@@ -430,8 +410,6 @@ C     output variables
       end function getN_2d
 ************************************************************************
       function getN_CPE4_2d(r,s) result(N)
-
-C     Function: getN_CPE4_2d
 
 C     Inputs: r, s --- local (element-level) coordinates
 
@@ -463,8 +441,6 @@ C     local variables
 ************************************************************************      
       function getN_CPE3_2d(r,s) result(N)
 
-C     Function: getN_CPE3_2d
-
 C     Inputs: r, s --- local (element-level) coordinates
 
 C     Outputs: N --- vector of shape functions evaluated at r, s
@@ -487,8 +463,6 @@ C     output variables
       end function getN_CPE3_2d
 ************************************************************************      
       subroutine getGauss_CPE4_2d(rgauss,sgauss,wgauss)
-
-C     Subroutine: getGauss_CPE4_2d
 
 C     Inputs: None
 
@@ -513,8 +487,6 @@ C     output variables
 ************************************************************************      
       subroutine getGauss_CPE3_2d(rgauss,sgauss,wgauss)
 
-C     Subroutine: getGauss_CPE3_2d
-
 C     Inputs: None
 
 C     Outputs: rgauss, sgauss --- vector of r, s-locations for Gaussian quadrature,
@@ -535,8 +507,6 @@ C     output variables
       end subroutine getGauss_CPE3_2d
 ************************************************************************
       subroutine getGaussEdge_2d(sgauss,wgauss)
-
-C     Subroutine: getGaussEdge_2d
 
 C     Outputs: sgauss --- vector of s-locations (local coordinate along edge)
 C                         for Gaussian quadrature
@@ -572,8 +542,6 @@ C     output variables
 ************************************************************************
       subroutine findInElement(posn,xp,yp,r,s)
 
-C     Subroutine: findInElement
-
 C     Purpose: Interface for findInCPE3, etc. (local coordinates of point within element)
       
 C     input variables
@@ -586,8 +554,6 @@ C     in/out variables
       end subroutine findInElement
 ************************************************************************     
       subroutine findInCPE3(posn,xp,yp,r,s)
-
-C     Subroutine: findInCPE3
 
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
@@ -633,8 +599,6 @@ C     local variables
       end subroutine findInCPE3
 ************************************************************************
       subroutine findInCPE4(posn,xp,yp,r,s)
-
-C     Subroutine: findInCPE4
 
 C     Inputs: posn --- global coordinates of element nodes, 2 by nelnodes
 C                      (i.e. each column is a coordinate pair)
@@ -693,8 +657,6 @@ C     local variables
 ************************************************************************
       function checkElement(edge,r,s) result(check)
 
-C     Function: checkElement
-
 C     Purpose: Interface for checkCPE4, etc. (determine whether a point
 C     lies on the correct side of an edge of an element)
       
@@ -708,8 +670,6 @@ C     output variables
       end function checkElement
 ************************************************************************
       function checkCPE4(edge,r,s) result(check)
-
-C     Function: checkCPE4
 
 C     Inputs: edge --- number of edge of element
 C             r, s --- local coordinates of point in element
@@ -743,8 +703,6 @@ C     output variables
       end function checkCPE4  
 ************************************************************************
       function checkCPE3(edge,r,s) result(check)
-
-C     Function: checkCPE3
 
 C     Inputs: edge --- number of edge of element
 C             r, s --- local coordinates of point in element

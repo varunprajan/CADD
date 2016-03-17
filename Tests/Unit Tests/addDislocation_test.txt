@@ -3,37 +3,46 @@ Test #1:
  
 Code:
 
-integer :: i, j
-call initMaterialData('simple_dd_materials')
-call initNodeData('simple_dd_nodes')
-call initFELibrary()
-call initFEElementData('simple_dd_feelements')
-call initSlipSysData('simple_dd_slipsys')
-call initDislData('simple_dd_disl')
-call addDislocation(1,0,1.5_dp,0.5_dp,1,1,0)
-write(*,*) 'posn'
-do i = 1, 8
-  write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
-end do
-write(*,*) 'element'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%element
-end do
-write(*,*) 'loc pos'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%localpos
-end do
+      integer :: mnumfe, element
+      integer :: i, j
+      
+      call initMaterialData('simple_dd_materials')
+      call initNodeData('simple_dd_nodes')
+      call initFELibrary()
+      call initFEElementData('simple_dd_feelements')
+      call initDislMiscData('simple_dd_dislmisc')
+      call initSlipSysData('simple_dd_slipsys')
+      call initDislData('simple_dd_disl')
+      mnumfe = 1
+      element = 0
+      call addDislocation(mnumfe,element,1.5_dp,0.5_dp,1,1,0)
+      write(*,*) 'mnumfe', mnumfe
+      write(*,*) 'element', element
+      write(*,*) 'posn'
+      do i = 1, 8
+      write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+      end do
+      write(*,*) 'element'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%element
+      end do
+      write(*,*) 'loc pos'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%localpos
+      end do
 
 Output:
+mnumfe           1
+ element           2
  posn
-  0.25000000000000000       0.25000000000000000     
-   1.2500000000000000        2.7500000000000000     
-   3.2500000000000000        1.7500000000000000     
-   2.2500000000000000        1.7500000000000000     
-   3.7500000000000000        1.7500000000000000     
-  0.50000000000000000       0.50000000000000000     
-   3.5000000000000000        3.5000000000000000     
-   1.5000000000000000       0.50000000000000000     
+  0.25000000000000000        0.0000000000000000     
+   1.2500000000000000        3.0000000000000000     
+   3.2500000000000000        2.0000000000000000     
+   2.2500000000000000        2.0000000000000000     
+   3.7500000000000000        2.0000000000000000     
+  0.50000000000734679       0.49999999999265321     
+   3.5000000000296914        3.4999999999703086     
+   1.5000000000000000        1.0000000000000000     
  element
            1
           10
@@ -51,32 +60,39 @@ Output:
   0.50000000000000000       0.50000000000000000     
    0.0000000000000000        0.0000000000000000     
    0.0000000000000000        0.0000000000000000     
-   0.0000000000000000        0.0000000000000000  
+   0.0000000000000000        0.0000000000000000    
 ******************************************************
 Test #2: Outside of mesh
 
 Code:
 
-integer :: i, j
-call initMaterialData('simple_dd_materials')
-call initNodeData('simple_dd_nodes')
-call initFELibrary()
-call initFEElementData('simple_dd_feelements')
-call initSlipSysData('simple_dd_slipsys')
-call initDislData('simple_dd_disl')
-call addDislocation(1,0,-0.5_dp,0.5_dp,1,1,0)
-write(*,*) 'posn'
-do i = 1, 8
-  write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
-end do
-write(*,*) 'element'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%element
-end do
-write(*,*) 'loc pos'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%localpos
-end do
+      integer :: mnumfe, element
+      integer :: i, j
+      
+      call initMaterialData('simple_dd_materials')
+      call initNodeData('simple_dd_nodes')
+      call initFELibrary()
+      call initFEElementData('simple_dd_feelements')
+      call initDislMiscData('simple_dd_dislmisc')
+      call initSlipSysData('simple_dd_slipsys')
+      call initDislData('simple_dd_disl')
+      mnumfe = 1
+      element = 0
+      call addDislocation(mnumfe,element,-0.5_dp,0.5_dp,1,1,0)
+      write(*,*) 'mnumfe', mnumfe
+      write(*,*) 'element', element
+      write(*,*) 'posn'
+      do i = 1, 8
+      write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+      end do
+      write(*,*) 'element'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%element
+      end do
+      write(*,*) 'loc pos'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%localpos
+      end do
 
 Output:
  Could not properly assign object
@@ -86,37 +102,46 @@ Output:
 
 Code:
 
-integer :: i, j
-call initMaterialData('simple_dd_materials')
-call initNodeData('simple_dd_nodes')
-call initFELibrary()
-call initFEElementData('simple_dd_feelements')
-call initSlipSysData('simple_dd_slipsys')
-call initDislData('simple_dd_disl')
-call addDislocation(1,8,1.5_dp,0.5_dp,1,1,0)
-write(*,*) 'posn'
-do i = 1, 8
-  write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
-end do
-write(*,*) 'element'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%element
-end do
-write(*,*) 'loc pos'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%localpos
-end do
+      integer :: mnumfe, element
+      integer :: i, j
+      
+      call initMaterialData('simple_dd_materials')
+      call initNodeData('simple_dd_nodes')
+      call initFELibrary()
+      call initFEElementData('simple_dd_feelements')
+      call initDislMiscData('simple_dd_dislmisc')
+      call initSlipSysData('simple_dd_slipsys')
+      call initDislData('simple_dd_disl')
+      mnumfe = 1
+      element = 8
+      call addDislocation(mnumfe,element,1.5_dp,0.5_dp,1,1,0)
+      write(*,*) 'mnumfe', mnumfe
+      write(*,*) 'element', element
+      write(*,*) 'posn'
+      do i = 1, 8
+      write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+      end do
+      write(*,*) 'element'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%element
+      end do
+      write(*,*) 'loc pos'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%localpos
+      end do
 
 Output:
+ mnumfe           1
+ element           2
  posn
-  0.25000000000000000       0.25000000000000000     
-   1.2500000000000000        2.7500000000000000     
-   3.2500000000000000        1.7500000000000000     
-   2.2500000000000000        1.7500000000000000     
-   3.7500000000000000        1.7500000000000000     
-  0.50000000000000000       0.50000000000000000     
-   3.5000000000000000        3.5000000000000000     
-   1.5000000000000000       0.50000000000000000     
+  0.25000000000000000        0.0000000000000000     
+   1.2500000000000000        3.0000000000000000     
+   3.2500000000000000        2.0000000000000000     
+   2.2500000000000000        2.0000000000000000     
+   3.7500000000000000        2.0000000000000000     
+  0.50000000000734679       0.49999999999265321     
+   3.5000000000296914        3.4999999999703086     
+   1.5000000000000000        1.0000000000000000     
  element
            1
           10
@@ -134,44 +159,54 @@ Output:
   0.50000000000000000       0.50000000000000000     
    0.0000000000000000        0.0000000000000000     
    0.0000000000000000        0.0000000000000000     
-   0.0000000000000000        0.0000000000000000
+   0.0000000000000000        0.0000000000000000     
+
 ******************************************************
 Test #4: Different slip system
 
 Code:
 
-integer :: i, j
-call initMaterialData('simple_dd_materials')
-call initNodeData('simple_dd_nodes')
-call initFELibrary()
-call initFEElementData('simple_dd_feelements')
-call initSlipSysData('simple_dd_slipsys')
-call initDislData('simple_dd_disl')
-call addDislocation(1,8,1.5_dp,0.5_dp,2,1,0)
-write(*,*) 'posn'
-do i = 1, 8
-  write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
-end do
-write(*,*) 'element'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%element
-end do
-write(*,*) 'loc pos'
-do i = 1, 8
-  write(*,*) disl(1)%list(i)%localpos
-end do
-call prettyPrintVec(disl(1)%splanes(2)%splane(4)%objnum(1),'o')
+      integer :: mnumfe, element
+      integer :: i, j
+      
+      call initMaterialData('simple_dd_materials')
+      call initNodeData('simple_dd_nodes')
+      call initFELibrary()
+      call initFEElementData('simple_dd_feelements')
+      call initDislMiscData('simple_dd_dislmisc')
+      call initSlipSysData('simple_dd_slipsys')
+      call initDislData('simple_dd_disl')
+      mnumfe = 1
+      element = 8
+      call addDislocation(mnumfe,element,1.5_dp,0.5_dp,2,1,0)
+      write(*,*) 'mnumfe', mnumfe
+      write(*,*) 'element', element
+      write(*,*) 'posn'
+      do i = 1, 8
+      write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+      end do
+      write(*,*) 'element'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%element
+      end do
+      write(*,*) 'loc pos'
+      do i = 1, 8
+      write(*,*) disl(1)%list(i)%localpos
+      end do
+      call prettyPrintVec(disl(1)%splanes(2)%splane(4)%objnum,'o')
 
 Output:
+ mnumfe           1
+ element           2
  posn
-  0.25000000000000000       0.25000000000000000     
-   1.2500000000000000        2.7500000000000000     
-   3.2500000000000000        1.7500000000000000     
-   2.2500000000000000        1.7500000000000000     
-   3.7500000000000000        1.7500000000000000     
-  0.50000000000000000       0.50000000000000000     
-   3.5000000000000000        3.5000000000000000     
-   1.5000000000000000       0.50000000000000000     
+  0.25000000000000000        0.0000000000000000     
+   1.2500000000000000        3.0000000000000000     
+   3.2500000000000000        2.0000000000000000     
+   2.2500000000000000        2.0000000000000000     
+   3.7500000000000000        2.0000000000000000     
+  0.50000000000734679       0.49999999999265321     
+   3.5000000000296914        3.4999999999703086     
+   1.5000000000064411       0.49999999999355893     
  element
            1
           10
@@ -192,4 +227,44 @@ Output:
    0.0000000000000000        0.0000000000000000     
  o
            8
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+
  ******************************************************

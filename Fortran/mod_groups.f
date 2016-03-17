@@ -47,8 +47,6 @@ C     module variables (global)
 ************************************************************************          
       subroutine initGroupData(groupfile)
 
-C     Subroutine: initGroupData
-
 C     Inputs: groupfile --- filename where group data is stored
 C     (should be something like '[filepref]_disl')
 
@@ -68,8 +66,6 @@ C     input variables
       end subroutine initGroupData
 ************************************************************************          
       subroutine readGroupData(groupfile)
-      
-C     Subroutine: readGroupData
 
 C     Inputs: groupfile --- filename where group data is stored
 C     (should be something like '[filepref]_disl')
@@ -104,8 +100,6 @@ C     read non-"all" groups
       end subroutine readGroupData
 ************************************************************************      
       subroutine processGroupData()
-
-C     Subroutine: processGroupData
 
 C     Inputs: None
 
@@ -142,8 +136,6 @@ C     then, create masks
 ************************************************************************
       function getGroupNum(gname) result(gnum)
 
-C     Function: getGroupNum
-
 C     Inputs: gname --- name of group
 
 C     Outputs: gnum --- index/number of group (1 <= gnum <= ngroups)
@@ -174,8 +166,6 @@ C     local variables
       end function getGroupNum
 ************************************************************************
       subroutine genGroupMaskAtoms(gnum)
-      
-C     Subroutine: genGroupMasksAtoms
 
 C     Inputs: gnum --- number of group
 
@@ -193,8 +183,6 @@ C     input variables
 ************************************************************************      
       subroutine genGroupMaskFENodes(gnum)
 
-C     Subroutine: genGroupMaskFENodes
-
 C     Inputs: gnum --- number of group
 
 C     Outputs: None
@@ -211,8 +199,6 @@ C     input variables
 ************************************************************************
       subroutine genGroupMaskAll(gnum)
 
-C     Subroutine: genGroupMaskAll
-
 C     Inputs: gnum --- number of group
 
 C     Outputs: None
@@ -228,8 +214,6 @@ C     input variables
       end subroutine genGroupMaskAll
 ************************************************************************
       subroutine writeGroupData(groupfile)
-      
-C     Subroutine: writeGroupData
 
 C     Inputs: groupfile --- filename where group data is stored
 C     (should be something like '[filepref]_groups')
@@ -261,8 +245,6 @@ C     write non-"all"/"temp" groups
       end subroutine writeGroupData
 ************************************************************************
       function getMaskSortedIntersect(list1,list2) result(mask2)
-      
-C     Function: getMaskSortedIntersect
 
 C     Inputs: list1 - sorted m by 1 integer array
 C             list2 - sorted n by 1 integer array

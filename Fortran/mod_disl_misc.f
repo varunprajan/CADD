@@ -26,8 +26,6 @@ C     module variables
       contains
 ************************************************************************
       subroutine initDislMiscData(dislmiscfile)
-      
-C     Subroutine: initDislMiscData
 
 C     Inputs: dislmiscfile --- filename where misc DD data is stored
 C     (should be something like '[filepref]_dislmisc')
@@ -48,8 +46,6 @@ C     input variables
       end subroutine initDislMiscData
 ************************************************************************
       subroutine readDislMiscData(dislmiscfile)
-      
-C     Subroutine: readDislMiscData
 
 C     Inputs: dislmiscfile --- filename where misc DD data is stored
 C     (should be something like '[filepref]_dislmisc')
@@ -84,8 +80,6 @@ C     use explicit integer -> logical conversion
       end subroutine readDislMiscData
 ************************************************************************
       subroutine writeDislMiscData(dislmiscfile)
-      
-C     Subroutine: writeDislMiscData
 
 C     Inputs: dislmiscfile --- filename where misc DD data is stored
 C     (should be something like '[filepref]_dislmisc')
