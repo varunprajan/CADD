@@ -1,0 +1,31 @@
+******************************************************
+Test #1: Check if fooled by dislocation
+ 
+Code:
+
+      real(dp) :: crackpos(2)
+      integer :: i
+      real(dp) :: x, y
+      
+C     initialize simulation, reset timestep, output dump
+      call initSimulation('atomistic_3','atomistic')
+      misc%incrementcurr = 0
+      call writeDump_ptr()
+      
+C     reset node types
+      do i = 1, nodes%nnodes
+          x = nodes%posn(1,i)
+          y = nodes%posn(2,i)
+          if ((abs(x) > 25.0_dp).or.(abs(y) > 25.0_dp)) then
+              nodes%types(2,i) = 2
+          end if
+      end do 
+      
+C     find crack position
+      crackpos = findCrack()
+      
+      write(*,*) 'Crack position', crackpos
+
+Output:
+ Crack position  -5.7375401072736416      -0.22238514185268521     
+******************************************************

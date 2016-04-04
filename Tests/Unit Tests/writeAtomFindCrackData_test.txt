@@ -1,0 +1,10 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call readAtomFindCrackData('example_atomfindcrack_test')
+      call writeAtomFindCrackData('example_atomfindcrack_out_test')
+
+Output: See file --- essentially identical to example_atomfindcrack_test
+******************************************************   

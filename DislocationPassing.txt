@@ -1,0 +1,79 @@
+Dislocation Passing Algorithm:
+
+Atomistic to Continuum:
+
+Assume dislocation has been detected at point xp, yp with burgers vector burgersvec.
+Assume branch cut of 0 (this may not be true for weird situations, like dislocations emitted backwards from a crack)
+
+Part A: Position of new (continuum) dislocation
+1) Determine which direction dislocation is traveling in. To do this, use a region function, with three regions: inside, within-detection, outside. Dislocation is assumed to be moving to the outside region.
+2) Find intersection of dislocation path with interface.
+3) Determine whether the path from the detected position to the interface intersection crossed a free surface (such as a crack).
+4)
+    a) If so, this means that the dislocation path crosses a free surface *in the atomistic domain*. So, leave dislocation where it is. Dislocation will eventually exit atomistic domain on its own, by leaving a step at the free surface. Quit routine.
+    b) Otherwise, go to step 5.
+5) Put the endpoint of the dislocation path beyond this intersection, by a distance passdistanceatoc
+6) Again determine whether this path (from the interface intersection to a position just beyond) crossed a free surface.
+7)
+    a) If so, this means that the dislocation path crosses a free surface *in the continuum domain*. So, place the dislocation halfway between the interface intersection and the free surface intersection.
+    b) If not, the proposed dislocation position is fine.
+    
+Part B: Adding, deleting, etc.
+1) Add new dislocation to continuum
+2) Add *oppositely* signed ghost dislocation at *old* location (in the atomistic region)
+
+Part C: Adjust atomic displacements
+1) Add displacements of dipole, adding displacements of dislocation at the new position and subtracting those of the dislocation at the old position. This accounts for the translation of the dislocation cut.
+2) Relax the atoms in a small box around the old atomistic core, to eliminate any residue of the old core.
+
+
+Continuum to Atomistic:
+
+The dislocation has been detected as leaving the mesh and its path as intersecting the interface. So, we already know its direction of travel.
+
+Part A: Position of new dislocation
+1) Try to place the dislocation inside the detection band, using the region function.
+2) 
+    a) If this was not possible, go to Branch A1. 
+    b) If this was possible, go to Branch A2.
+    
+Branch A1: Dislocation is cutting atomistic region obliquely
+1) Determine whether dislocation path intersects the interface *again*
+2)
+    a) If not, it's unclear what happened. Print error, and quit routine.
+    b) If so, go to step 3.
+3) Try to place the dislocation just past the *second* interface intersection, in the continuum, by a distance passdistancectoa. Determine whether this path (from the second interface intersection to a position just beyond) crosses a free surface.
+4)
+    a) If so, the dislocation path crosses a free surface *in the continuum domain*. So, place the dislocation halfway between the (second) interface intersection and the free surface intersection.
+    b) If not, the proposed dislocation position is fine.
+    
+Part B1: Adding, deleting, etc.
+1) The continuum dislocation has basically just remained in the continuum. So, no need to add (two opposite) ghost dislocations, etc.
+2) Simply delete the old dislocation, and add a new one at the new position (this is algorithmically simpler than moving it, since the mesh_find algorithm would again fail)
+
+Part C1: Adjust atomic displacements
+1) Add displacements of dipole, adding displacements of dislocation at the new position and subtracting those of the dislocation at the old position. This accounts for the translation of the dislocation cut (i.e., the cut of the atoms at the two interface intersection points).
+
+
+Branch A2: Dislocation can be placed in atomistic region
+1) Determine whether the dislocation path (from interface intersection to the inner edge of the detection band) crossed a free surface.
+2)
+    a) If so, the dislocation seems destined to exit via this free surface, leaving a crack step. So, new dislocation position is slightly beyond this crack surface
+    b) If not, go to step 3.
+3) Try to place the dislocation past the inner edge of the detection band by some distance, passdistancectoa. Determine whether this path (from the inner edge of the detection band to a position just beyond) crosses a free surface.
+4)
+    a) If so, place dislocation halfway between inner edge of detection band and free surface intersection
+    b) If not, go to step 5.
+5) Determine whether the path intersects the detection band again (this is possible for some oblique intersections of detection band).
+6)
+    a) If so, place dislocation halfway between the two different detection band intersections (both at the border between the inside and within-detection regions). This is problematic because, during the relaxation process, the dislocation could easily move back to the detection band in the old direction, leading to oscillations back and forth. Another possible option is to pass it out the other side.
+    b) If not, the proposed dislocation position is fine.
+    
+Part B2: Adding, deleting, etc.
+1) Delete old continuum dislocation.
+2) Add *same* signed ghost dislocation at the *new* location, inside the atomistic region. Add new dislocation to continuum
+
+Part C2: Adjust atomic displacements
+1) Add displacements of dipole, adding displacements of dislocation at the new position and subtracting those of the dislocation at the old position. This accounts for the translation of the dislocation cut.
+2) Relax the atoms in a small box around the new atomistic dislocation, to ensure the proper dislocation core in the atomistic region.
+    

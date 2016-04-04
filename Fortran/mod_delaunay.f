@@ -9,6 +9,7 @@ C     Notes/TODO: Only 2D, currently
       use mod_math, only: thirdconst, getCircumradiusSqforTriangle
       use mod_materials, only: materials
       use mod_neighbors, only: neighbors
+      use mod_nodes, only: nodes
 
       implicit none
 
@@ -21,28 +22,75 @@ C     Notes/TODO: Only 2D, currently
       integer, allocatable :: trineigh(:,:)
       logical, allocatable :: trigood(:)
       end type
-      
-C     module variables (global)
-      type(delaunaydata) :: delaunay
 
       private :: diaedg, i4_modp, i4_sign, perm_check, perm_inverse,
      &           r82vec_permute, r82vec_sort_heap_index_a, swapec,
      &           vbedg, i4_wrap, lrline
-      public :: genDelaunay, delaunay, dtris2, identifyLargeTri,
-     &          getTriNodes, getTriCenter
+      public :: genDelaunay, dtris2, identifyLargeTri, regenDelaunay,
+     &          getTriNodes, getTriCenter, CIRCUMSQFACHEX,
+     &          updateDelaunayPos
+     
+C     HARD-CODED CONSTANTS
+      real(dp), parameter :: CIRCUMSQFACHEX = 2.0_dp ! see identifyLargeTri
+                                                     ! ratio of circumradius**2 in largest dislocated triangle to circumradius**2 in equilibrium triangle
+                                                     ! (must be less than 3, because otherwise edge triangles would be counted as "good")
 
       contains
 ************************************************************************
-      subroutine genDelaunay()
+      subroutine regenDelaunay(delaunay,regen)
 
-C     Inputs: None
+C     In/out: delaunay --- structure containing information about delaunay triangulation
+C             regen --- parameter indicating whether delaunay triangulation needs to be regenerated
+C                       (after regeneration, it is set to false)
 
 C     Outputs: None
       
-C     Purpose: Run delaunay routine on points (generate triangles and neighbors,
-C     label bad triangles)
+C     Purpose: Regenerate triangles/neighbors, if necessary. Otherwise,
+C     simply update delaunay%xy using new node positions
+
+      implicit none
+      
+C     in/out variables
+      type(delaunaydata) :: delaunay
+      logical :: regen
+      
+      call updateDelaunayPos(delaunay) ! update xy coordinates
+      if (regen) then
+          call genDelaunay(delaunay) ! regenerate triangulation
+          call genBadTriangles(delaunay) ! regenerate bad triangles
+          regen = .false. ! reset
+      end if 
+      
+      end subroutine regenDelaunay
+************************************************************************
+      subroutine updateDelaunayPos(delaunay)
+      
+C     in/out variables
+      type(delaunaydata) :: delaunay
+      
+C     local variables
+      integer :: i
+      integer :: node
+      
+      do i = 1, size(delaunay%nodenums)
+          node = delaunay%nodenums(i)
+          delaunay%xy(:,i) = nodes%posn(1:2,node) ! current position
+      end do
+      
+      end subroutine updateDelaunayPos
+************************************************************************
+      subroutine genDelaunay(delaunay)
+
+C     In/out: delaunay --- structure containing information about delaunay triangulation
+
+C     Outputs: None
+      
+C     Purpose: Generate triangles and neighbors
       
       implicit none
+      
+C     in/out variables
+      type(delaunaydata) :: delaunay
       
 C     local variables
       integer :: numpoints
@@ -54,29 +102,43 @@ C     deallocate, if necessary
       if (allocated(delaunay%trineigh)) then
           deallocate(delaunay%trineigh)
       end if
-      if (allocated(delaunay%trigood)) then
-          deallocate(delaunay%trigood)
-      end if
       
 C     run main routine
       numpoints = size(delaunay%xy,2)
       call dtris2(numpoints,delaunay%xy,
      &            delaunay%trivert,delaunay%trineigh)
-      
       delaunay%numtri = size(delaunay%trivert,2)
+      
+      end subroutine genDelaunay
+************************************************************************      
+      subroutine genBadTriangles(delaunay)
+
+C     In/out: delaunay --- structure containing information about delaunay triangulation
+
+C     Outputs: None
+      
+C     Purpose: Generate list of bad triangles
+
+      implicit none
+      
+C     in/out variables
+      type(delaunaydata) :: delaunay
+      
+C     deallocate, if necessary
+      if (allocated(delaunay%trigood)) then
+          deallocate(delaunay%trigood)
+      end if
       
 C     find bad triangles
       allocate(delaunay%trigood(delaunay%numtri))
-      call identifyLargeTri()  
+      call identifyLargeTri(delaunay) 
       
-C     reset regen
-      neighbors%delaunayregen = .false.
-      
-      end subroutine genDelaunay
+      end subroutine genBadTriangles      
 ************************************************************************
-      function getTriNodes(trinum) result(trinodes)
+      function getTriNodes(delaunay,trinum) result(trinodes)
 
-C     Inputs: trinum --- index of triangle in triangulation
+C     Inputs: delaunay --- structure containing information about delaunay triangulation 
+C             trinum --- index of triangle in triangulation
 
 C     Outputs: trinodes --- array, 2 by 3, of coordinates of nodes/vertices of triangle
       
@@ -85,6 +147,7 @@ C     Purpose: Get coordinates of nodes/vertices of triangle
       implicit none
       
 C     input variables
+      type(delaunaydata) :: delaunay
       integer :: trinum
       
 C     output variables
@@ -100,9 +163,10 @@ C     local variables
       
       end function getTriNodes
 ************************************************************************
-      function getTriCenter(trinum) result(tricenter)
+      function getTriCenter(delaunay,trinum) result(tricenter)
 
-C     Inputs: trinum --- index of triangle in triangulation
+C     Inputs: delaunay --- structure containing information about delaunay triangulation 
+C             trinum --- index of triangle in triangulation
 
 C     Outputs: tricenter --- vector, 2 by 1, coordinates of triangle center
       
@@ -112,26 +176,30 @@ C     of dislocation, if it is found in that triangle)
       implicit none
       
 C     input variables
+      type(delaunaydata) :: delaunay
       integer :: trinum
     
 C     output variables
       real(dp) :: tricenter(2)
       
-      tricenter = thirdconst*sum(getTriNodes(trinum),2)
+      tricenter = thirdconst*sum(getTriNodes(delaunay,trinum),2)
       
       end function getTriCenter
-************************************************************************ 
-      subroutine identifyLargeTri()
+************************************************************************
+      subroutine identifyLargeTri(delaunay)
 
-C     Inputs: None
+C     In/out: delaunay --- structure containing information about delaunay triangulation 
 
 C     Outputs: None
       
-C     Purpose: Loop through triangles from delaunay, labelling each
+C     Purpose: Loop through triangles, labelling each
 C     according to whether it is too large or not: i.e. a bad triangle is
 C     one whose circumradius exceeds a cutoff
       
       implicit none
+      
+C     input variables
+      type(delaunaydata) :: delaunay
       
 C     local variables
       integer :: i
@@ -139,8 +207,8 @@ C     local variables
       real(dp) :: circumradiussq
       
       do i = 1, delaunay%numtri
-          p = getTriNodes(i)
-          circumradiussq = getCircumradiusSqForTriangle(p)
+          p = getTriNodes(delaunay,i)
+          circumradiussq = getCircumradiusSqForTriangle(p)    
           delaunay%trigood(i) = (circumradiussq <
      &                           delaunay%circumradiussqcutoff)
       end do

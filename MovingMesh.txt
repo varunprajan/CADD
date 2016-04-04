@@ -1,0 +1,26 @@
+Moving Mesh Algorithm for Crack Problem:
+
+Call shift position delta_x, which is a multiple of the atomic spacing
+
+(x --- undeformed configuration; X --- deformed configuration)
+
+Interpolate displacement fields:
+1) In new body, displacement at a point, x, is given by the displacement in the old body at a point x + delta_x:
+   i.e., u_new(x) = u_old(x + delta_x)
+2) Triangulate the atomistic domain in the *undeformed* configuration
+3) Three possibilities for x + delta_x
+    i) Lies in the atomistic domain: find triangle containing x + delta_x (using bins?), interpolate based on displacements of surrounding atoms. Since deformation in atomistic region is highly non-affine, ideally x + delta_x is very close to an atom, rather than in between several atoms. This is why delta_x should be a multiple of the atomic spacing.
+    ii) Lies in the continuum domain: find local position in mesh, evaluate total displacement field (FE + DD) at that point
+    iii) Lies in neither: point must lie at the boundary (so new point is outside mesh). The boundary displacements are set by the K-field, so this case doesn't really matter (i.e. we can assign an arbitrary displacement)
+
+Shift objects:
+1) Shift all objects --- all dislocations (real, escaped, ghost), dislocation sources and obstacles, and slip planes --- by -delta_x.
+2) Possible problems:
+    i) Ghost dislocations can leave atomistic zone. Is this a problem?
+    ii) Real (continuum) dislocations can leave simulation cell. How should this be addressed? Limit dislocation activity to smaller box within cell?
+    iii) Real (continuum) dislocations can enter atomistic region. Is it sufficient to simply interpolate the field? Or, should dislocations be passed beforehand? If so, how do we deal with corner cases, where slip plane doesn't intersect interface?
+    iv) Sources can leave simulation cell or enter atomistic region. If they are deleted, the fields associated with their latent dislocations will also be removed, which may cause oscillations. So, we cannot allow sources directly ahead of atomistic region.
+    v) Obstacles can leave simulation cell or enter atomistic region. If they are deleted, this can lead to unpinning of dislocation pileups, which may cause oscillations. So, we cannot allow obstacles directly ahead of atomistic region
+    vi) Escaped dislocations can move from being ahead of the crack tip to being behind, creating a spurious crack face step because of the "region" issue.
+    vii) Atomistic dislocations must be detected and passed out if delta_x > (distance from interface to inner detection). So, it's easiest to force crack growth to be less than this distance?
+
