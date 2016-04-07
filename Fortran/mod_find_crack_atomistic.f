@@ -1,10 +1,13 @@
       module mod_find_crack_atomistic
       
-C     Purpose: Finds crack position in atomistic region.
-C     Strategy: We detect the crack using pure geometry:
+C     Purpose: Finds crack position in atomistic region in a CADD simulation.
+C     (Can be used in an atomistic only simulation, but the outer nodes need to be
+C     labelled as interface nodes.)
+C     Strategy: We detect the crack using geometry:
 C     we triangulate the atoms, and determine the locations of
-C     "large" triangles that are not at the edge of the region. The "rightmost"
-C     large triangle corresponds to the crack tip
+C     "large" triangles that are not at the edge of the region. The edge of the region
+C     is associated with triangles that comprise one or more interface nodes. The "rightmost"
+C     large triangle not on the edge corresponds to the crack tip
 
 C     TODO: Modify for 3D (?)
 
@@ -31,12 +34,13 @@ C     module variables
       
       private
       public :: findCrack, initAtomFindCrackData, readAtomFindCrackData,
-     & processAtomFindCrackData, writeAtomFindCrackData, crackfinding
+     & processAtomFindCrackData, writeAtomFindCrackData, crackfinding,
+     & isTriangleOnEdge
 
 C     HARD-CODED CONSTANTS     
       real(dp), parameter :: FUDGECIRCUM = 0.75_dp ! fudge for circumradius**2 cutoff
                                                    ! should be at least 0.5, and probably less than 1
-                                                   ! if too small, spurious objects (such as dislocations) may be found
+                                                   ! if too small, defects  (such as dislocations) may be found
                                                    ! if too large, the position of the crack tip will be inaccurate (slightly behind the actual crack)
 
       contains
@@ -183,6 +187,16 @@ C     loop over large triangles, excluding ones near edge
       end function findCrack
 ************************************************************************
       function isTriangleOnEdge(delaunay,trinum) result(isonedge)
+ 
+C     Inputs: delaunay --- structure containing information about delaunay triangulation
+C             trinum --- index of triangle in triangulation
+ 
+C     Outputs: isonedge --- logical indicating whether triangle is on the edge of the triangulation
+ 
+C     Purpose: Defected (large) triangles are either associated with the crack,
+C     or with the outside edge of the triangulated region. This function
+C     determines whether the triangle is on the edge by evaluating whether
+C     any of its nodes are interface nodes
       
       implicit none
       

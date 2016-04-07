@@ -12,14 +12,16 @@
      &    getCircumradiusSqForTriangle, logicalToInt, getDeterminant2,
      &    nearestMultiple
       use mod_nodes, only: nodes, initNodeData, readNodeData,
-     &  processNodeData, writeNodeData, getXYAtomBounds, getXYBounds
+     &  processNodeData, writeNodeData, getXYAtomBounds, getXYBounds,
+     &  getXYAtomBoundsUndef, getXYAtomBoundsDef
       use mod_misc, only: misc, initMiscData, readMiscData,
      &                    writeMiscData, updateMiscIncrementCurr
       use mod_neighbors, only: neighbors, updateNeighborsCheck,
      & initNeighborData, writeNeighborData, genNeighList,
-     & readNeighborData, processNeighborData, checkDisp,
+     & readNeighborData, processNeighborData, checkDisp, atombox,
      & updatePosSinceLastCheck, getAtomsInBoxGroupTemp, genAtomBins,
-     & updateNeighborsNoCheck, updateNeighIncrementCurr
+     & updateNeighborsNoCheck, updateNeighIncrementCurr, getAtomBin,
+     & genAtomBinsUndeformed, genAtomBinsCurrent
       use mod_materials, only: initMaterialData, materials,
      &    readMaterialData, processMaterialData, writeMaterialData,
      &    getNucleationLength, nmaterials, getMuNuApprox
@@ -90,7 +92,7 @@
      &  getFEStrainAtPoint
       use mod_disl_detect_pass, only: initDetectionData,
      &  readDetectionData, processDetectionData, BOXWIDTHNORM,
-     &  writeDetectionData, assignDetectionPoints, placeDetectionSub,
+     &  writeDetectionData, findDetectionNodes, placeDetectionSub,
      &  getDislBranchCut, insideAnnulus, getPaddedParamsAnnulus,
      &  insideRectAnnulus, detection, errorInterface,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
@@ -103,8 +105,10 @@
      & initGeneralChunk, initAtomisticChunk, initFEChunk,
      & getRestartPrefSuff, writeRestartDD, writeRestartCADD,
      & writeRestartCADDNoDisl, writeRestartFE, writeRestartAtomistic
-      use mod_delaunay, only: dtris2, delaunay, genDelaunay,
-     & identifyLargeTri, getTriCenter, getTriNodes
+      use mod_delaunay, only: dtris2, genDelaunay, regenDelaunay,
+     & identifyLargeTri, getTriCenter, getTriNodes, delaunaydata,
+     & genBadTriangles, setDelaunayPos, setDelaunayPosDef,
+     & setDelaunayPosUndef
       use mod_disl_ident_simple, only: initDislIdentData,
      & computeCircuits, identsimple, getIdealVector
       use mod_dd_main, only: runDDStep,
@@ -141,30 +145,83 @@
      & writeDumpObstacles, writeDumpCompute, writeDumpCentro,
      & writeDumpNodesUndefChunk, writeDumpNodesDefElementsChunk,
      & writeDumpNodesUndefElementsChunk
+      use mod_find_crack_atomistic, only: initAtomFindCrackData,
+     & readAtomFindCrackData, writeAtomFindCrackData, isTriangleOnEdge,
+     & processAtomFindCrackData, crackfinding, findCrack
+      use mod_moving_mesh_crack_cadd, only: moveMeshCrack, 
+     &  interpFromFEPoint, interpFromAtomPoint, readCADDMovingMeshData,
+     &  writeCADDMovingMeshData, passDislocationsBefore, shiftPosnDisp,
+     &  passDislocationsAfter, passDislocationsSub, shiftPosnDisp,
+     &  interpFromFEPoint, interpFromAtomPoint, checkTriangle,
+     &  locateClosestAtomUndef, shiftDDPos, shiftSlipPlanes,
+     &  updateDislPosMovingMesh, updateDislPosMovingMeshSub,
+     &  updateSourcePosMovingMesh, updateObstaclePosMovingMesh,
+     &  initCADDMovingMeshData, movingmesh, processCADDMovingMeshData,
+     &  getNewDetectionBandAfter, getNewDetectionBandBefore,
+     &  atomicDispInterpolation
      
       implicit none
-
-      integer :: mnumfe, iplane, isys
-      real(dp) :: relpos, pt(2), disp(2)
-
       
-      call initSimulation('simple2_dd','dd')
+      real(dp) :: orig(2), a1(2), a2(2)
+      real(dp) :: fac
+      integer :: i
+      real(dp) :: y, ydisp
+      logical :: failure
+      real(dp) :: disp(2), posnundef(2)
 
-      pt = [1.0_dp,2.0_dp]
-      isys = 1
-      mnumfe = 1
-      disp = [3.0_dp,0.0_dp]
-      call getSlipPlane(pt,mnumfe,isys,iplane,relpos)
-      write(*,*) 'relpos', relpos
-      write(*,*) 'iplane', iplane
-      slipsys(mnumfe)%origin(:,isys) = slipsys(mnumfe)%origin(:,isys)
-     &                               - disp
-      pt = pt - disp
-      call getSlipPlane(pt,mnumfe,isys,iplane,relpos)
-      write(*,*) 'relpos', relpos
-      write(*,*) 'iplane', iplane
-
+      nodes%nnodes = 9
+      allocate(nodes%posn(7,nodes%nnodes))
+      nodes%posn = 0.0_dp
+      orig = [0.0_dp,0.0_dp]
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [-0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      nodes%posn(1:2,3) = orig
+      nodes%posn(1:2,4) = orig + a1
+      nodes%posn(1:2,5) = orig - a1
+      nodes%posn(1:2,6) = orig + a2
+      nodes%posn(1:2,7) = orig + a1 + a2
+      nodes%posn(1:2,8) = orig - a2
+      nodes%posn(1:2,9) = orig - a1 - a2
       
-
+      allocate(nodes%types(3,nodes%nnodes))
+      nodes%types(:,1) = [1,0,0]
+      nodes%types(:,2) = [1,0,0]
+      do i = 3, nodes%nnodes
+          nodes%types(:,i) = [1,1,0]
+      end do
+      
+      call processNodeData()
+      
+C     stretch in y-direction
+      fac = 0.2_dp
+      do i = 1, size(nodes%posn,1)
+          y = nodes%posn(2,i)
+          ydisp = fac*y
+          nodes%posn(5,i) = nodes%posn(5,i) + ydisp
+          nodes%posn(2,i) = nodes%posn(2,i) + ydisp
+      end do
+      
+      neighbors%nmaxbin = 30
+      neighbors%nmaxneigh = 30
+      neighbors%rneigh = 0.5_dp
+      neighbors%rneighsq = 0.25_dp
+      neighbors%rhomax = 1.0_dp
+      allocate(neighbors%binlist(2,nodes%natoms)) 
+      
+      call genAtomBinsUndeformed()
+      movingmesh%delaunay%nodenums = nodes%atomlist
+      call setDelaunayPosUndef(movingmesh%delaunay)
+      call genDelaunay(movingmesh%delaunay)
+      
+      call initFELibrary()
+      movingmesh%eltypenum = getElTypeNum('CPE3') ! triangle
+      
+      posnundef = [0.9_dp,0.8_dp]
+      call atomicDispInterpolation(posnundef,failure,disp)
+      write(*,*) 'Failed?', failure
+      
+      
+            
+      
       
       end program

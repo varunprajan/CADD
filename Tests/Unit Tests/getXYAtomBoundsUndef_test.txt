@@ -1,0 +1,14 @@
+******************************************************
+Test #1: Displace node
+ 
+Code:
+
+      real(dp):: xmin, xmax, ymin, ymax
+      call initNodeData('example_nodes_test')
+      nodes%posn(1:2,2) = nodes%posn(1:2,2) + [8.0_dp,-10.0_dp]
+      nodes%posn(4:5,2) = nodes%posn(4:5,2) + [8.0_dp,-10.0_dp]      
+      call getXYAtomBoundsUndef(xmin,xmax,ymin,ymax)
+      write(*,*) xmin, xmax, ymin, ymax
+
+Output:  -3.0000000000000000        5.0000000000000000       -3.0000000000000000        3.0000000000000000     
+******************************************************

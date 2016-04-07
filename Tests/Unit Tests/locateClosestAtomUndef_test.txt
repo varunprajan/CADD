@@ -1,0 +1,113 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      real(dp) :: orig(2), a1(2), a2(2)
+      real(dp) :: fac
+      integer :: i, atomnum
+      real(dp) :: y, ydisp
+
+      nodes%nnodes = 9
+      allocate(nodes%posn(7,nodes%nnodes))
+      nodes%posn = 0.0_dp
+      orig = [0.0_dp,0.0_dp]
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [-0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      nodes%posn(1:2,3) = orig
+      nodes%posn(1:2,4) = orig + a1
+      nodes%posn(1:2,5) = orig - a1
+      nodes%posn(1:2,6) = orig + a2
+      nodes%posn(1:2,7) = orig + a1 + a2
+      nodes%posn(1:2,8) = orig - a2
+      nodes%posn(1:2,9) = orig - a1 - a2
+      
+      allocate(nodes%types(3,nodes%nnodes))
+      nodes%types(:,1) = [1,0,0]
+      nodes%types(:,2) = [1,0,0]
+      do i = 3, nodes%nnodes
+          nodes%types(:,i) = [1,1,0]
+      end do
+      
+      call processNodeData()
+      
+C     stretch in y-direction
+      fac = 0.2_dp
+      do i = 1, size(nodes%posn,1)
+          y = nodes%posn(2,i)
+          ydisp = fac*y
+          nodes%posn(5,i) = nodes%posn(5,i) + ydisp
+          nodes%posn(2,i) = nodes%posn(2,i) + ydisp
+      end do
+      
+      neighbors%nmaxbin = 30
+      neighbors%nmaxneigh = 30
+      neighbors%rneigh = 0.5_dp
+      neighbors%rneighsq = 0.25_dp
+      neighbors%rhomax = 1.0_dp
+      allocate(neighbors%binlist(2,nodes%natoms)) 
+      
+      call genAtomBinsUndeformed()
+      
+      atomnum = locateClosestAtomUndef(orig - a1 - a2)
+      write(*,*) atomnum      
+
+Output:
+           7
+******************************************************
+Test #2:
+ 
+Code:
+
+      real(dp) :: orig(2), a1(2), a2(2)
+      real(dp) :: fac
+      integer :: i, atomnum
+      real(dp) :: y, ydisp
+
+      nodes%nnodes = 9
+      allocate(nodes%posn(7,nodes%nnodes))
+      nodes%posn = 0.0_dp
+      orig = [0.0_dp,0.0_dp]
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [-0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      nodes%posn(1:2,3) = orig
+      nodes%posn(1:2,4) = orig + a1
+      nodes%posn(1:2,5) = orig - a1
+      nodes%posn(1:2,6) = orig + a2
+      nodes%posn(1:2,7) = orig + a1 + a2
+      nodes%posn(1:2,8) = orig - a2
+      nodes%posn(1:2,9) = orig - a1 - a2
+      
+      allocate(nodes%types(3,nodes%nnodes))
+      nodes%types(:,1) = [1,0,0]
+      nodes%types(:,2) = [1,0,0]
+      do i = 3, nodes%nnodes
+          nodes%types(:,i) = [1,1,0]
+      end do
+      
+      call processNodeData()
+      
+C     stretch in y-direction
+      fac = 0.2_dp
+      do i = 1, size(nodes%posn,1)
+          y = nodes%posn(2,i)
+          ydisp = fac*y
+          nodes%posn(5,i) = nodes%posn(5,i) + ydisp
+          nodes%posn(2,i) = nodes%posn(2,i) + ydisp
+      end do
+      
+      neighbors%nmaxbin = 30
+      neighbors%nmaxneigh = 30
+      neighbors%rneigh = 0.5_dp
+      neighbors%rneighsq = 0.25_dp
+      neighbors%rhomax = 1.0_dp
+      allocate(neighbors%binlist(2,nodes%natoms)) 
+      
+      call genAtomBinsUndeformed()
+      
+      atomnum = locateClosestAtomUndef(orig - 0.75_dp*a1)
+      write(*,*) atomnum
+
+Output:
+           3
+******************************************************

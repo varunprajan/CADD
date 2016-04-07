@@ -38,7 +38,8 @@ C     TODO: Needs to be modified (heavily?) for 3D.
       use mod_types, only: dp
       use mod_utils, only: readMatTransposeSize, writeMatTransposeSize,
      &                     readVecSize, writeVecSize
-      use mod_delaunay, only: delaunay, getTriCenter, genDelaunay
+      use mod_delaunay, only: delaunaydata, getTriCenter, regenDelaunay,
+     &                        CIRCUMSQFACHEX
       use mod_disl_ident_simple, only: computeCircuits, identsimple
       use mod_utils, only: writeMat, prettyPrintMat
       use mod_math, only: getIntersectionTwoLines, normalizeVec,
@@ -61,14 +62,15 @@ C     TODO: Needs to be modified (heavily?) for 3D.
  
       private
       public :: initDetectionData, readDetectionData, placeDetectionSub,
-     &  processDetectionData, writeDetectionData, assignDetectionPoints,
+     &  processDetectionData, writeDetectionData, findDetectionNodes,
      &  assignDetectionBand, getDislBranchCut, insideAnnulus,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
      &  passContinuumToAtomistic, passAtomistictoContinuum, detection,
      &  updateAtomsPassing, insideRectAnnulus, imposeDipoleDispOnAtoms,
      &  errorInterface, placeInsideDetection, placeOutsideDetection,
      &  findInterfaceIntersectionDeformed, BOXWIDTHNORM,
-     &  getPaddedParamsAnnulus, getPaddedParamsRectAnnulus
+     &  getPaddedParamsAnnulus, getPaddedParamsRectAnnulus,
+     &  processDetectionBand
      
       type compdata
       real(dp), allocatable :: burgersvec(:)
@@ -93,9 +95,10 @@ C     (processed)
       character(len=20) :: lattice
       type(compdata), allocatable :: comp(:)
       real(dp), allocatable :: paramspadded(:)
+      type(delaunaydata) :: delaunay
       end type
 
-C     module variables (private)
+C     module variables
       type(detectiondata) :: detection
       procedure(Dummy), pointer :: insideDetectionBand_ptr    
 
@@ -105,9 +108,6 @@ C     HARD-CODED CONSTANTS
       real(dp), parameter :: DISTPAD = 1.5_dp ! see paramspadded/processDetectionData
       real(dp), parameter :: STEPFAC = 0.01_dp ! passing constants (not too important)
       real(dp), parameter :: FUDGEFAC = 0.02_dp ! passing constants (not too important)
-      real(dp), parameter :: CIRCUMSQFACHEX = 2.0_dp ! see identifyLargeTri/processDetectionData
-C                                                    ! ratio of circumradius**2 in largest dislocated triangle to circumradius**2 in equilibrium triangle
-                                                     ! (must be less than 3, because otherwise edge triangles would be counted as "good")
 
       contains
 ************************************************************************
@@ -188,7 +188,6 @@ C     local variables
       integer :: isys, bsgn
       integer :: nslipsys, ncomp, counter
       real(dp) :: direction(2)
-      real(dp) :: padding
       
       mnumfe = detection%mnumfe
       mnum = fematerials%list(mnumfe)
@@ -214,15 +213,26 @@ C     detection stuff
      &                                 detection%burgers*bsgn*direction
               end do    
           end do
-          delaunay%circumradiussqcutoff =
+          detection%delaunay%circumradiussqcutoff =
      &         CIRCUMSQFACHEX*(detection%burgers)**2/3.0_dp ! 1/sqrt(3) is factor for circumradius for equilateral triangle
       end if
       
 C     delaunay stuff
-      padding = DISTPAD*detection%burgers
-      call assignDetectionBand(padding)
+      call processDetectionBand()
       
       end subroutine processDetectionData
+************************************************************************
+      subroutine processDetectionBand()
+
+C     local variables
+      real(dp) :: padding
+
+      padding = DISTPAD*detection%burgers
+      call assignDetectionBand(padding)
+      call findDetectionNodes()
+      neighbors%delaunayregendetect = .true. ! need to generate triangulation
+      
+      end subroutine processDetectionBand
 ************************************************************************
       subroutine writeDetectionData(detectionfile)
  
@@ -260,7 +270,7 @@ C     local variables
       
       end subroutine writeDetectionData
 ************************************************************************
-      subroutine assignDetectionPoints()                                                                                                                                                                                                                                                                                                                                                                                                                                    ctionPoints
+      subroutine findDetectionNodes()
  
 C     Inputs: None
  
@@ -278,7 +288,6 @@ C     may not work since band may shear into two and lose continuity.
 C     local variables
       integer :: i
       integer :: node, counter
-      real(dp) :: tempxy(2,nodes%nrealatoms)
       integer :: tempnodes(nodes%nrealatoms)
       real(dp) :: posn(2)
       
@@ -289,22 +298,17 @@ C     local variables
           if (insideDetectionBand_ptr(posn,
      &                                detection%paramspadded) == 0) then ! use padded params to grab atoms just outside the band
               counter = counter + 1
-              tempxy(:,counter) = posn
               tempnodes(counter) = node
           end if
       end do
       
 C     final result, store in delaunay
-      if (allocated(delaunay%xy)) then
-          deallocate(delaunay%xy)
-      end if
-      if (allocated(delaunay%nodenums)) then
-          deallocate(delaunay%nodenums)
+      if (allocated(detection%delaunay%nodenums)) then
+          deallocate(detection%delaunay%nodenums)
       end if  
-      delaunay%xy = tempxy(:,1:counter)
-      delaunay%nodenums = tempnodes(1:counter)      
+      detection%delaunay%nodenums = tempnodes(1:counter)
       
-      end subroutine assignDetectionPoints
+      end subroutine findDetectionNodes
 ************************************************************************
       subroutine assignDetectionBand(padding)
  
@@ -572,34 +576,29 @@ C     find dislocations (if any), pass them to continuum
      
 C     local variables
       integer :: i
-      integer :: node
       integer :: mnumfe
       real(dp), allocatable :: circuit(:,:)
       real(dp) :: burgersinfnorm
       real(dp) :: burgersvec(2), dislpos(2)
       integer :: bcut, bsgn, isys
     
-C     regen delaunay, if necessary (note: neighbors%delaunayregen set to .true. whenever neighbor list is updated)
-      if (neighbors%delaunayregen) then
-          call assignDetectionPoints() ! reassign nodes/pts
-          call genDelaunay() ! regenerate triangulation
-      else ! otherwise, just update xy coordinates
-          do i = 1, size(delaunay%nodenums)
-              node = delaunay%nodenums(i)
-              delaunay%xy(:,i) = nodes%posn(1:2,node) ! current position
-          end do
-      end if     
+C     regen delaunay, if necessary (note: neighbors%delaunayregendetect set to .true. whenever neighbor list is updated)
+      if (neighbors%delaunayregendetect) then
+          call findDetectionNodes() ! reassign nodes/pts
+      end if
+      call regenDelaunay(detection%delaunay,
+     &                                    neighbors%delaunayregendetect)    
       
 C     compute burgers circuits
       mnumfe = detection%mnumfe
-      circuit = computeCircuits()
+      circuit = computeCircuits(detection%delaunay)
       detected = .false.
-      do i = 1, delaunay%numtri
-      if (delaunay%trigood(i)) then
+      do i = 1, detection%delaunay%numtri
+      if (detection%delaunay%trigood(i)) then
           burgersvec = circuit(:,i)
           burgersinfnorm = maxval(abs(burgersvec))
           if (burgersinfnorm > TOLCONST) then
-              dislpos = getTriCenter(i)
+              dislpos = getTriCenter(detection%delaunay,i)
               if (insideDetectionBand_ptr(dislpos,
      &                                    detection%params) == 0) then ! dislocation must be inside actual detection band (not padded one)
                   write(*,*) 'Found dislocation'

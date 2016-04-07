@@ -3,25 +3,25 @@ Test #1:
 
 Code:
 
-integer :: i
-integer :: point_num
-real(dp) :: point_xy(2,4)
-real(dp) :: res(2,3)
+      integer :: i
+      integer :: point_num
+      real(dp) :: point_xy(2,4)
+      real(dp) :: res(2,3)
+      type(delaunaydata) :: delaunay
+      
+      point_num = 4
+      point_xy(:,1) = [0.0_dp,0.0_dp]
+      point_xy(:,2) = [1.0_dp,0.0_dp]
+      point_xy(:,3) = [1.0_dp,1.0_dp]
+      point_xy(:,4) = [0.0_dp,1.0_dp]
+      delaunay%xy = point_xy
 
-point_num = 4
-point_xy(:,1) = [0.0_dp,0.0_dp]
-point_xy(:,2) = [1.0_dp,0.0_dp]
-point_xy(:,3) = [1.0_dp,1.0_dp]
-point_xy(:,4) = [0.0_dp,1.0_dp]
-delaunay%numpoints = point_num
-delaunay%xy = point_xy
-
-call genDelaunay()
-call prettyPrintMat(delaunay%trivert,'Triangulation')
-do i = 1, delaunay%numtri
-  res = getTriNodes(i)
-  call prettyPrintMat(res,'Triangle')
-end do   
+      call genDelaunay(delaunay)
+      call prettyPrintMat(delaunay%trivert,'Triangulation')
+      do i = 1, delaunay%numtri
+            res = getTriNodes(delaunay,i)
+            call prettyPrintMat(res,'Triangle')
+      end do
 
 Output:
  Triangulation

@@ -1,0 +1,13 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call readCADDMovingMeshData('example_caddmovingmesh_test')
+      write(*,*) movingmesh%deltaxcrack
+      write(*,*) movingmesh%maxshift
+
+Output:
+   1.0000000000000000     
+   10.000000000000000   
+******************************************************   

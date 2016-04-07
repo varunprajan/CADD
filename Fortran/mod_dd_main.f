@@ -518,6 +518,8 @@ C     input variables
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
 C             iplane --- index of slip plane within slip system
+C             iobj --- index of dislocation within slip plane
+C             dislnum --- number of dislocation
 
 C     Purpose: Update disl. position (x, y) and associated attributes (localpos, element, etc.)
 C     using (adjusted) disl. displacement along slip plane, for *single* dislocation
@@ -599,6 +601,8 @@ C         3) If not, then second possibility has occurred: so, delete the discre
 C     Inputs: mnumfe --- number of fe material
 C             isys --- index of slip system
 C             iplane --- index of slip plane within slip system
+C             iobj --- index of dislocation within slip plane
+C             dislnum --- number of dislocation
 
 C     Purpose: Update disl. position (x, y) and associated attributes (localpos, element, etc.)
 C     using (adjusted) disl. displacement along slip plane, for *single* dislocation.

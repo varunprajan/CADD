@@ -12,6 +12,11 @@ Check:
     mod_utils
             
 To be checked:            
+    mod_disl_detect_pass
+        All
+    Redo integration tests (to check mod_io, others?)
+        
+To be checked, later:
     mod_disl_fields
         Ghost dislocation stuff
     mod_fe_main_2d
@@ -19,10 +24,77 @@ To be checked:
     mod_mesh_find
         findInOneMatSub (after reworking)
         
-
-        
+mod_moving_mesh_crack_cadd
+    Doc: Done!
+    initCADDMovingMeshData
+        Doc: Done!
+        Test: Not needed.
+    readCADDMovingMeshData
+        Doc: Done!
+        Test: Done!
+    processCADDMovingMeshData
+        Doc: Done!
+        Test: Done!
+    writeCADDMovingMeshData
+        Doc: Done!
+        Test: Done!
+    moveMeshCrack
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    passDislocationsBefore
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    getNewDetectionBandBefore
+        Doc: Done!
+        Test: Done!
+    passDislocationsAfter
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    getNewDetectionBandAfter
+        Doc: Done!
+        Test: Done!
+    passDislocationsSub
+        Doc: Done!
+        Test: Implicitly, through passDislocationsBefore/After
+    shiftPosnDisp
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    interpFromFEPoint
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    interpFromAtomPoint
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    atomicDispInterpolation
+        Doc: Done!
+        Test: Done!
+    checkTriangle
+        Doc: Done!
+        Test: Done!
+    locateClosestAtomUndef
+        Doc: Done!
+        Test: Done!
+    shiftDDPos
+        Doc: Done!
+        Test: Done!
+    shiftSlipPlanes
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    updateDislPosMovingMesh
+        Doc: Done!
+        Test: Done!
+    updateDislPosMovingMeshSub
+        Doc: Done!
+        Test: Implicitly, through updateDislPosMovingMesh
+    updateSourcePosMovingMesh
+        Doc: Done!
+        Test: Done!
+    updateObstaclePosMovingMesh
+        Doc: Done!
+        Test: Done!
 
 mod_compute
+    Doc: Done!
     initComputeData
         Doc: Done!
         Test: Done!
@@ -40,7 +112,7 @@ mod_compute
         Test: Done!
     writeComputeDataSub
         Doc: Done!
-        Test: Implicitly through readComputeData
+        Test: Implicitly through writeComputeData
     getCentroAtoms
         Doc: Done!
         Test: Implicitly, through atomistic_2
@@ -71,7 +143,7 @@ mod_damping
         Doc: Done!
         Test: Done!
 mod_dd_integrate
-    Doc:
+    Doc: Done!
     assignDispFromPKOneMat
         Doc: Done!
         Test: Implicitly, through source_with_obstacles
@@ -150,12 +222,28 @@ mod_dd_main
         Doc: Done!
         Test: Implicitly, through source_with_obstacles
 mod_delaunay
+    Doc: Done!
+    regenDelaunay
+        Doc: Done!
+        Test: Done!
+    setDelaunayPosDef
+        Doc: Done!
+        Test: Implicitly, through regenDelaunay
+    setDelaunayPosUndef
+        Doc: Done!
+        Test: Not needed. (Sufficiently similar to setDelaunayPos)
+    setDelaunayPos
+        Doc: Done!
+        Test: Implicitly, through regenDelaunay
     genDelaunay
+        Doc: Done!
+        Test: Done!
+    genBadTriangles
         Doc: Done!
         Test: Done!
     getTriNodes
         Doc: Done!
-        Test: Test!
+        Test: Done!
     getTriCenter
         Doc: Done!
         Test: Done!
@@ -169,37 +257,37 @@ mod_disl_detect_pass
     Doc: Done!
     initDetectionData
         Doc: Done!
-        Test: Done!
+        Test:
     readDetectionData
         Doc: Done!
-        Test: Done!
+        Test:
     processDetectionData
         Doc: Done!
-        Test: Done!
+        Test:
     writeDetectionData
         Doc: Done!
-        Test: Done!
+        Test:
     assignDetectionPoints
         Doc: Done!
-        Test: Done!
+        Test:
     assignDetectionBand
         Doc: Done!
         Test: Implicitly, through assignDetectionPoints
     insideAnnulus
         Doc: Done!
-        Test: Done!
+        Test:
     getPaddedParamsAnnulus
         Doc: Done!
-        Test: Done!
+        Test:
     insideRectAnnulus
         Doc: Done!
-        Test: Done!
+        Test:
     getPaddedParamsRectAnnulus
         Doc: Done!
-        Test: Done!
+        Test:
     getDislPropsFromBurgersVec
         Doc: Done!
-        Test: Done!
+        Test:
     getDislBranchCut
         Doc: Done!
         Test: Not needed.
@@ -211,28 +299,28 @@ mod_disl_detect_pass
         Test: Implicitly, through cadd_k_test
     passContinuumToAtomistic
         Doc: Done!
-        Test: Done!
+        Test:
     placeInsideDetection
         Doc: Done!
-        Test: Done!
+        Test:
     placeOutsideDetection
         Doc: Done!
-        Test: Done!
+        Test:
     placeDetectionSub
         Doc: Done
-        Test: Done!
+        Test:
     findInterfaceIntersectionDeformed
         Doc: Done!
-        Test: Done! 
+        Test:
     errorInterface
         Doc: Done!
         Test: Not needed.
     updateAtomsPassing
         Doc: Done!
-        Test: Done!
+        Test:
     imposeDipoleDispOnAtoms
         Doc: Done!
-        Test: Done!
+        Test:
 mod_disl_escaped
     initDislEscapedData
         Doc: Done!
@@ -715,6 +803,25 @@ mod_fe_main_2d_assign
     assignFE
         Doc: Done!
         Test: Implicitly, through simple_fe_pad, etc.
+mod_find_crack_atomistic
+    initAtomFindCrackData
+        Doc: Done!
+        Test: Not needed.
+    readAtomFindCrackData
+        Doc: Done!
+        Test: Done!
+    processAtomFindCrackData
+        Doc: Done!
+        Test: Implicitly, through initSimulation
+    writeAtomFindCrackData
+        Doc: Done!
+        Test: Done!
+    findCrack
+        Doc: Done!
+        Test: Done!
+    isTriangleOnEdge
+        Doc: Done!
+        Test: Done!
 mod_groups
     Doc: Done!
     initGroupData:
@@ -874,7 +981,7 @@ mod_math
         Test: Done!
     linspace
         Doc: Done!
-        Test:
+        Test: Done!
     intToLogical
         Doc: Done!
         Test: Done!
@@ -1015,9 +1122,18 @@ mod_neighbors:
     checkDisp
         Doc: Done!
         Test: Done!
+    genAtomBinsUndeformed
+        Doc: Done!
+        Test: Not needed.
+    genAtomBinsCurrent
+        Doc: Done!
+        Test: Not needed.
     genAtomBins
         Doc: Done!
-        Test: Implicitly, through genNeighList
+        Test: Half done (have not checked undeformed case)
+    getAtomBin
+        Doc: Done!
+        Test: Done!
     genNeighList
         Doc: Done!
         Test: Done!

@@ -9,7 +9,7 @@ C     Notes/TODO: Implement correction step!
       
       use mod_types, only: dp
       use mod_math, only: piconst
-      use mod_delaunay, only: delaunay
+      use mod_delaunay, only: delaunaydata, genBadTriangles
       use mod_materials, only: materials
       
       implicit none
@@ -67,9 +67,9 @@ C     local variables
       
       end subroutine initDislIdentData
 ************************************************************************
-      function computeCircuits() result(circuits)
+      function computeCircuits(delaunay) result(circuits)
 
-C     Inputs: None
+C     Inputs:  delaunay --- structure containing information about delaunay triangulation
 
 C     Outputs: circuits --- array, 2 by numtri, containing burgers vector for each triangle
       
@@ -80,6 +80,9 @@ C     Notes/TODO: This computes vectors for "bad" triangles, which is unnecessar
 C     except for those edges that neighbor good triangles.
 C     
       implicit none
+      
+C     input variables
+      type(delaunaydata) :: delaunay
       
 C     output variables
       real(dp), allocatable :: circuits(:,:)

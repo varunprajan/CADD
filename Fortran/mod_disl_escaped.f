@@ -11,7 +11,8 @@ C     is somewhat involved and difficult to implement.
 C     Long note/TODO: Accounting for these fields properly is tricky, and I'm
 C     not quite sure my discussion below is completely correct. In particular, I'm not sure
 C     if my fields are correct in the case of a cracked body where one dislocation has escaped
-C     but the other has not. Regardless, I think the implementation
+C     but the other has not. The approach also seems to give spurious steps on the crack face
+C     when the moving mesh technique is employed in crack simulations. Regardless, I think the implementation
 C     is substantially better than that in the previous version of the code (which, admittedly, is a low bar).
 
 C     The escaped "dislocations" are not real entities, and their purpose

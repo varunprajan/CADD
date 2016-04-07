@@ -12,7 +12,8 @@ C     Possible extensions: ?
       
       private
       public :: nodes, initNodeData, writeNodeData,
-     & readNodeData, processNodeData, getXYAtomBounds, getXYBounds
+     & readNodeData, processNodeData, getXYAtomBounds, getXYBounds,
+     & getXYAtomBoundsDef, getXYAtomBoundsUndef
       
       type nodedata
 C     read-in
@@ -145,14 +146,57 @@ C     misc. arrays
       
       end subroutine processNodeData
 ************************************************************************
-      subroutine getXYAtomBounds(xmin,xmax,ymin,ymax)
+      subroutine getXYAtomBoundsDef(xmin,xmax,ymin,ymax)
 
 C     Inputs: None
 
-C     Outputs: None
+C     Outputs: xmin, xmax, ymin, ymax --- max x and y positions for all atoms
+
+C     Purpose: Get max, min x- and y-positions for all atoms
+C     (including pad atoms) in *deformed* state
+
+      implicit none
+
+C     output variables
+      real(dp) :: xmin, xmax
+      real(dp) :: ymin, ymax
+      
+      call getXYAtomBounds(.false.,xmin,xmax,ymin,ymax)
+      
+      end subroutine getXYAtomBoundsDef
+************************************************************************
+      subroutine getXYAtomBoundsUndef(xmin,xmax,ymin,ymax)
+
+C     Inputs: None
+
+C     Outputs: xmin, xmax, ymin, ymax --- max x and y positions for all atoms
+
+C     Purpose: Get max, min x- and y-positions for all atoms
+C     (including pad atoms) in *undeformed* state
+
+      implicit none
+
+C     output variables
+      real(dp) :: xmin, xmax
+      real(dp) :: ymin, ymax
+      
+      call getXYAtomBounds(.true.,xmin,xmax,ymin,ymax)
+      
+      end subroutine getXYAtomBoundsUndef
+************************************************************************
+      subroutine getXYAtomBounds(undeformed,xmin,xmax,ymin,ymax)
+
+C     Inputs: undeformed --- flag indicating whether undeformed positions are to be used
+
+C     Outputs: xmin, xmax, ymin, ymax --- max x and y positions for all atoms
 
 C     Purpose: Get max, min x- and y-positions for all atoms
 C     (including pad atoms)
+
+      implicit none
+
+C     input variables
+      logical :: undeformed
 
 C     output variables
       real(dp) :: xmin, xmax
@@ -171,6 +215,10 @@ C     get x, y bounds by looping over all atoms
           atom = nodes%atomlist(i)
           xcurr = nodes%posn(1,atom)
           ycurr = nodes%posn(2,atom)
+          if (undeformed) then
+              xcurr = xcurr - nodes%posn(4,atom)
+              ycurr = ycurr - nodes%posn(5,atom)
+          end if    
           xmin = min(xmin,xcurr)
           xmax = max(xmax,xcurr)
           ymin = min(ymin,ycurr)
@@ -187,6 +235,8 @@ C     Outputs: None
 
 C     Purpose: Get max, min x- and y-positions for all nodes in *undeformed* state
 
+      implicit none
+
 C     output variables
       real(dp) :: xmin, xmax
       real(dp) :: ymin, ymax
@@ -195,8 +245,6 @@ C     local variables
       integer :: i
       real(dp) :: xdef, ydef, xdisp, ydisp, xcurr, ycurr
 
-C     get x, y bounds by looping over all atoms, including pad atoms
-C     could use min, max, but this would result in two loops
       xmin = huge(xmin)
       xmax = -huge(xmax)
       ymin = huge(ymin)

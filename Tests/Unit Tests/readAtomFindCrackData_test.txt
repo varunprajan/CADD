@@ -1,0 +1,11 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call readAtomFindCrackData('example_atomfindcrack_test')
+      write(*,*) crackfinding%mnum
+
+Output:
+           1
+******************************************************   

@@ -1,5 +1,5 @@
 ******************************************************
-Test #1:
+Test #1: Perfect lattice
  
 Code:
 
@@ -20,20 +20,15 @@ Code:
       delaunay%circumradiussqcutoff = 1.1_dp*(1.0_dp/sqrt(3.0_dp))**2
       
       call genDelaunay(delaunay)
-      call prettyPrintMat(delaunay%trivert,'vertices')
-      call prettyPrintMat(delaunay%trivert,'neighbors')
+      call genBadTriangles(delaunay)
+      write(*,*) 'good'
+      write(*,*) delaunay%trigood
 
 Output:
- vertices
-           4           5           3
-           1           4           1
-           3           3           2
- neighbors
-           4           5           3
-           1           4           1
-           3           3           2
+ good
+ T T T
 ******************************************************
-Test #2:
+Test #2: (Circumradius of equilateral triangle is S/sqrt(3))
  
 Code:
 
@@ -58,12 +53,6 @@ Code:
       call prettyPrintMat(delaunay%trivert,'neighbors')
 
 Output:
- vertices
-           5           3           3           5
-           4           4           1           3
-           3           1           2           2
- neighbors
-           5           3           3           5
-           4           4           1           3
-           3           1           2           2
+ good
+ T F F F
 ******************************************************

@@ -18,6 +18,7 @@
      &                                 updateFENodalPosnAll_ptr
       use mod_pad_atoms, only: updatePad
       use mod_utils, only: prettyPrintMat, prettyPrintVec
+      use mod_find_crack_atomistic, only: findCrack
       
       implicit none
       
@@ -31,9 +32,10 @@
       real(dp) :: dt, forcetol
       character(len=15) :: gammasuffix, dtsuffix, stepssuffix
       character(len=:), allocatable :: filename
+      real(dp) :: crackpos(2)
       
 C     read, initialize
-      call initSimulation('cadd_nodisl_k_test_large','cadd_nodisl')
+      call initSimulation('cadd_nodisl_k_test_medium','cadd_nodisl')
       call writeDump_ptr()
       write(*,*) 'Wrote dump'
       
@@ -79,6 +81,8 @@ C     apply K, equilibrate, dump
           call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
      &                               forcetol,natomisticstepstot)
           write(iunit,*) KIapply, natomisticstepstot
+          crackpos = findCrack()
+          write(*,*) 'Crack position', crackpos
           call updateMiscIncrementCurr(1)
           call writeDump_ptr()
       end do
@@ -108,7 +112,7 @@ C     we will check forces on atoms
       counter = 0
       
       do while (forcenorm > forcetol)
-          write(*,*) 'Starting iteration'
+          ! write(*,*) 'Starting iteration'
           call loopVerlet(natomisticsteps,dt,'all',damp) ! step 1 (see Algorithm.txt)
           counter = counter + 1
           
@@ -116,7 +120,7 @@ C     we will check forces on atoms
           call updatePad() ! step 4
           
           forcenorm = maxval(sum(abs(nodes%potforces),1)) ! infinity norm
-          write(*,*) 'forcenorm', forcenorm
+          ! write(*,*) 'forcenorm', forcenorm
       end do
       natomisticstepstot = counter*natomisticsteps
       

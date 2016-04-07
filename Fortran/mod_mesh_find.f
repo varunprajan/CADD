@@ -465,8 +465,6 @@ C     local variables
           end do
           if (proceed) then  ! we're either inside the element or a bad flip happened
               if (.not.badflip) then ! inside the element
-                  r = 0.0_dp
-                  s = 0.0_dp
                   call getLocalCoords(transpose(posn),
      &                                eltypenum,xp,yp,r,s)
               end if
@@ -499,7 +497,7 @@ C     input variables
       integer :: eltypenum
       real(dp) :: xp, yp
       
-C     in/out variables
+C     output variables
       real(dp) :: r, s
       
 C     local variables
@@ -508,12 +506,14 @@ C     local variables
       real(dp) :: rold, sold
 
       norm = huge(0.0_dp)
+      r = 0.0_dp
+      s = 0.0_dp
       do i = 1, COUNTERMAX2
           if (norm < NORMCONST) then
               return
           else    
               rold = r
-              sold = s
+              sold = s             
               call felib(eltypenum)%findinElement_ptr(posn,xp,yp,r,s)
               norm = sqrt((r - rold)**2 + (s - sold)**2)
           end if    

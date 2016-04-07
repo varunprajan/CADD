@@ -1,0 +1,39 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initNodeData('example_nodes_test')
+      call initMaterialData('example_materials_test')
+      call initPotentialData('example_potentials_test')
+      call initMiscData('example_misc_test')
+      call initNeighborData('example_neighbors_test')
+      neighbors%rneigh = 1.0_dp
+      call genAtomBins(.false.) ! deformed coordinates
+      call genNeighList()
+      call prettyPrintMat(transpose(neighbors%binlist),
+     & 'Bin list')
+      call prettyPrintMat(transpose(neighbors%bincount),
+     & 'Bin count')
+
+Output: (Verified this with manual calculation)
+        
+            Neighbor list
+ Bin list
+           2           5
+           6           6
+           4           4
+           5           6
+           9           7
+           1           1
+           1           7
+ Bin count
+           1           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0
+           0           0           0           1           0           0           0           0           0
+           0           1           0           0           0           0           0           0           0
+           0           0           0           0           1           1           0           0           0
+           1           0           0           0           0           0           0           0           1
+
+******************************************************

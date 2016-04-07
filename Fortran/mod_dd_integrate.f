@@ -1,4 +1,11 @@
       module mod_dd_integrate
+
+C     Purpose: Integrates dd equation of motion: dx/dt = F_{pk}/b,
+C     either using the basic forward Euler method or using the gradient
+C     correction method of Chakravarthy and Curtin, 2011, MSMSE. 
+
+C     Notes: See long note for dispFromPKOneMatVCorr describing
+C     possible issues with the gradient correction method.
       
       use mod_types, only: dp
       use mod_disl_try, only: disl
@@ -39,7 +46,7 @@ C     input variables
       select case (gradientcorr)
           case (.true.) ! use gradient correction
               dispFromPKOneMat_ptr => dispFromPKOneMatVCorr
-          case (.false.) ! don't use gradient correction
+          case (.false.) ! don't use gradient correction (i.e., just forward Euler)
               dispFromPKOneMat_ptr => dispFromPKOneMat
       end select
       

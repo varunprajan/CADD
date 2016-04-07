@@ -3,34 +3,35 @@ Test #1: Perfect lattice
 
 Code:
 
-real(dp), allocatable :: circuits(:,:)
 
-integer :: point_num
-real(dp) :: point_xy(2,5)
-real(dp) :: a1(2), a2(2)
+      real(dp), allocatable :: circuits(:,:)
 
-point_num = 5
-a1 = [1.0_dp,0.0_dp]
-a2 = [0.5_dp,0.5_dp*sqrt(3.0_dp)]
-point_xy(:,1) = [0.0_dp,0.0_dp]
-point_xy(:,2) = a1
-point_xy(:,3) = a2
-point_xy(:,4) = a2 - a1
-point_xy(:,5) = 2*a2 - a1
-delaunay%numpoints = point_num
-delaunay%xy = point_xy
-call genDelaunay()
+      integer :: point_num
+      real(dp) :: point_xy(2,5)
+      real(dp) :: a1(2), a2(2)
 
-call initDD()
-call initDislIdentData()
-circuits = computeCircuits()
+      point_num = 5
+      a1 = [1.0_dp,0.0_dp]
+      a2 = [0.5_dp,0.5_dp*sqrt(3.0_dp)]
+      point_xy(:,1) = [0.0_dp,0.0_dp]
+      point_xy(:,2) = a1
+      point_xy(:,3) = a2
+      point_xy(:,4) = a2 - a1
+      point_xy(:,5) = 2*a2 - a1
+      detection%delaunay%xy = point_xy
+      identsimple%mnum = 1
+      call genDelaunay(detection%delaunay)
 
-call prettyPrintMat(circuits,'Burgers vectors')
+      call initSimulation('detect_test_1','dd')
+      call initDislIdentData()
+      circuits = computeCircuits(detection%delaunay)
+      
+      call prettyPrintMat(circuits,'Burgers vectors')
 
 Output:
  Burgers vectors
-   2.2204460492503131E-016  -2.2204460492503131E-016   1.1102230246251565E-016
-   1.3745716479114655E-016   2.2204460492503131E-016   1.1102230246251565E-016
+  -2.2204460492503131E-016   2.2204460492503131E-016   5.5511151231257827E-016
+   3.3306690738754696E-016   0.0000000000000000       -1.1102230246251565E-016
 ******************************************************
 Test #2: Realistic example (see dislocated_hex)
 

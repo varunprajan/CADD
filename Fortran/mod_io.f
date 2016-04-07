@@ -35,6 +35,10 @@ C     from/to files. Can be used to write "dump" or "restart" files.
      &  assembleAndFactorAll_ptr
       use mod_compute, only: initComputeData, writeComputeData
       use mod_dd_main, only: assignDD
+      use mod_moving_mesh_crack_cadd, only: initCADDMovingMeshData,
+     & writeCADDMovingMeshData
+      use mod_find_crack_atomistic, only: initAtomFindCrackData,
+     & writeAtomFindCrackData
       
       implicit none
       
@@ -74,6 +78,10 @@ C     module variables
       character(len=*), parameter :: suffixdetection = '_detection'
       character(len=*), parameter :: suffixgroups = '_groups'
       character(len=*), parameter :: suffixcompute = '_compute'
+      character(len=*), parameter :: suffixcaddmovingmesh =
+     &                                                 '_caddmovingmesh'
+      character(len=*), parameter :: suffixatomfindcrack =
+     &                                                  '_atomfindcrack'
       
       contains
 ************************************************************************
@@ -191,7 +199,7 @@ C     local variables
       call initAtomisticChunk(pref)
       call initFEChunk(pref)
       call initDDChunk(pref)
-      call initCADDNoDislChunk()
+      call initCADDNoDislChunk(pref)
       call initCADDChunk(pref)
       
       end subroutine initCADD
@@ -213,7 +221,7 @@ C     local variables
       call initGeneralChunk(pref)
       call initAtomisticChunk(pref)
       call initFEChunk(pref)
-      call initCADDNoDislChunk()
+      call initCADDNoDislChunk(pref)
       
       end subroutine initCADDNoDisl
 ************************************************************************
@@ -304,7 +312,7 @@ C     Inputs: pref --- file prefix (= misc%simname)
 C     Outputs: None
 
 C     Purpose: Initialize data needed for simulations with atoms:
-C     potential style, potentials, interactions, neighbors, damping
+C     potential style, potentials, interactions, neighbors, damping, atom crack finding
       
       implicit none
 
@@ -370,17 +378,21 @@ C     input variables
       
       end subroutine initDDChunk
 ************************************************************************
-      subroutine initCADDNoDislChunk()
+      subroutine initCADDNoDislChunk(pref)
 
-C     Inputs: None
+C     Inputs: pref --- file prefix (= misc%simname)
 
 C     Outputs: None
 
-C     Purpose: Initialize data needed for simulations with pad atoms
+C     Purpose: Initialize data needed for multiscale simulations (with or without DD)
 
       implicit none
       
+C     input variables      
+      character(len=*) :: pref
+      
       call initPad()
+      call initAtomFindCrackData(pref//suffixatomfindcrack)
       
       end subroutine initCADDNoDislChunk
 ************************************************************************
@@ -399,6 +411,7 @@ C     input variables
       
       call initDetectionData(pref//suffixdetection)
       call initDislIdentData()
+      call initCADDMovingMeshData(pref) 
       
       end subroutine initCADDChunk
 ************************************************************************
@@ -443,6 +456,7 @@ C     local variables
       call writeRestartAtomisticChunk(pref,suff)
       call writeRestartFEChunk(pref,suff)
       call writeRestartDDChunk(pref,suff)
+      call writeRestartCADDNoDislChunk(pref,suff)
       call writeRestartCADDChunk(pref,suff)
       
       end subroutine writeRestartCADD
@@ -468,6 +482,7 @@ C     local variables
       call writeRestartGeneralChunk(pref,suff)
       call writeRestartAtomisticChunk(pref,suff)
       call writeRestartFEChunk(pref,suff)
+      call writeRestartCADDNoDislChunk(pref,suff)
       
       end subroutine writeRestartCADDNoDisl
 ************************************************************************
@@ -573,7 +588,7 @@ C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.
 C     Outputs: None
 
 C     Purpose: Write restart files relevant to simulations with atoms:
-C     potentials, interactions, neighbors, damping
+C     potentials, interactions, neighbors, damping, atom crack finding
 
       implicit none
 
@@ -635,6 +650,26 @@ C     input variables
       
       end subroutine writeRestartDDChunk
 ************************************************************************
+      subroutine writeRestartCADDNoDislChunk(pref,suff)
+
+C     Inputs: pref --- prefix for restart file name (= misc%simname)
+C             suff --- suffix for restart file name (e.g. at increment 0 -> '.0.restart')
+
+C     Outputs: None
+
+C     Purpose: Write restart files relevant to multiscale simulations:
+C     atom finding
+
+      implicit none
+
+C     input variables      
+      character(len=*) :: pref
+      character(len=*) :: suff
+      
+      call writeAtomFindCrackData(pref//suffixatomfindcrack//suff)
+      
+      end subroutine writeRestartCADDNoDislChunk
+************************************************************************
       subroutine writeRestartCADDChunk(pref,suff)
 
 C     Inputs: pref --- prefix for restart file name (= misc%simname)
@@ -651,6 +686,7 @@ C     input variables
       character(len=*) :: suff
       
       call writeDetectionData(pref//suffixdetection//suff)
+      call writeCADDMovingMeshData(pref//suffixcaddmovingmesh//suff)
       
       end subroutine writeRestartCADDChunk
 ************************************************************************

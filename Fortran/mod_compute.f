@@ -98,6 +98,8 @@ C     Outputs: None
 
 C     Purpose: Read data for a specific compute from file
       
+      implicit none
+      
 C     input variables
       integer :: iunit
       type(cdata) :: comp
@@ -284,5 +286,5 @@ C     sort and add n/2 smallest
       centro = sum(temp(1:n/2))
       
       end function getCentroAtom
-************************************************************************    
+************************************************************************  
       end module mod_compute

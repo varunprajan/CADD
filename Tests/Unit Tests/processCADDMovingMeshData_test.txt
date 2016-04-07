@@ -1,0 +1,15 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      call initSimulation('cadd_k_test_medium','dd')
+      call readCADDMovingMeshData('cadd_k_test_medium_caddmovingmesh')
+      call processCADDMovingMeshData()
+      write(*,*) movingmesh%eltypenum
+      write(*,*) shape(movingmesh%delaunay%nodenums)
+
+Output:
+           2
+        2651 
+******************************************************   

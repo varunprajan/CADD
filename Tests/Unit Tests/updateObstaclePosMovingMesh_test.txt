@@ -1,0 +1,48 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, j
+
+      call initSimulation('simple_dd','dd')
+      movingmesh%xshift = -0.2_dp
+      call shiftDDPos()
+      
+      call updateObstaclePosMovingMesh()
+      
+      write(*,*) 'Obstacle positions and elements'
+      do i = 1, size(obstacles(1)%list)
+          write(*,*) 'Pos', (obstacles(1)%list(i)%posn(j), j = 1,2)
+          write(*,*) 'Element', obstacles(1)%list(i)%element
+      end do
+
+Output:
+ Obstacle positions and elements
+ Pos  0.30000000000734678       0.49999999999265321     
+ Element           1
+ Pos   3.3000000000296912        3.4999999999703086     
+ Element          16    
+******************************************************
+Test #2: Move obstacle out of cell
+ 
+Code:
+
+      integer :: i, j
+
+      call initSimulation('simple_dd','dd')
+      movingmesh%xshift = -2.0_dp
+      call shiftDDPos()
+      
+      call updateObstaclePosMovingMesh()
+      
+      write(*,*) 'Obstacle positions and elements'
+      do i = 1, size(obstacles(1)%list)
+          write(*,*) 'Pos', (obstacles(1)%list(i)%posn(j), j = 1,2)
+          write(*,*) 'Element', obstacles(1)%list(i)%element
+      end do
+
+Output: (Error)
+ Could not place obstacle within mesh
+
+******************************************************

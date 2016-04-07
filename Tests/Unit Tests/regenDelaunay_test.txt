@@ -1,0 +1,110 @@
+******************************************************
+Test #1: Don't regenerate triangulation after moving node
+ 
+Code:
+
+      integer :: i
+      real(dp) :: res(2)
+      type(delaunaydata) :: delaunay
+      logical :: regen
+      
+      allocate(nodes%posn(7,4))
+      nodes%posn(1:2,1) = [0.0_dp,0.0_dp]
+      nodes%posn(1:2,2) = [1.0_dp,0.0_dp]
+      nodes%posn(1:2,3) = [1.0_dp,1.0_dp]
+      nodes%posn(1:2,4) = [0.0_dp,1.0_dp]
+      delaunay%nodenums = [1,2,3,4]
+      
+      regen = .true.
+      call regenDelaunay(delaunay,regen)
+      
+      call prettyPrintMat(delaunay%trivert,'Triangulation')
+      do i = 1, delaunay%numtri
+            res = getTriCenter(delaunay,i)
+            write(*,*) 'Center', res
+      end do
+      
+C     displace
+      nodes%posn(1:2,1) = [2.0_dp,0.0_dp]
+      
+      regen = .false.
+      call regenDelaunay(delaunay,regen)
+      
+      call prettyPrintMat(delaunay%trivert,'Triangulation')
+      do i = 1, delaunay%numtri
+            res = getTriCenter(delaunay,i)
+            write(*,*) 'Center', res
+      end do
+      
+      write(*,*) 'Regen?', regen
+
+Output:
+ Triangulation
+           4           4
+           1           2
+           2           3
+ Center  0.33333333333333331       0.33333333333333331     
+ Center  0.66666666666666663       0.66666666666666663     
+ Triangulation
+           4           4
+           1           2
+           2           3
+ Center   1.0000000000000000       0.33333333333333331     
+ Center  0.66666666666666663       0.66666666666666663     
+ Regen? F
+******************************************************
+Test #2: Regenerate triangulation after moving node
+ 
+Code:
+
+      integer :: i
+      real(dp) :: res(2)
+      type(delaunaydata) :: delaunay
+      logical :: regen
+      
+      allocate(nodes%posn(7,4))
+      nodes%posn(1:2,1) = [0.0_dp,0.0_dp]
+      nodes%posn(1:2,2) = [1.0_dp,0.0_dp]
+      nodes%posn(1:2,3) = [1.0_dp,1.0_dp]
+      nodes%posn(1:2,4) = [0.0_dp,1.0_dp]
+      delaunay%nodenums = [1,2,3,4]
+      
+      regen = .true.
+      call regenDelaunay(delaunay,regen)
+      
+      call prettyPrintMat(delaunay%trivert,'Triangulation')
+      do i = 1, delaunay%numtri
+            res = getTriCenter(delaunay,i)
+            write(*,*) 'Center', res
+      end do
+      
+C     displace
+      nodes%posn(1:2,1) = [2.0_dp,0.0_dp]
+      
+      regen = .false.
+      call regenDelaunay(delaunay,regen)
+      
+      call prettyPrintMat(delaunay%trivert,'Triangulation')
+      do i = 1, delaunay%numtri
+            res = getTriCenter(delaunay,i)
+            write(*,*) 'Center', res
+      end do
+      
+      write(*,*) 'Regen?', regen
+
+Output:
+ Triangulation
+           4           4
+           1           2
+           2           3
+ Center  0.33333333333333331       0.33333333333333331     
+ Center  0.66666666666666663       0.66666666666666663     
+ Triangulation
+           4           3
+           2           2
+           3           1
+ Center  0.66666666666666663       0.66666666666666663     
+ Center   1.3333333333333333       0.33333333333333331     
+ Regen? F
+
+******************************************************

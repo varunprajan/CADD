@@ -1,0 +1,24 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, j
+
+      call initSimulation('simple_dd','dd')
+      movingmesh%xshift = -2.0_dp
+      call shiftDDPos()
+      
+      call updateSourcePosMovingMesh()
+      
+      write(*,*) 'Source positions and elements'
+      do i = 1, size(sources(1)%list)
+          write(*,*) 'Pos', (sources(1)%list(i)%posn(j), j = 1,2)
+          write(*,*) 'Element', sources(1)%list(i)%element
+      end do
+
+Output:
+ Source positions and elements
+ Pos   1.0000000000259677        2.9999999999740323     
+ Element          10      
+******************************************************

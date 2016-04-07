@@ -3,7 +3,7 @@ Test #1: One material
  
 Code:
 
-      real(dp) :: dislposold(2), trig(2), dislposnew(2)
+      real(dp) :: dislposold(2), trig(2), dislposnew(2), corepos(2)
       real(dp) :: dispnorm, burgers
       integer :: bsgn, bcut
       
@@ -27,7 +27,8 @@ C     update positions, run damped MD
       detection%damp%gname = 'temp'
       detection%damp%gamma = 0.5_dp
       detection%mdnincrements = 200
-      call updateAtomsPassing(dislposold,dislposnew,
+      corepos = dislposold
+      call updateAtomsPassing(dislposold,dislposnew,corepos,
      &                        burgers,bsgn,bcut,trig(1),trig(2))
  
 C     write dump

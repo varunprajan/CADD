@@ -21,9 +21,11 @@ C     Possible extensions: ?
       private
       public :: neighbors, updateNeighborsCheck, initNeighborData,
      &          writeNeighborData, genNeighList, checkDisp,
-     &          updatePosSinceLastCheck, readNeighborData, genAtomBins,
+     &          updatePosSinceLastCheck, readNeighborData, atombox,
      &          processNeighborData, updateNeighIncrementCurr,
-     &          getAtomsInBoxGroupTemp, updateNeighborsNoCheck
+     &          getAtomsInBoxGroupTemp, updateNeighborsNoCheck,
+     &          genAtomBins, genAtomBinsCurrent, genAtomBinsUndeformed,
+     &          getAtomBin, isInAtomBox
       
       type neighbordata
 C     read-in
@@ -34,7 +36,8 @@ C     read-in
       real(dp) :: Lz
       real(dp) :: skin
 C     processed
-      logical :: delaunayregen
+      logical :: delaunayregendetect
+      logical :: delaunayregencrack
       integer :: incrementcurr
       integer ,allocatable :: binlist(:,:)
       integer, allocatable :: bincount(:,:)
@@ -281,12 +284,13 @@ C     *without checking* "check", "delay", and "every" conditions.
       implicit none
       
 C     write(*,*) 'Updated neighbors'
-      call genAtomBins()
+      call genAtomBinsCurrent()
       call genNeighList()
       call updatePosSinceLastCheck()
       neighbors%incrementcurr = 0
       neighbors%incrsincelastupdate = neighbors%incrementcurr
-      neighbors%delaunayregen = .true. ! need to regenerate triangulation, since neighbor list has been updated
+      neighbors%delaunayregendetect = .true. ! need to regenerate triangulation, since neighbor list has been updated
+      neighbors%delaunayregencrack = .true. ! need to regenerate triangulation, since neighbor list has been updated
       
       end subroutine
 ************************************************************************
@@ -358,9 +362,43 @@ C     goal: get two largest displacements since last check
       
       end function checkDisp
 ************************************************************************
-      subroutine genAtomBins()
+      subroutine genAtomBinsCurrent()
 
 C     Inputs: None
+
+C     Outputs: None
+
+C     Purpose: Assign atoms in current positions to bins (see binlist, binarray, bincount)
+
+C     Notes: Binning is efficient only when atoms are roughly
+C     contiguous (otherwise, bins are too large).
+
+      implicit none
+      
+      call genAtomBins(.false.)
+      
+      end subroutine genAtomBinsCurrent
+************************************************************************
+      subroutine genAtomBinsUndeformed()
+
+C     Inputs: None
+
+C     Outputs: None
+
+C     Purpose: Assign atoms in undeformed positions to bins (see binlist, binarray, bincount)
+
+C     Notes: Binning is efficient only when atoms are roughly
+C     contiguous (otherwise, bins are too large).
+
+      implicit none
+      
+      call genAtomBins(.true.)
+      
+      end subroutine genAtomBinsUndeformed
+************************************************************************
+      subroutine genAtomBins(undeformed)
+
+C     Inputs: undeformed --- flag indicating whether undeformed positions are to be used
 
 C     Outputs: None
 
@@ -371,6 +409,9 @@ C     contiguous (otherwise, bins are too large).
 
       implicit none
       
+C     input variables
+      logical :: undeformed    
+      
 C     local variables
       integer :: nbinsx, nbinsy
       integer :: i
@@ -379,14 +420,13 @@ C     local variables
       integer :: binx, biny, bcount
       
 C     get x, y bounds, store in atombox structure
-      call getXYAtomBounds(atombox%xmin,atombox%xmax,
-     &                     atombox%ymin,atombox%ymax)
+      call getXYAtomBounds(undeformed,atombox%xmin,atombox%xmax,
+     &                                atombox%ymin,atombox%ymax)
       
 C     figure out # of bins, fudge end points slightly b/c of finite prec.
       atombox%xmin = atombox%xmin - TOLCONST
       atombox%ymin = atombox%ymin - TOLCONST
-      nbinsx = ceiling((atombox%xmax - atombox%xmin)/neighbors%rneigh)
-      nbinsy = ceiling((atombox%ymax - atombox%ymin)/neighbors%rneigh)
+      call getAtomBin(atombox%xmax,atombox%ymax,nbinsx,nbinsy) ! atom at xmax, ymax is in largest bin
       
 C     (re)allocate/initialize arrays
       if (allocated(neighbors%binarray)) then
@@ -406,8 +446,11 @@ C     assign atoms to bins
           atom = nodes%atomlist(i)
           x = nodes%posn(1,atom)
           y = nodes%posn(2,atom)
-          binx = ceiling((x - atombox%xmin)/neighbors%rneigh)
-          biny = ceiling((y - atombox%ymin)/neighbors%rneigh)
+          if (undeformed) then
+              x = x - nodes%posn(4,atom)
+              y = y - nodes%posn(5,atom)
+          end if
+          call getAtomBin(x,y,binx,biny)
           neighbors%binlist(1,i) = binx
           neighbors%binlist(2,i) = biny
           bcount = neighbors%bincount(binx,biny) + 1
@@ -422,6 +465,52 @@ C     assign atoms to bins
       
       end subroutine genAtomBins
 ************************************************************************
+      function isInAtomBox(x,y) result(inatombox)
+
+C     Inputs: x, y --- positions of point
+
+C     Outputs: inatombox --- logical indicating if point is inside atom box
+
+C     Purpose: Get the bin for an atom from its position
+
+      implicit none
+      
+C     input variables
+      real(dp) :: x, y
+      
+C     output variables
+      logical :: inatombox
+      
+C     local variables
+      logical :: xcond, ycond
+      
+      xcond = ((x >= atombox%xmin).and.(x <= atombox%xmax))
+      ycond = ((y >= atombox%ymin).and.(y <= atombox%ymax))
+      inatombox = (xcond.and.ycond)
+      
+      end function isInAtomBox
+************************************************************************      
+      subroutine getAtomBin(x,y,binx,biny)
+
+C     Inputs: x, y --- positions of atom
+
+C     Outputs: binx, biny --- bin numbers in the x and y direction
+
+C     Purpose: Get the bin for an atom from its position
+
+      implicit none
+
+C     input variables
+      real(dp) :: x, y
+      
+C     output variables
+      integer :: binx, biny
+
+      binx = ceiling((x - atombox%xmin)/neighbors%rneigh)
+      biny = ceiling((y - atombox%ymin)/neighbors%rneigh)
+      
+      end subroutine getAtomBin
+************************************************************************      
       subroutine genNeighList()
 
 C     Inputs: None
@@ -527,12 +616,11 @@ C     local variables
       integer :: gnum
       
       ! regenerate atom bins...
-      call genAtomBins()
+      call genAtomBinsCurrent()
       
-      binxmin = ceiling((xmin - atombox%xmin)/neighbors%rneigh)
-      binymin = ceiling((ymin - atombox%ymin)/neighbors%rneigh)
-      binxmax = ceiling((xmax - atombox%xmin)/neighbors%rneigh)
-      binymax = ceiling((ymax - atombox%ymin)/neighbors%rneigh)
+      ! get the limiting atomic bins for our box
+      call getAtomBin(xmin,ymin,binxmin,binymin)
+      call getAtomBin(xmax,ymax,binxmax,binymax)
       
       ! make sure box doesn't extend past atom box
       nbinsx = size(neighbors%bincount,1)
@@ -573,5 +661,5 @@ C     get/regenerate masks
       call genGroupMaskAtoms(gnum)
       
       end subroutine getAtomsInBoxGroupTemp
-************************************************************************
+************************************************************************      
       end module mod_neighbors

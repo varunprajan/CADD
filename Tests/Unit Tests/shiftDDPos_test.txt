@@ -1,0 +1,41 @@
+******************************************************
+Test #1:
+ 
+Code:
+
+      integer :: i, j
+
+      call initSimulation('simple_dd','dd')
+      movingmesh%xshift = -2.0_dp
+      call shiftDDPos()
+      
+      write(*,*) 'Dislocation positions'
+      do i = 1, disl(1)%ndisl
+          write(*,*) (disl(1)%list(i)%posn(j), j = 1,2)
+      end do
+      
+      write(*,*) 'Source positions'
+      do i = 1, size(sources(1)%list)
+          write(*,*) (sources(1)%list(i)%posn(j), j = 1,2)
+      end do
+      
+      write(*,*) 'Obstacle positions'
+      do i = 1, size(obstacles(1)%list)
+          write(*,*) (obstacles(1)%list(i)%posn(j), j = 1,2)
+      end do
+
+Output:
+ Dislocation positions
+  -1.7500000000000000        0.0000000000000000     
+ -0.75000000000000000        3.0000000000000000     
+   1.2500000000000000        2.0000000000000000     
+  0.25000000000000000        2.0000000000000000     
+   1.7500000000000000        2.0000000000000000     
+  -1.4999999999926532       0.49999999999265321     
+   1.5000000000296914        3.4999999999703086     
+ Source positions
+   1.0000000000259677        2.9999999999740323     
+ Obstacle positions
+  -1.4999999999926532       0.49999999999265321     
+   1.5000000000296914        3.4999999999703086        
+******************************************************

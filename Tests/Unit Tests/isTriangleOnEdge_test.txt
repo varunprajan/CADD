@@ -1,0 +1,87 @@
+******************************************************
+Test #1: All nodes are interface nodes
+ 
+Code:
+
+      integer :: nodenum(3), node(3)
+      integer :: i
+      logical :: isedge, regen
+      
+C     initialize simulation, reset timestep, output dump
+      call initSimulation('atomistic_3','atomistic')
+      misc%incrementcurr = 0
+      call writeDump_ptr()
+      
+      regen = .true.
+      call regenDelaunay(crackfinding%delaunay,regen)
+      
+      nodenum = crackfinding%delaunay%trivert(:,1)
+      do i = 1, 3
+          node(i) = crackfinding%delaunay%nodenums(nodenum(i))
+          nodes%types(2,node(i)) = 2
+      end do
+      
+      isedge = isTriangleOnEdge(crackfinding%delaunay,1)
+      write(*,*) isedge
+
+Output:
+ T
+******************************************************
+Test #2: No nodes are interface nodes
+ 
+Code:
+
+      integer :: nodenum(3), node(3)
+      integer :: i
+      logical :: isedge, regen
+      
+C     initialize simulation, reset timestep, output dump
+      call initSimulation('atomistic_3','atomistic')
+      misc%incrementcurr = 0
+      call writeDump_ptr()
+      
+      regen = .true.
+      call regenDelaunay(crackfinding%delaunay,regen)
+      
+      nodenum = crackfinding%delaunay%trivert(:,1)
+      do i = 1, 3
+          node(i) = crackfinding%delaunay%nodenums(nodenum(i))
+          nodes%types(2,node(i)) = 0
+      end do
+      
+      isedge = isTriangleOnEdge(crackfinding%delaunay,1)
+      write(*,*) isedge
+
+Output:
+ F
+******************************************************
+Test #3: One node is an interface node
+ 
+Code:
+
+      integer :: nodenum(3), node(3)
+      integer :: i
+      logical :: isedge, regen
+      
+C     initialize simulation, reset timestep, output dump
+      call initSimulation('atomistic_3','atomistic')
+      misc%incrementcurr = 0
+      call writeDump_ptr()
+      
+      regen = .true.
+      call regenDelaunay(crackfinding%delaunay,regen)
+      
+      nodenum = crackfinding%delaunay%trivert(:,1)
+      do i = 1, 3
+          node(i) = crackfinding%delaunay%nodenums(nodenum(i))
+          nodes%types(2,node(i)) = 1
+      end do
+      
+      nodes%types(2,node(2)) = 2
+      
+      isedge = isTriangleOnEdge(crackfinding%delaunay,1)
+      write(*,*) isedge
+
+Output:
+ T
+******************************************************

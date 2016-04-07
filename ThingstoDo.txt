@@ -2,11 +2,19 @@ Things to do:
 
 Algorithmic issues:
     Moving mesh
-        Devise algorithm, implement
-        May need to implement crack finding algorithm
+        Issues
+            Continuum dislocation escaping mesh
+            Continuum dislocation crossing into atomistic region
+            Atomistic dislocation crossing into continuum region
+            Ghost dislocation moving over long distances
+            Replenish sources, obstacles
+    Issue with delaunayregen
+            
+    Crack finding
     Dislocation passing
         Problem with assigning "crack region" to dislocation originating from atomistic region
-        Dipole displacements of atoms may be too large if atom is close to dislocation center 
+        Dipole displacements of atoms may be too large if atom is close to dislocation center
+        Do we need to identify dislocations in the "inner ring" of continuum elements before they reach the interface?
     Mesh find
         Fix findInOneMatSub
 

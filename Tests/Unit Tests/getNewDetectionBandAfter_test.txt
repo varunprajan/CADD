@@ -1,0 +1,39 @@
+******************************************************
+Test #1: abs(xmax - xc) > abs(xmin - xc)
+ 
+Code:
+
+      real(dp) :: xmin, xmax, ymin, ymax
+      real(dp), allocatable :: paramsnew(:)
+
+      detection%params = [0.0_dp,0.0_dp,10.0_dp,15.0_dp,10.0_dp,15.0_dp]
+      detection%bandtype = 'rect_annulus'
+      xmin = -16.0_dp
+      xmax = 17.0_dp
+      ymin = -16.0_dp
+      ymax = 16.0_dp
+      paramsnew = getNewDetectionBandAfter(xmin,xmax,ymin,ymax)
+      write(*,*) paramsnew
+
+Output:
+   0.0000000000000000        0.0000000000000000        10.000000000000000        17.000000000000000        10.000000000000000        15.000000000000000      
+******************************************************
+Test #2: abs(xmax - xc) < abs(xmin - xc)
+ 
+Code:
+
+      real(dp) :: xmin, xmax, ymin, ymax
+      real(dp), allocatable :: paramsnew(:)
+
+      detection%params = [0.0_dp,0.0_dp,10.0_dp,15.0_dp,10.0_dp,15.0_dp]
+      detection%bandtype = 'rect_annulus'
+      xmin = -16.0_dp
+      xmax = 15.0_dp
+      ymin = -16.0_dp
+      ymax = 16.0_dp
+      paramsnew = getNewDetectionBandAfter(xmin,xmax,ymin,ymax)
+      write(*,*) paramsnew
+
+Output:
+   0.0000000000000000        0.0000000000000000        10.000000000000000        16.000000000000000        10.000000000000000        15.000000000000000     
+******************************************************

@@ -1,0 +1,29 @@
+******************************************************
+Test #1:
+
+Code:
+
+      integer :: binx, biny
+      atombox%xmin = 1.0_dp
+      atombox%ymin = 1.0_dp
+      neighbors%rneigh = 2.0_dp
+      call getAtomBin(2.0_dp,4.0_dp,binx,biny)
+      write(*,*) binx, biny
+
+Output:
+           1           2  
+ ******************************************************
+ Test #2:
+
+Code:
+
+      integer :: binx, biny
+      atombox%xmin = 1.0_dp
+      atombox%ymin = 1.0_dp
+      neighbors%rneigh = 2.0_dp
+      call getAtomBin(1.1_dp,8.2_dp,binx,biny)
+      write(*,*) binx, biny
+
+Output:
+           1           4   
+ ******************************************************

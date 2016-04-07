@@ -1,14 +1,15 @@
       module mod_moving_mesh_crack_cadd
       
 C     Purpose: Implements moving mesh technique for CADD crack problem, similar
-C     to that outlined in Chakravarthy and Curtin, 2011, MSMSE for the DD crack problem.
-C     In the moving mesh method, the problem is shifted so that a crack at (xcrack, 0)
-C     is moved to (0, 0). To do this, displacements are found at nodes
+C     to that outlined in Chakravarthy and Curtin, 2011, MSMSE for the pure DD crack problem.
+C     In the moving mesh method, the problem is shifted so that a crack at (xcrack, ycrackpos)
+C     is moved to (xsmall, ycrackpos), where xsmall is close to zero
+C     and ycrackpos probably is as well. To do this, displacements are found at nodes
 C     in the original mesh by finding the corresponding displacement
-C     at a point shifted by (xcrack, 0) using interpolation.
+C     at a point shifted by (xcrack, ycrackpos) using interpolation.
 C     Also, dislocations are shifted by the same amount. In the end,
 C     the result is that all of the field variables have been shifted by xcrack,
-C     the crack is back at (xsmall, 0), where xsmall is very close to 0,
+C     the crack is back at (xsmall, ycrackpos), where xsmall is very close to 0,
 C     and the mesh is unchanged (stiffness matrix is the same, etc.).
 
 C     Long note: There are many limitations/potential problems associated with the moving mesh technique for crack simulations.
@@ -30,6 +31,10 @@ C     moved into the continuum (since the continuum obviously can't represent
 C     the dislocation properly). Thus, before the moving mesh technique is applied,
 C     the detection band is expanded *inward*, and dislocations are detected and passed out.
 C     Again, whether this is a good solution is unclear.
+C     6) The interpolation of displacements may fail in regions where the
+C     deformation is non-affine. This may happen for large xshift = xcrack - xsmall
+C     and when dislocation cuts are present in the left part of the domain
+C     (which might happen if dislocations can be emitted backwards).
 
 C     Issue #3 can probably be resolved with a better algorithm,
 C     where dislocations are passed out of the simulation cell to become
@@ -37,6 +42,14 @@ C     escaped dislocations, and sources/obstacles are deactivated when
 C     they leave the simulation cell (although this might cause unpinning
 C     of dislocation pileups, etc.)
 
+C     Notes/TODO: This module needs to be thoroughly tested using integration tests.
+C     I'm particularly worried about the case where a discrete dislocation
+C     leaves the simulation cell during the shifting process.
+
+C     Other notes/TODO: Do dislocation sources and obstacles need to be
+C     "replenished" as they are lost from the region ahead of the crack?
+
+      use mod_utils, only: prettyPrintMat
       use mod_types, only: dp
       use mod_nodes, only: nodes, getXYAtomBoundsDef
       use mod_misc, only: misc
@@ -50,17 +63,18 @@ C     of dislocation pileups, etc.)
       use mod_disl_ghost, only: ghostdisl
       use mod_slip_sys, only: slipsys
       use mod_neighbors, only: genAtomBinsUndeformed, neighbors,
-     &                         getAtomBin, updateNeighborsNoCheck
-      use mod_delaunay, only: delaunaydata, genDelaunay
+     &                isInAtomBox, getAtomBin, updateNeighborsNoCheck
+      use mod_delaunay, only: delaunaydata, genDelaunay,
+     & setDelaunayPosUndef
       use mod_mesh_find, only: findInAllWithGuessDef, getLocalCoords,
      & findInAllInitiallyUndef, findInAllWithGuessUndef
       use mod_disl_detect_pass, only: detectAndPassDislocations,
      & detection, processDetectionBand
+     
       implicit none
       
       type movingmeshdata
 C     read-in
-      logical :: active
       real(dp) :: deltaxcrack
       real(dp) :: maxshift
 C     processed
@@ -75,11 +89,25 @@ C     module variables (global)
       private
       public :: moveMeshCrack, shiftPosnDisp, initCADDMovingMeshData,
      &  interpFromFEPoint, interpFromAtomPoint, readCADDMovingMeshData,
-     &  genAtomTriangulationUndeformed, writeCADDMovingMeshData
+     &  writeCADDMovingMeshData, passDislocationsBefore, movingmesh,
+     &  passDislocationsAfter, passDislocationsSub, checkTriangle,
+     &  locateClosestAtomUndef, shiftDDPos, shiftSlipPlanes,
+     &  updateDislPosMovingMesh, updateDislPosMovingMeshSub,
+     &  updateSourcePosMovingMesh, updateObstaclePosMovingMesh,
+     &  processCADDMovingMeshData, getNewDetectionBandAfter,
+     &  getNewDetectionBandBefore, isInAtomBox, atomicDispInterpolation
 
       contains
 ************************************************************************
       subroutine initCADDMovingMeshData(movingmeshfile)
+ 
+C     Inputs: movingmeshfile --- filename where moving mesh information is stored
+C     (should be something like '[filepref]_caddmovingmesh')
+ 
+C     Outputs: None
+ 
+C     Purpose: Read, initialize data in "movingmesh" structure, which holds
+C     information about the moving mesh method for CADD problems
       
       implicit none
       
@@ -87,10 +115,18 @@ C     input variables
       character(len=*) :: movingmeshfile
       
       call readCADDMovingMeshData(movingmeshfile)
+      call processCADDMovingMeshData()      
       
       end subroutine initCADDMovingMeshData
 ************************************************************************
       subroutine readCADDMovingMeshData(movingmeshfile)
+ 
+C     Inputs: movingmeshfile --- filename where moving mesh information is stored
+C     (should be something like '[filepref]_caddmovingmesh')
+ 
+C     Outputs: None
+ 
+C     Purpose: Read moving mesh data from file
       
       implicit none
       
@@ -109,13 +145,28 @@ C     local variables
       end subroutine readCADDMovingMeshData
 ************************************************************************
       subroutine processCADDMovingMeshData()
+ 
+C     Inputs: None
+ 
+C     Outputs: None
+ 
+C     Purpose: Set up node numbers for delaunay triangulation (used for interpolation),
+C     etc.
       
-      movingmesh%delaunay%nodenums = nodes%atomlist
-      allocate(movingmesh%delaunay%xy(2,nodes%natoms))
+      movingmesh%delaunay%nodenums = nodes%atomlist ! moving mesh triangulation uses all atoms, including pad
+      movingmesh%eltypenum = getElTypeNum('CPE3') ! triangle
       
       end subroutine processCADDMovingMeshData
 ************************************************************************
       subroutine writeCADDMovingMeshData(movingmeshfile)
+ 
+C     Inputs: movingmeshfile --- filename where moving mesh information is stored
+C     (should be something like '[filepref]_caddmovingmesh')
+ 
+C     Outputs: None
+ 
+C     Purpose: Write moving mesh data to file (essentially
+C     inverse of readCADDMovingMeshData). Useful in creating "restart" file
       
       implicit none
       
@@ -134,14 +185,40 @@ C     local variables
       end subroutine writeCADDMovingMeshData
 ************************************************************************
       subroutine moveMeshCrack(crackpos)
+ 
+C     Inputs: crackpos --- current x, y coordinates of crack (real vector, length 2)
+ 
+C     Outputs: None
+ 
+C     Purpose: Run the moving mesh method to relocate the crack at position (xcrackpos, ycrackpos)
+C     to position (xsmall, ycrackpos), where xsmall is close to zero
+C     (but not exactly zero, due to lattice discreteness). Several steps:
+C     0) compute x-shift of the crack (= epsilon - xcrackpos).
+C        Shift must be multiple of deltaxcrack, and no larger than maxshift
+C     1) pass dislocations (outward) from the atomistic region ---
+C        we don't want these to be moved into the continuum
+C     2) assign new displacements to the nodes so that, in essence,
+C        everything is shifted back by xshift, but we retain the old mesh (i.e., the stiffness matrix is the same)
+C     3) move all DD objects (dislocations of all types, sources, obstacles, and slip planes) back by xshift
+C     4) update local positions of these objects (i.e., find the new elements in which they reside)
+C     5) now, we have shifted everything appropriately. However, there may
+C        be dislocations in the atomistic region outside of the detection band.
+C        These must be passed outward, since they cannot be detected
       
+      implicit none
+            
 C     input variables
       real(dp) :: crackpos(2)
       
       movingmesh%xshift = -nearestMultiple(crackpos(1),
      &                                     movingmesh%deltaxcrack) ! shift must be integer multiple of deltaxcrack
                                                                    ! shift is backwards (hence negative sign)
-      movingmesh%eltypenum = getElTypeNum('CPE3') ! triangle
+                                                                   
+      if (abs(movingmesh%xshift) > movingmesh%maxshift) then
+          write(*,*) 'Crack shift is too large'
+          stop
+      end if
+      
       call passDislocationsBefore()    
       call shiftPosnDisp()
       call shiftDDPos()
@@ -155,28 +232,189 @@ C     input variables
       end subroutine moveMeshCrack
 ************************************************************************
       subroutine passDislocationsBefore()
+ 
+C     Inputs: None
+
+C     Outputs: None
+ 
+C     Purpose: Dislocations in the atomistic region must be passed out
+C     before the moving mesh method is applied if they would otherwise
+C     end up in the continuum region. The reason is that the continuum
+C     cannot represent an atomistic dislocation properly with displacements alone
+C     (we need an actual discrete dislocation object).
+
+C     To do this, we expand the dislocation band inward, detect the dislocations
+C     and pass them out. A problem may arise if the shift distance is too large, 
+C     where we pass out dislocations very deep in the interior of the atomistic region.
+C     So this possibility should be checked carefully
       
-      call passDislocationsSub('inner')
+      implicit none
+      
+C     local variables
+      real(dp) :: xmin, xmax, ymin, ymax      
+      real(dp), allocatable :: paramsnew(:)
+      real(dp) :: maxdisttointerface
+      
+C     get atom box
+      call getXYAtomBoundsDef(xmin,xmax,ymin,ymax)
+      maxdisttointerface = sqrt((xmax - xmin)**2 + (ymax - ymin)**2)
+      
+C     get new detection band
+      paramsnew = getNewDetectionBandBefore(xmin,xmax,ymin,ymax)
+      
+      call passDislocationsSub(maxdisttointerface,paramsnew)
       
       end subroutine passDislocationsBefore
 ************************************************************************
-      subroutine passDislocationsAfter()
+      function getNewDetectionBandBefore(xmin,xmax,ymin,ymax)
+     &                                                result(paramsnew)
+ 
+C     Inputs: xmin, xmax, ymin, ymax --- min, max x- and y-coordinates
+C       of atomistic region in *deformed* configuration
+
+C     Outputs: paramsnew --- new parameters for detection band (annulus),
+
+C     Purpose: Construct a new detection band that captures all dislocations
+C     that might otherwise be (spuriously) moved into the continuum. The strategy
+C     is to shift the left inner boundary of the box to encompass more space.
+C     This also causes the box's center to shift as well
+     
+      implicit none
+
+C     input variables
+      real(dp) :: xmin, xmax, ymin, ymax
       
-      call passDislocationsSub('outer')
+C     output variables
+      real(dp), allocatable :: paramsnew(:)
+
+C     local variables
+      real(dp) :: xc, xcnew
+      real(dp) :: halfLxinner, halfLxinnernew
+      real(dp) :: halfLxouter, halfLxouternew
+      real(dp) :: xmininner1, xmininner2, xmininnernew
+      real(dp) :: xminouter, xmaxinner
+     
+C     construct new detection band, with center and thickness shifted in x
+C     (this is a bit complicated, and requires a picture to understand)
+      paramsnew = detection%params
+      if (detection%bandtype == 'rect_annulus') then
+          xc = paramsnew(1)
+          halfLxinner = paramsnew(3)
+          halfLxouter = paramsnew(4)
+          xmininner1 = xc - halfLxinner
+          xmininner2 = xmin - movingmesh%xshift
+          xmininnernew = max(xmininner1,xmininner2)
+          xmaxinner = xc + halfLxinner
+          xcnew = 0.5_dp*(xmininnernew + xmaxinner)
+          halfLxinnernew = xcnew - xmininnernew
+          xminouter = xc - halfLxouter                
+          halfLxouternew = xcnew - xminouter
+          paramsnew(1) = xcnew
+          paramsnew(3) = halfLxinnernew
+          paramsnew(4) = halfLxouternew
+      else
+          write(*,*) 'Method is undefined for non-rectangular bands'
+          stop
+      end if
+      
+      end function getNewDetectionBandBefore
+************************************************************************
+      subroutine passDislocationsAfter()
+ 
+C     Inputs: None
+
+C     Outputs: None
+ 
+C     Purpose: After the moving mesh method is applied, dislocations
+C     may reside outside of the detection band in the atomistic region.
+C     (Due to continuum dislocations lying ahead of the atomistic region)
+C     These cannot be detected, so they must be passed out before the 
+C     normal CADD loop can resume.
+
+C     To do this, we expand the dislocation band outward to cover the entire
+C     atomistic region, and pass out any dislocations we find.
+
+      implicit none
+
+C     local variables
+      real(dp) :: xmin, xmax, ymin, ymax      
+      real(dp), allocatable :: paramsnew(:)
+      real(dp) :: maxdisttointerface
+      
+C     get atom box
+      call getXYAtomBoundsDef(xmin,xmax,ymin,ymax)
+      maxdisttointerface = sqrt((xmax - xmin)**2 + (ymax - ymin)**2)
+
+C     get new detection band
+      paramsnew = getNewDetectionBandAfter(xmin,xmax,ymin,ymax) 
+      
+      call passDislocationsSub(maxdisttointerface,paramsnew)
       
       end subroutine passDislocationsAfter
 ************************************************************************
-      subroutine passDislocationsSub(option)
+      function getNewDetectionBandAfter(xmin,xmax,ymin,ymax)
+     &                                                result(paramsnew)
+ 
+C     Inputs: xmin, xmax, ymin, ymax --- min, max x- and y-coordinates
+C       of atomistic region in *deformed* configuration
+
+C     Outputs: paramsnew --- new parameters for detection band (annulus),
+
+C     Purpose: Construct a new detection band that captures all dislocations
+C     that might have been moved outside of the detection band as a result
+C     of the moving mesh method. Basically, we simple expand the outer band
+C     of the detection band to encompass the entire atomistic region.
+
+      implicit none
+
+C     input variables
+      real(dp) :: xmin, xmax, ymin, ymax
+      
+C     output variables
+      real(dp), allocatable :: paramsnew(:)
+      real(dp) :: xc
+      real(dp) :: xdist1, xdist2
+      real(dp) :: halfLxouternew
+
+C     construct new detection band, expanded outward to reach interface
+      paramsnew = detection%params
+      if (detection%bandtype == 'rect_annulus') then
+          xc = paramsnew(1)
+          xdist1 = xc - xmin
+          xdist2 = xmax - xc
+          halfLxouternew = max(xdist1,xdist2)
+          paramsnew(4) = halfLxouternew
+      else
+          write(*,*) 'Method is undefined for non-rectangular bands'
+          stop
+      end if     
+     
+      end function getNewDetectionBandAfter
+************************************************************************
+      subroutine passDislocationsSub(maxdisttointerface,paramsnew)
+ 
+C     Inputs: None
+
+C     Outputs: None
+ 
+C     Purpose: After the moving mesh method is applied, dislocations
+C     may reside outside of the detection band in the atomistic region.
+C     (Due to continuum dislocations lying ahead of the atomistic region)
+C     These cannot be detected, so they must be passed out before the 
+C     normal CADD loop can resume.
+
+C     To do this, we expand the dislocation band outward to cover the entire
+C     atomistic region, and pass out any dislocations we find.
+      
+      implicit none
       
 C     input variables
-      character(len=*) :: option
+      real(dp) :: maxdisttointerface
+      real(dp) :: paramsnew(:)
       
 C     local variables
-      real(dp) :: xmin, xmax, ymin, ymax
       real(dp) :: tempmaxdisttointerface
       real(dp), allocatable :: tempparams(:), tempparamspadded(:)
-      real(dp) :: xc, xmin1, xmin2, xminnew, xdist1, xdist2
-      real(dp) :: halfLxinner, halfLxouter
       logical :: detected
       
 C     regenerate neighbor lists
@@ -186,32 +424,10 @@ C     save old
       tempmaxdisttointerface = detection%maxdisttointerface
       tempparams = detection%params
       tempparamspadded = detection%paramspadded
-      
-C     get atom box
-      call getXYAtomBoundsDef(xmin,xmax,ymin,ymax)
-      detection%maxdisttointerface =
-     &                      sqrt((xmax - xmin)**2 + (ymax - ymin)**2)
-      
-C     resize detection band
-      xc = detection%params(1)
-      if (detection%bandtype == 'rect_annulus') then
-          if (trim(option) == 'inner') then ! expand dislocation band inwards
-              halfLxinner = detection%params(3)
-              xmin1 = xc - halfLxinner
-              xmin2 = xmin + movingmesh%maxshift
-              xminnew = min(xmin1,xmin2)
-              halfLxinner = xc - xminnew
-              detection%params(3) = halfLxinner
-          else if (trim(option) == 'outer') then ! expand dislocation band outwards
-              xdist1 = xc - xmin
-              xdist2 = xmax - xc
-              halfLxouter = max(xdist1,xdist2)
-              detection%params(4) = halfLxouter
-          end if
-      else
-          write(*,*) 'Method is undefined for non-rectangular bands'
-          stop
-      end if 
+
+C     assign new
+      detection%maxdisttointerface = maxdisttointerface
+      detection%params = paramsnew
 
 C     regen detection band, pass dislocations
       call processDetectionBand()
@@ -226,13 +442,17 @@ C     restore old parameters
 ************************************************************************
       subroutine shiftPosnDisp()
  
-C     Subroutine: shiftPosnDisp
- 
 C     Inputs: None
  
 C     Outputs: None
  
-C     Purpose: Shift the positions and displacements of all nodes by delta_x = movingmesh%xshift
+C     Purpose: Re-interpolate the displacements so that, effectively,
+C     the mesh, atoms, etc. are shifted back by xshift.
+C     Operationally, we assign displacements to a node at point x
+C     in the new mesh (with the crack back at the origin, or thereabouts)
+C     by using the displacements of a node at point x + xshift
+C     in the old mesh (with the crack at crackpos). x and x + xshift
+C     correspond to the *undeformed* configuration
            
       implicit none
       
@@ -243,8 +463,8 @@ C     local variables
       integer :: i, j, k
       integer :: node
       integer :: m, n
-      real(dp) :: posnundef(2), newdisp(2)
-      real(dp) :: shiftvec(2)
+      real(dp) :: posnundef(2), posnshift(2), shiftvec(2)
+      real(dp) :: newdisp(2)
       
 C     new posn
       nodesshape = shape(nodes%posn)
@@ -263,7 +483,8 @@ C     shift vector (find corresponding point by shifting forwards)
       
 C     generate undeformed atomic bins, triangulation
       call genAtomBinsUndeformed()
-      call genAtomTriangulationUndeformed()
+      call setDelaunayPosUndef(movingmesh%delaunay)
+      call genDelaunay(movingmesh%delaunay)
       
 C     cycle over elements to generate good guesses
       do i = 1, size(feelements)
@@ -272,8 +493,8 @@ C     cycle over elements to generate good guesses
               node = feelements(i)%connect(k,j)
               if (.not.alreadychecked(node)) then
                   posnundef = nodes%posn(1:2,node)-nodes%posn(4:5,node)
-                  posnundef = posnundef + shiftvec
-                  newdisp = interpFromFEPoint(node,posnundef,i,j)
+                  posnshift = posnundef + shiftvec
+                  newdisp = interpFromFEPoint(posnshift,i,j)
                   newposn(1:2,i) = posnundef + newdisp
                   newposn(4:5,i) = newdisp
                   alreadychecked(node) = .true.
@@ -286,7 +507,8 @@ C     deal with rest of nodes (just atoms)
       do i = 1, nodes%nnodes
       if (.not.alreadychecked(i)) then
           posnundef = nodes%posn(1:2,i) - nodes%posn(4:5,i)
-          newdisp = interpFromAtomPoint(posnundef)
+          posnshift = posnundef + shiftvec
+          newdisp = interpFromAtomPoint(posnshift)
           newposn(1:2,i) = posnundef + newdisp
           newposn(4:5,i) = newdisp
       end if
@@ -296,26 +518,20 @@ C     deal with rest of nodes (just atoms)
       
       end subroutine shiftPosnDisp
 ************************************************************************
-      subroutine genAtomTriangulationUndeformed()
-      
-C     local variables
-      integer :: i
-      integer :: node
-      
-      do i = 1, nodes%natoms
-          node = nodes%atomlist(i)
-          movingmesh%delaunay%xy(:,i) = nodes%posn(1:2,node) -
-     &                                  nodes%posn(4:5,node)
-      end do
-      call genDelaunay(movingmesh%delaunay)
-      
-      end subroutine genAtomTriangulationUndeformed
-************************************************************************
-      function interpFromFEPoint(node,posnundef,mnumfe,element)
-     &                                                     result(disp)
+      function interpFromFEPoint(posnundef,mnumfe,element) result(disp)
+ 
+C     Inputs: posnundef --- position of point in undeformed coordinates
+C             mnumfe --- guess for fe material number that point is in
+C             element --- guess for element that point is in
+ 
+C     Outputs: disp --- displacement of point
+ 
+C     Purpose: Find interpolated displacement of point, assuming that it lies within
+C     the continuum domain (if that search fails, we search the atomistic domain instead)
+
+      implicit none
 
 C     input variables
-      integer :: node
       real(dp) :: posnundef(2)
       integer :: mnumfe
       integer :: element
@@ -333,8 +549,8 @@ C     local variables
       if (badflip) then ! if not successful, interpolate atomistic displacements
           call atomicDispInterpolation(posnundef,failure,disp)
           if (failure) then ! if still not successful, our point must be at the boundary,
-                            ! so just use the original node displacements (we'll correct boundary displacements later)
-              disp = nodes%posn(node,4:5)
+                            ! so just use fake displacement (we'll correct boundary displacements later)
+              disp = [0.0_dp,0.0_dp]
           end if
       else 
           eltypenum = feelements(mnumfe)%eltypenum
@@ -345,7 +561,16 @@ C     local variables
       end function interpFromFEPoint
 ************************************************************************
       function interpFromAtomPoint(posnundef) result(disp)
+ 
+C     Inputs: posnundef --- position of point in undeformed coordinates
+ 
+C     Outputs: disp --- displacement of point
+ 
+C     Purpose: Find interpolated displacement of point, assuming that it lies within
+C     the atomistic domain (if that search fails, we search the continuum domain instead)
      
+      implicit none
+
 C     input variables
       real(dp) :: posnundef(2)
       
@@ -371,7 +596,24 @@ C     local variables
       end function interpFromAtomPoint
 ************************************************************************
       subroutine atomicDispInterpolation(posnundef,failure,disp)
-     
+ 
+C     Inputs: posnundef --- position of point in undeformed coordinates
+
+C     Outputs: failure --- flag indicating that search failed
+C              disp --- displacement of point
+ 
+C     Purpose: Find interpolated displacement of point, assuming that it lies within
+C     atomistic region (if search fails, this is indicated in "failure").
+
+C     Note: The position *must* lie very close to a vertex, since deformations
+C     are not affine far within the atomistic region. Positions will lie
+C     close to a vertex only if xshift is a multiple of the atomic spacing (deltaxcrack)
+C     Some positions will not lie close to a vertex if they were originally
+C     continuum positions (i.e., posnundef = posn_{continuum} + shiftvec),
+C     but these are probably close to the interface where deformations should be affine.
+      
+      implicit none
+      
 C     input variables
       real(dp) :: posnundef(2)
       
@@ -383,8 +625,16 @@ C     local variables
       integer :: closestatom
       integer :: i, j
       
+C     check if in atom box
+      failure = (.not.isInAtomBox(posnundef(1),posnundef(2)))
+      if (failure) then
+          return
+      end if
+      
+C     find closest atom in atom box
       closestatom = locateClosestAtomUndef(posnundef)
-      failure = .true.
+      
+C     find triangles that that atom belongs to, check if point lies in that triangle
       do i = 1, movingmesh%delaunay%numtri
           do j = 1, 3
               if (movingmesh%delaunay%trivert(j,i) == closestatom) then ! node belongs to a triangle, so check
@@ -399,6 +649,19 @@ C     local variables
       end subroutine atomicDispInterpolation
 ************************************************************************
       subroutine checkTriangle(posnundef,trinum,failure,disp)
+ 
+C     Inputs: posnundef --- position of point in undeformed coordinates
+C             trinum --- number of triangle in triangulation
+
+C     Outputs: failure --- flag indicating that point was not in the triangle
+C              disp --- displacement of point, linearly interpolating using vertices of triangle
+C                       (only valid if failure == .false.)
+ 
+C     Purpose: Check whether point lies within a triangle in the delaunay
+C     triangulation. If it does, compute its displacement assuming deformation
+C     is affine within the triangle.
+      
+      implicit none
       
 C     input variables
       real(dp) :: posnundef(2)
@@ -409,7 +672,7 @@ C     output variables
       real(dp) :: disp(2)
       
 C     local variables
-      real(dp) :: posn(2,3)
+      real(dp) :: triposnundef(2,3)
       integer :: i
       integer :: atom, node
       integer :: idx1, idx2, idx3
@@ -421,10 +684,10 @@ C     local variables
 C     triangle vertex positions, displacements
       do i = 1, 3
           atom = movingmesh%delaunay%trivert(i,trinum)
-          node = nodes%atomlist(atom)
-          posn(:,i) = nodes%posn(node,1:2)
-          udisp(i) = nodes%posn(node,4)
-          vdisp(i) = nodes%posn(node,5)
+          node = movingmesh%delaunay%nodenums(atom)
+          triposnundef(:,i) = movingmesh%delaunay%xy(:,atom)
+          udisp(i) = nodes%posn(4,node)
+          vdisp(i) = nodes%posn(5,node)
       end do
       
 C     check all three sides
@@ -432,8 +695,8 @@ C     check all three sides
           idx1 = i
           idx2 = mod(idx1,3) + 1
           idx3 = mod(idx2,3) + 1
-          check = checkSameSide(posnundef,posn(:,idx3),
-     &                          posn(:,idx1),posn(:,idx2))
+          check = checkSameSide(posnundef,triposnundef(:,idx3),
+     &                       triposnundef(:,idx1),triposnundef(:,idx2))
           failure = (.not.check)
           if (failure) then ! we're not in triangle, so quit
               return
@@ -441,7 +704,7 @@ C     check all three sides
       end do
       
 C     if we've gotten this far, compute local position in the triangle
-      call getLocalCoords(transpose(posn),movingmesh%eltypenum,
+      call getLocalCoords(transpose(triposnundef),movingmesh%eltypenum,
      &                    posnundef(1),posnundef(2),r,s)
                           
 C     displacement is given by shape function interpolation
@@ -451,29 +714,35 @@ C     displacement is given by shape function interpolation
       
       end subroutine checkTriangle
 ************************************************************************
-      function locateClosestAtomUndef(posn) result(closestatom)
+      function locateClosestAtomUndef(posnundef) result(closestatom)
+ 
+C     Inputs: posnundef --- position of point in undeformed coordinates
+
+C     Outputs: closestatom --- index of atom (in nodes%atomlist) of closest atom to the point
+ 
+C     Purpose: Finds closest atom to a point using atom bins
+C              (already generated using getAtomBinsUndeformed)
+
+      implicit none
       
 C     input variables
-      real(dp) :: posn(2)
+      real(dp) :: posnundef(2)
       
 C     output variables
       integer :: closestatom
       
 C     local variables
-      real(dp) :: x, y
       integer :: j, kx, ky
       integer :: nbinsx, nbinsy
       integer :: binx, biny, binxneigh, binyneigh
       integer :: atom, node
-      real(dp) :: nodepos(2)
+      real(dp) :: nodeposundef(2)
       real(dp) :: distmin, dist
       
-      ! get the atomic bin for our position
-      x = posn(1)
-      y = posn(2)
-      call getAtomBin(x,y,binx,biny)
+C     get the atomic bin for our position
+      call getAtomBin(posnundef(1),posnundef(2),binx,biny)
       
-      ! set distance to be very large value
+C     set distance to be very large value
       closestatom = 0
       distmin = huge(0.0_dp)
       
@@ -491,8 +760,8 @@ C         loop through possible neighbors
           do j = 1, neighbors%bincount(binxneigh,binyneigh)
               atom = neighbors%binarray(j,binxneigh,binyneigh)
               node = nodes%atomlist(atom)
-              nodepos = nodes%posn(1:2,node) - nodes%posn(4:5,node)
-              dist = sum((posn - nodepos)**2)
+              nodeposundef = nodes%posn(1:2,node) - nodes%posn(4:5,node)
+              dist = sum((posnundef - nodeposundef)**2)
               if (dist < distmin) then
                   closestatom = atom
                   distmin = dist
@@ -505,6 +774,17 @@ C         loop through possible neighbors
       end function
 ************************************************************************
       subroutine shiftDDPos()
+ 
+C     Inputs: None
+
+C     Outputs: None
+ 
+C     Purpose: Shifts all DD objects by xshift: normal, ghost, and escaped
+C     dislocations, sources, and obstacles
+
+C     TODO: Does the shifting of ghost dislocations cause problems?
+
+      implicit none
       
 C     local variables
       integer :: i, j
@@ -554,8 +834,14 @@ C     obstacles
       end subroutine shiftDDPos
 ************************************************************************
       subroutine shiftSlipPlanes()
+ 
+C     Inputs: None
+
+C     Outputs: None
+ 
+C     Purpose: Shifts all slip planes by shift
       
-C     Notes: There are two ways to do this, each with their own advantages
+C     Long note: There are two ways to do this, each with their own advantages
 C     and disadvantages.
 
 C     1) The simpler/more elegant method is to simply shift 
@@ -602,10 +888,6 @@ C     Outputs: None
 C     Purpose: Find new element and local position for all dislocations
 
       implicit none
-
-C     input variables
-      integer :: mnumfe
-      integer :: isys, iplane
       
 C     local variables
       integer :: i, j, k, l
@@ -615,10 +897,9 @@ C     local variables
       do j = 1, size(disl(i)%splanes)
       do k = 1, size(disl(i)%splanes(j)%splane)
       do l = 1, disl(i)%splanes(j)%splane(k)%nmax
-          dislnum = disl(mnumfe)%splanes(isys)%splane(iplane)%objnum(i)
-          if (disl(mnumfe)%list(dislnum)%active) then
-              call updateDislPosMovingMeshSub(mnumfe,isys,
-     &                                        iplane,i,dislnum)
+          dislnum = disl(i)%splanes(j)%splane(k)%objnum(l)
+          if (disl(i)%list(dislnum)%active) then
+              call updateDislPosMovingMeshSub(i,j,k,l,dislnum)
           end if
       end do
       end do
@@ -629,6 +910,26 @@ C     local variables
 ************************************************************************
       subroutine updateDislPosMovingMeshSub(mnumfe,isys,iplane,
      &                                      iobj,dislnum)
+
+C     Inputs: mnumfe --- number of fe material
+C             isys --- index of slip system
+C             iplane --- index of slip plane within slip system
+C             iobj --- index of dislocation within slip plane
+C             dislnum --- number of dislocation
+
+C     Outputs: None
+
+C     Purpose: Find new element and local position for a single dislocation
+C     If the dislocation moves into the atomistic region, it should
+C     naturally be replaced with atomistic dislocation during interpolation
+C     (hopefully).
+
+C     Notes/TODO: I'm not sure how to deal with the case of the dislocation
+C     leaving the simulation cell entirely
+
+C     Notes/TODO: Doesn't work for multimaterial systems
+      
+      implicit none
       
 C     input variables
       integer :: mnumfe
@@ -653,9 +954,7 @@ C     figure out where the new dislocation is
       call findInAllWithGuessDef(dislposnew(1),dislposnew(2),
      &                           mnumfenew,elementnew,r,s,badflip)
      
-      if (badflip) then ! not in mesh. Not sure how to deal with case of leaving simulation cell entirely.
-                        ! If it moves into atomistic region, it should be replaced with atomistic dislocation naturally during interpolation (we hope),
-                        ! so simply delete it
+      if (badflip) then ! not in mesh. Either in atomistic region or left simulation cell. The second possibility is assumed not to occur
           write(*,*) 'Dislocation escaped while moving mesh'
           write(*,*) 'x', dislposnew(1), 'y', dislposnew(2)
           call deleteDislocation(mnumfe,isys,iplane,iobj)
@@ -680,6 +979,8 @@ C     Inputs: None
 C     Outputs: None
 
 C     Purpose: Find new element and local position for all disl. sources
+
+C     Notes/TODO: Does not work for multimaterial systems
 
       implicit none
       
@@ -721,6 +1022,8 @@ C     Outputs: None
 
 C     Purpose: Find new element and local position for all disl. obstacles
 
+C     Notes/TODO: Does not work for multimaterial systems
+
       implicit none
       
 C     local variables
@@ -732,7 +1035,7 @@ C     local variables
       
       do i = 1, size(obstacles)
       do j = 1, size(obstacles(i)%list)
-          element = sources(i)%list(j)%element
+          element = obstacles(i)%list(j)%element
           x = obstacles(i)%list(j)%posn(1)
           y = obstacles(i)%list(j)%posn(2)
           mnumfenew = i

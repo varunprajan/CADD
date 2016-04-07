@@ -28,7 +28,8 @@ C     Notes/TODO: Only 2D, currently
      &           vbedg, i4_wrap, lrline
       public :: genDelaunay, dtris2, identifyLargeTri, regenDelaunay,
      &          getTriNodes, getTriCenter, CIRCUMSQFACHEX,
-     &          updateDelaunayPos
+     &          setDelaunayPos, genBadTriangles, setDelaunayPosDef,
+     &          setDelaunayPosUndef
      
 C     HARD-CODED CONSTANTS
       real(dp), parameter :: CIRCUMSQFACHEX = 2.0_dp ! see identifyLargeTri
@@ -45,8 +46,8 @@ C                       (after regeneration, it is set to false)
 
 C     Outputs: None
       
-C     Purpose: Regenerate triangles/neighbors, if necessary. Otherwise,
-C     simply update delaunay%xy using new node positions
+C     Purpose: Update delaunay%xy using new (deformed) node positions. If needed,
+C     regenerate triangles/neighbors.
 
       implicit none
       
@@ -54,7 +55,7 @@ C     in/out variables
       type(delaunaydata) :: delaunay
       logical :: regen
       
-      call updateDelaunayPos(delaunay) ! update xy coordinates
+      call setDelaunayPosDef(delaunay) ! update xy coordinates
       if (regen) then
           call genDelaunay(delaunay) ! regenerate triangulation
           call genBadTriangles(delaunay) ! regenerate bad triangles
@@ -63,21 +64,88 @@ C     in/out variables
       
       end subroutine regenDelaunay
 ************************************************************************
-      subroutine updateDelaunayPos(delaunay)
+      subroutine setDelaunayPosDef(delaunay)
+
+C     Inputs: None
+
+C     In/out: delaunay --- structure containing information about delaunay triangulation
+
+C     Outputs: None
+      
+C     Purpose: Set delaunay%xy using new (deformed) positions of nodes listed in delaunay%nodenums.
+C     Allocate if necessary.
+
+      implicit none
+      
+C     in/out variables
+      type(delaunaydata) :: delaunay
+      
+      call setDelaunayPos(delaunay,.false.)
+      
+      end subroutine setDelaunayPosDef
+************************************************************************
+      subroutine setDelaunayPosUndef(delaunay)
+
+C     Inputs: None
+
+C     In/out: delaunay --- structure containing information about delaunay triangulation
+
+C     Outputs: None
+      
+C     Purpose: Set delaunay%xy using undeformed positions of nodes listed in delaunay%nodenums.
+C     Allocate if necessary.
+
+      implicit none
+      
+C     in/out variables
+      type(delaunaydata) :: delaunay
+      
+      call setDelaunayPos(delaunay,.true.)
+      
+      end subroutine setDelaunayPosUndef
+************************************************************************
+      subroutine setDelaunayPos(delaunay,undeformed)
+
+C     Inputs: undeformed --- flag indicating whether undeformed positions are to be used
+
+C     In/out: delaunay --- structure containing information about delaunay triangulation
+
+C     Outputs: None
+      
+C     Purpose: Set delaunay%xy using either undeformed or deformed positions of nodes listed in delaunay%nodenums.
+C     Allocate if necessary.
+      
+      implicit none
+      
+C     input variables
+      logical :: undeformed
       
 C     in/out variables
       type(delaunaydata) :: delaunay
       
 C     local variables
-      integer :: i
+      integer :: i, npoints
       integer :: node
+      real(dp) :: posn(2)
       
-      do i = 1, size(delaunay%nodenums)
+C     allocate xy
+      if (allocated(delaunay%xy)) then
+          deallocate(delaunay%xy)
+      end if
+      npoints = size(delaunay%nodenums)
+      allocate(delaunay%xy(2,npoints))
+      
+C     update xy
+      do i = 1, npoints
           node = delaunay%nodenums(i)
-          delaunay%xy(:,i) = nodes%posn(1:2,node) ! current position
+          posn = nodes%posn(1:2,node)
+          if (undeformed) then
+              posn = posn - nodes%posn(4:5,node)
+          end if    
+          delaunay%xy(:,i) = posn ! current position
       end do
       
-      end subroutine updateDelaunayPos
+      end subroutine setDelaunayPos
 ************************************************************************
       subroutine genDelaunay(delaunay)
 
@@ -85,7 +153,7 @@ C     In/out: delaunay --- structure containing information about delaunay trian
 
 C     Outputs: None
       
-C     Purpose: Generate triangles and neighbors
+C     Purpose: Generate triangles and neighbors from xy points
       
       implicit none
       
