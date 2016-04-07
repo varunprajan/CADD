@@ -70,7 +70,7 @@ C     TODO: Needs to be modified (heavily?) for 3D.
      &  errorInterface, placeInsideDetection, placeOutsideDetection,
      &  findInterfaceIntersectionDeformed, BOXWIDTHNORM,
      &  getPaddedParamsAnnulus, getPaddedParamsRectAnnulus,
-     &  processDetectionBand
+     &  processDetectionBand, recrossDetection
      
       type compdata
       real(dp), allocatable :: burgersvec(:)
@@ -606,7 +606,10 @@ C     compute burgers circuits
                   call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
                   write(*,*) 'Dislocation position', dislpos
                   bcut = getDislBranchCut(mnumfe,isys,dislpos)
+                  if (disl(1)%ndisl <= 0) then
+                  write(*,*) disl(1)%ndisl
                   call passAtomisticToContinuum(dislpos,bsgn,bcut,isys)
+                  end if
               end if
           end if
       end if
@@ -828,6 +831,10 @@ C     delete old dislocation
       
 C     update atom positions, including imposing dipole displacements
 C     and minimizing atomic positions near core
+
+C     if we passed the dislocation from continuum to continuum,
+C     the loopVerlet routine within the updateAtomsPassing step is harmless/inefficient
+
       atompos = posnew ! position of atomic dislocation core
       call updateAtomsPassing(posold,posnew,atompos,
      &                        burgers,bsgn,bcut,cost,sint)
@@ -836,7 +843,7 @@ C     and minimizing atomic positions near core
 ************************************************************************
       subroutine recrossDetection(pint,dispnorm,pintnew,isint)
 
-C     Inputs: pint --- old intersection point (between dislocation path and interface between atomistic and continuum region
+C     Inputs: pint --- old intersection point (between dislocation path and interface between detection band and "inside")
 C             dispnorm --- normalized vector indicating dislocation travel direction
       
 C     Outputs: pintnew --- coordinates of new intersection point (between dislocation path and interface between detection band and "inside")

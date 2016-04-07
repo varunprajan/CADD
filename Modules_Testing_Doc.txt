@@ -13,7 +13,8 @@ Check:
             
 To be checked:            
     mod_disl_detect_pass
-        All
+        passContinuumtoAtomistic
+        recrossDetection
     Redo integration tests (to check mod_io, others?)
         
 To be checked, later:
@@ -257,37 +258,37 @@ mod_disl_detect_pass
     Doc: Done!
     initDetectionData
         Doc: Done!
-        Test:
+        Test: Done!
     readDetectionData
         Doc: Done!
-        Test:
+        Test: Done!
     processDetectionData
         Doc: Done!
-        Test:
+        Test: Done!
     writeDetectionData
         Doc: Done!
-        Test:
-    assignDetectionPoints
+        Test: Done!
+    findDetectionNodes
         Doc: Done!
-        Test:
+        Test: Done!
     assignDetectionBand
         Doc: Done!
         Test: Implicitly, through assignDetectionPoints
     insideAnnulus
         Doc: Done!
-        Test:
+        Test: Done!
     getPaddedParamsAnnulus
         Doc: Done!
-        Test:
+        Test: Done!
     insideRectAnnulus
         Doc: Done!
-        Test:
+        Test: Done!
     getPaddedParamsRectAnnulus
         Doc: Done!
-        Test:
+        Test: Done!
     getDislPropsFromBurgersVec
         Doc: Done!
-        Test:
+        Test: Done!
     getDislBranchCut
         Doc: Done!
         Test: Not needed.
@@ -299,28 +300,31 @@ mod_disl_detect_pass
         Test: Implicitly, through cadd_k_test
     passContinuumToAtomistic
         Doc: Done!
-        Test:
+        Test: Done!
+    recrossDetection
+        Doc: Done!
+        Test: Done!
     placeInsideDetection
         Doc: Done!
-        Test:
+        Test: Done!
     placeOutsideDetection
         Doc: Done!
-        Test:
+        Test: Done!
     placeDetectionSub
-        Doc: Done
-        Test:
+        Doc: Done!
+        Test: Done!
     findInterfaceIntersectionDeformed
         Doc: Done!
-        Test:
+        Test: Done!
     errorInterface
         Doc: Done!
         Test: Not needed.
     updateAtomsPassing
         Doc: Done!
-        Test:
+        Test: Done!
     imposeDipoleDispOnAtoms
         Doc: Done!
-        Test:
+        Test: Done!
 mod_disl_escaped
     initDislEscapedData
         Doc: Done!

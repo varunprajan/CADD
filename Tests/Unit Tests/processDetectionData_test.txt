@@ -23,7 +23,7 @@ Code:
       p(:,2) = p(:,1) + detection%comp(2)%burgersvec ! at 0 degrees
       p(:,3) = p(:,1) + detection%comp(4)%burgersvec ! at 60 degrees
       circumsqactual = getCircumradiusSqForTriangle(p)
-      circumsqmax = delaunay%circumradiussqcutoff
+      circumsqmax = detection%delaunay%circumradiussqcutoff
       write(*,*) 'Actual circumradius**2 at equil.', circumsqactual
       write(*,*) 'Max circumradius**2', circumsqmax
 

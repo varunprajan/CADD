@@ -411,7 +411,7 @@ C     input variables
       
       call initDetectionData(pref//suffixdetection)
       call initDislIdentData()
-      call initCADDMovingMeshData(pref) 
+      call initCADDMovingMeshData(pref//suffixcaddmovingmesh) 
       
       end subroutine initCADDChunk
 ************************************************************************

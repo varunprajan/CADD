@@ -94,7 +94,7 @@
      &  readDetectionData, processDetectionData, BOXWIDTHNORM,
      &  writeDetectionData, findDetectionNodes, placeDetectionSub,
      &  getDislBranchCut, insideAnnulus, getPaddedParamsAnnulus,
-     &  insideRectAnnulus, detection, errorInterface,
+     &  insideRectAnnulus, detection, errorInterface, recrossDetection,
      &  getDislPropsFromBurgersVec, detectAndPassDislocations,
      &  passContinuumToAtomistic, passAtomistictoContinuum,
      &  updateAtomsPassing, assignDetectionBand, placeInsideDetection,
@@ -162,64 +162,63 @@
      
       implicit none
       
-      real(dp) :: orig(2), a1(2), a2(2)
-      real(dp) :: fac
-      integer :: i
-      real(dp) :: y, ydisp
-      logical :: failure
-      real(dp) :: disp(2), posnundef(2)
+      integer :: mnumfe, mnum
+      real(dp) :: KI, KII
+      real(dp) :: xc, yc
+      real(dp) :: mu, nu
+      real(dp) :: dislpos(2), dislpos2(2)
+      integer :: isys, elguess, bsgn, bcut
+      real(dp) :: disldisp
+      integer :: k
+      
+C     read, initialize
+      call initSimulation('cadd_k_test_medium','cadd')
+      
+C     material stuff
+      mnumfe = 1
+      mnum = fematerials%list(mnumfe)
+      mu = materials(mnum)%mu
+      nu = materials(mnum)%nu
 
-      nodes%nnodes = 9
-      allocate(nodes%posn(7,nodes%nnodes))
-      nodes%posn = 0.0_dp
-      orig = [0.0_dp,0.0_dp]
-      a1 = [1.0_dp,0.0_dp]
-      a2 = [-0.5_dp,0.5_dp*sqrt(3.0_dp)]
-      nodes%posn(1:2,3) = orig
-      nodes%posn(1:2,4) = orig + a1
-      nodes%posn(1:2,5) = orig - a1
-      nodes%posn(1:2,6) = orig + a2
-      nodes%posn(1:2,7) = orig + a1 + a2
-      nodes%posn(1:2,8) = orig - a2
-      nodes%posn(1:2,9) = orig - a1 - a2
+C     crack center (slightly offset from atom)
+      xc = 0.5_dp
+      yc = 0.3_dp
       
-      allocate(nodes%types(3,nodes%nnodes))
-      nodes%types(:,1) = [1,0,0]
-      nodes%types(:,2) = [1,0,0]
-      do i = 3, nodes%nnodes
-          nodes%types(:,i) = [1,1,0]
+C     K-field
+      KI = 7.5_dp
+      KII = 0.0_dp  
+      
+C     apply field
+      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
+      call solveAll_ptr() ! step 3
+      call updatePad() ! step 4
+      
+C     create dipole
+      dislpos = [-22.0_dp,-14.8_dp]
+      isys = 2 ! 60 degrees
+      dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
+      elguess = 0 ! initial element is unknown
+      bsgn = 1
+      bcut = 0
+      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
+     &                    isys,bsgn,bcut)
+      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
+     &                    isys,-bsgn,bcut)
+     
+C     dump
+      call updateMiscIncrementCurr(8)
+      call writeDump_ptr()
+     
+C     move dislocation
+      disldisp = 5.0_dp
+      disl(mnumfe)%list(1)%disp = disldisp
+      disl(mnumfe)%list(2)%disp = 0.0_dp
+      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
+          call updateDislPos(mnumfe,isys,k)
       end do
       
-      call processNodeData()
-      
-C     stretch in y-direction
-      fac = 0.2_dp
-      do i = 1, size(nodes%posn,1)
-          y = nodes%posn(2,i)
-          ydisp = fac*y
-          nodes%posn(5,i) = nodes%posn(5,i) + ydisp
-          nodes%posn(2,i) = nodes%posn(2,i) + ydisp
-      end do
-      
-      neighbors%nmaxbin = 30
-      neighbors%nmaxneigh = 30
-      neighbors%rneigh = 0.5_dp
-      neighbors%rneighsq = 0.25_dp
-      neighbors%rhomax = 1.0_dp
-      allocate(neighbors%binlist(2,nodes%natoms)) 
-      
-      call genAtomBinsUndeformed()
-      movingmesh%delaunay%nodenums = nodes%atomlist
-      call setDelaunayPosUndef(movingmesh%delaunay)
-      call genDelaunay(movingmesh%delaunay)
-      
-      call initFELibrary()
-      movingmesh%eltypenum = getElTypeNum('CPE3') ! triangle
-      
-      posnundef = [0.9_dp,0.8_dp]
-      call atomicDispInterpolation(posnundef,failure,disp)
-      write(*,*) 'Failed?', failure
-      
+      call updateMiscIncrementCurr(1)
+      call writeDump_ptr()
       
             
       

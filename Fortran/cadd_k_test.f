@@ -24,6 +24,7 @@
       use mod_disl_try, only: disl
       use mod_disl_escaped, only: escapeddisl
       use mod_disl_ghost, only: ghostdisl
+      use mod_find_crack_atomistic, only: findCrack      
       
       implicit none
       
@@ -38,6 +39,7 @@
       character(len=15) :: gammasuffix, dtsuffix, stepssuffix
       character(len=:), allocatable :: filename
       integer :: counter
+      real(dp) :: crackpos(2)
       
 C     read, initialize
       call initSimulation('cadd_k_test_large','cadd')
@@ -86,6 +88,8 @@ C     apply K, equilibrate, dump
           call equilibrateCADD(natomisticsteps,dt,dtdd,normaldamping,
      &                    counter,forcetol,natomisticstepstot)
           write(iunit,*) KIapply, counter, natomisticstepstot
+          crackpos = findCrack()
+          write(*,*) 'Crack position', crackpos
           call updateMiscIncrementCurr(1)
           call writeDump_ptr()
       end do
@@ -142,7 +146,7 @@ C         write(*,*) 'Starting iteration'
           call runDDStep(dtdd) ! step 5 
           
           forcenorm = maxval(sum(abs(nodes%potforces),1)) ! 1-norm
-          write(*,*) 'forcenorm', forcenorm
+          ! write(*,*) 'forcenorm', forcenorm
           
       end do
       natomisticstepstot = counter*natomisticsteps
