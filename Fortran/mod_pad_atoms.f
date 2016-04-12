@@ -14,7 +14,7 @@ C     there, they appear to claim that just the FE displacements are needed.
       implicit none
       
       private
-      public :: padatoms, initPad, updatePad, assignPad
+      public :: padatoms, initPad, updatePad, assignPad, padt
       
       type padt
       integer :: mnumfe

@@ -12,6 +12,7 @@ C     For the latter, have to distinguish between atomistic simtypes and not.
       use mod_compute, only: compute, getCentroAtoms
       use mod_utils, only: writeMatTranspose, writeVec
       use mod_slip_sys, only: slipsys
+      use mod_pad_atoms, only: updatePad
       
       implicit none
       
@@ -253,6 +254,7 @@ C     input variables
       logical :: defoption
       
       call updateFENodalPosnAll_ptr()
+      call updatePad()
       if (defoption) then
           call writeDumpNodesDefChunk(iunit)
       else

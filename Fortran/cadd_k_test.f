@@ -16,22 +16,25 @@
       use mod_damping, only: normaldamping, dampingdata
       use mod_fe_main_2d_assign, only: solveAll_ptr,
      &                                 updateFENodalPosnAll_ptr
-      use mod_pad_atoms, only: updatePad
+      use mod_pad_atoms, only: updatePad, padatoms, padt
       use mod_utils, only: prettyPrintMat, prettyPrintVec
       use mod_disl_detect_pass, only: detectAndPassDislocations
       use mod_dd_main, only: runDDStep
       use mod_dd_integrate, only: getResolvedStressOnDisl
       use mod_disl_try, only: disl
       use mod_disl_escaped, only: escapeddisl
-      use mod_disl_ghost, only: ghostdisl
-      use mod_find_crack_atomistic, only: findCrack      
+      use mod_find_crack_atomistic, only: findCrack
+      
+! FIX
+      use mod_fe_main_2d, only: getFEDispAtPoint
+      use mod_disl_fields2, only: getTildeDispAtPointAll
       
       implicit none
       
       integer :: iunit
       integer :: i
       integer :: mnumfe, mnum
-      real(dp) :: KIstart, KIincr, KIend, KIapply, KII
+      real(dp) :: KIstart, KIincr, KIend, KIapply, KIcurr, KII
       real(dp) :: xc, yc
       real(dp) :: mu, nu
       integer :: nstepsK, natomisticsteps, natomisticstepstot
@@ -78,20 +81,30 @@ C     file
      &                             //'_steps_'//trim(stepssuffix)
       open(newunit=iunit,file=filename)
 
+      crackpos = [0.0_dp,0.0_dp] 
       
 C     apply K, equilibrate, dump
       do i = 0, nstepsK
-          KIapply = KIstart + i*KIincr
-          write(*,*) 'Current KI', KIapply
+          if (i == 0) then
+              KIapply = KIstart
+          else
+              KIapply = KIincr
+          end if    
+          KIcurr = KIstart + i*KIincr
+          write(*,*) 'Current KI', KIcurr
           
-          call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
+          call applyKDispIso(KIapply,KII,mu,nu,crackpos(1),
+     &                                         crackpos(2),'all')
           call equilibrateCADD(natomisticsteps,dt,dtdd,normaldamping,
      &                    counter,forcetol,natomisticstepstot)
-          write(iunit,*) KIapply, counter, natomisticstepstot
+          write(iunit,*) KIcurr, counter, natomisticstepstot
           crackpos = findCrack()
           write(*,*) 'Crack position', crackpos
           call updateMiscIncrementCurr(1)
+          write(*,*) 'increment', misc%incrementcurr
           call writeDump_ptr()
+          call writePadStuff()
+          
       end do
       
       call writeRestart_ptr()
@@ -135,6 +148,7 @@ C         write(*,*) 'Starting iteration'
               write(*,*) 'After passing'
               write(*,*) 'increment', misc%incrementcurr
               call writeDump_ptr()
+              call writePadStuff()
           end if
           
           if (escapeddisl(mnumfe)%nescapeddisl > 0) then
@@ -153,4 +167,28 @@ C         write(*,*) 'Starting iteration'
       
       end subroutine equilibrateCADD
 ************************************************************************
+      subroutine writePadStuff()
+      
+      ! FIX!!!!
+      integer :: padatomnum, node, eltypenum
+      real(dp) :: fedisp(2), dddisp(2), posnundef(2), totaldisp(2)
+      type(padt) :: padatom
+      
+      padatomnum = 337
+      node = nodes%padatomlist(padatomnum)
+      write(*,*) 'Pad atom position', nodes%posn(1:2,node)
+      write(*,*) 'Pad atom displacement', nodes%posn(4:5,node)
+      posnundef = nodes%posn(1:2,node) - nodes%posn(4:5,node)
+      padatom = padatoms(padatomnum)
+      eltypenum = 2
+      fedisp = getFEDispAtPoint(padatom%mnumfe,eltypenum,
+     &     padatom%element,padatom%localpos(1),padatom%localpos(2))
+      write(*,*) 'FE displacement', fedisp
+      dddisp = getTildeDispAtPointAll(posnundef,padatom%mnumfe)
+      write(*,*) 'DD displacement', dddisp
+      totaldisp = fedisp + dddisp
+      write(*,*) 'Total displacement', totaldisp
+      
+      end subroutine writePadStuff
+************************************************************************      
       end program

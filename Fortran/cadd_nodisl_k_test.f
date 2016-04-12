@@ -25,7 +25,7 @@
       integer :: iunit
       integer :: i
       integer :: mnumfe, mnum
-      real(dp) :: KIstart, KIincr, KIend, KIapply, KII
+      real(dp) :: KIstart, KIincr, KIend, KIapply, KIcurr, KII
       real(dp) :: xc, yc
       real(dp) :: mu, nu
       integer :: nstepsK, natomisticsteps, natomisticstepstot
@@ -71,20 +71,27 @@ C     file
      &                             //'_steps_'//trim(stepssuffix)
       open(newunit=iunit,file=filename)
 
+      crackpos = [0.0_dp,0.0_dp]      
       
 C     apply K, equilibrate, dump
       do i = 0, nstepsK          
-          KIapply = KIstart + i*KIincr
-          write(*,*) 'Current KI', KIapply
+          if (i == 0) then
+              KIapply = KIstart
+          else
+              KIapply = KIincr
+          end if    
+          KIcurr = KIstart + i*KIincr
+          write(*,*) 'Current KI', KIcurr
           
-          call applyKDispIso(KIapply,KII,mu,nu,xc,yc,'all')
+          call applyKDispIso(KIapply,KII,mu,nu,crackpos(1),
+     &                                         crackpos(2),'all')
           call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
      &                               forcetol,natomisticstepstot)
-          write(iunit,*) KIapply, natomisticstepstot
-          crackpos = findCrack()
-          write(*,*) 'Crack position', crackpos
+          write(iunit,*) KIcurr, natomisticstepstot
           call updateMiscIncrementCurr(1)
           call writeDump_ptr()
+          crackpos = findCrack()
+          write(*,*) 'Crack position', crackpos
       end do
       
       close(iunit)
@@ -120,7 +127,7 @@ C     we will check forces on atoms
           call updatePad() ! step 4
           
           forcenorm = maxval(sum(abs(nodes%potforces),1)) ! infinity norm
-          ! write(*,*) 'forcenorm', forcenorm
+          write(*,*) 'forcenorm', forcenorm
       end do
       natomisticstepstot = counter*natomisticsteps
       

@@ -606,10 +606,7 @@ C     compute burgers circuits
                   call getDislPropsFromBurgersVec(burgersvec,isys,bsgn)
                   write(*,*) 'Dislocation position', dislpos
                   bcut = getDislBranchCut(mnumfe,isys,dislpos)
-                  if (disl(1)%ndisl <= 0) then
-                  write(*,*) disl(1)%ndisl
                   call passAtomisticToContinuum(dislpos,bsgn,bcut,isys)
-                  end if
               end if
           end if
       end if

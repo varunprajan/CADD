@@ -2,19 +2,17 @@ Things to do:
 
 Algorithmic issues:
     Moving mesh
-        Issues
-            Continuum dislocation escaping mesh
-            Continuum dislocation crossing into atomistic region
-            Atomistic dislocation crossing into continuum region
-            Ghost dislocation moving over long distances
-            Replenish sources, obstacles
-    Issue with delaunayregen
-            
-    Crack finding
+        Continuum dislocation escaping mesh
+        Continuum dislocation crossing into atomistic region
+        Atomistic dislocation crossing into continuum region
+        Ghost dislocation moving over long distances
+        Replenish sources, obstacles
+    Issue with delaunayregen --- is there a better way to write this?
     Dislocation passing
         Problem with assigning "crack region" to dislocation originating from atomistic region
         Dipole displacements of atoms may be too large if atom is close to dislocation center
         Do we need to identify dislocations in the "inner ring" of continuum elements before they reach the interface?
+        Movement of dislocation onto an actual slip plane may lead to incorrect displacements, "hole" in pad atoms
     Mesh find
         Fix findInOneMatSub
 

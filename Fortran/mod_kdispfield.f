@@ -84,8 +84,8 @@ C         disp fields (again, see Bower) without prefactor
           unorm(1) = uxInorm + uxIInorm
           unorm(2) = uyInorm + uyIInorm
           u = (sqrt(r)*prefac)*unorm
-          nodes%posn(1:2,i) = posnundef + u
-          nodes%posn(4:5,i) = u
+          nodes%posn(1:2,i) = nodes%posn(1:2,i) + u
+          nodes%posn(4:5,i) = nodes%posn(4:5,i) + u
       end if
       end do
       
