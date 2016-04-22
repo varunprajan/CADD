@@ -17,10 +17,10 @@ C     Possible extensions: ?
       
       type nodedata
 C     read-in
-      integer :: nnodes
       integer, allocatable :: types(:,:)
       real(dp), allocatable :: posn(:,:)
 C     processed
+      integer :: nnodes
       integer :: natoms
       integer, allocatable :: atomlist(:)
       integer :: nfenodes

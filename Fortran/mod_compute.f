@@ -38,7 +38,8 @@ C     processed
       type(cdata) :: centro
 C     can add more computes here as needed; need to add corresponding line to read, process, write
       end type
-      
+
+C     module variables      
       type(computedata) :: compute
       
       contains

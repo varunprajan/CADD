@@ -21,7 +21,6 @@ C     read-in
       logical :: iscrackproblem
       character(len=60) :: potstyle
       integer :: restartincrement
-      real(dp) :: timestep
 C     processed
       character(len=60) :: simname
       character(len=20) :: simtype
@@ -78,7 +77,6 @@ C     use explicit integer -> logical conversion
       misc%iscrackproblem = intToLogical(temp)
       read(iunit,*) misc%potstyle
       read(iunit,*) misc%restartincrement
-      read(iunit,*) misc%timestep
       
       close(iunit)
       
@@ -113,7 +111,6 @@ C     use explicit logical -> integer conversion
       write(iunit,*) temp
       write(iunit,*) misc%potstyle
       write(iunit,*) misc%restartincrement
-      write(iunit,*) misc%timestep
 
       close(iunit)
       

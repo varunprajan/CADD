@@ -107,7 +107,8 @@ C     local variables
       
       do i = 1, disl(mnumfe)%ndisl
       if (disl(mnumfe)%list(i)%active) then ! loop over active dislocations
-          tau = getResolvedStressOnDisl(mnumfe,i) 
+          tau = getResolvedStressOnDisl(mnumfe,i)
+          bsgn = disl(mnumfe)%list(i)%sgn
           bfac = sign(bfacabs,real(bsgn,dp))
           v = velFromTau(tau,bfac)
           disl(mnumfe)%list(i)%disp = dispFromVel(v,dt,vmax)

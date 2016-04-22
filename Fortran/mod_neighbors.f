@@ -31,13 +31,15 @@ C     Possible extensions: ?
 C     read-in
       logical :: checkdisp
       integer :: delay
+      integer :: dimensions
       integer :: every
       integer :: images
       real(dp) :: Lz
       real(dp) :: skin
 C     processed
+      real(dp) :: atompervolmax
+      logical :: delaunayregencrack      
       logical :: delaunayregendetect
-      logical :: delaunayregencrack
       integer :: incrementcurr
       integer ,allocatable :: binlist(:,:)
       integer, allocatable :: bincount(:,:)
@@ -48,7 +50,6 @@ C     processed
       integer :: nmaxbin
       integer :: incrsincelastupdate
       real(dp), allocatable :: possincelastcheck(:,:)
-      real(dp) :: rhomax
       real(dp) :: rneigh
       real(dp) :: rneighsq
       end type
@@ -116,6 +117,7 @@ C     local variables
 C     use explicit integer -> logical conversion
       neighbors%checkdisp = intToLogical(temp)
       read(iunit,*) neighbors%delay
+      read(iunit,*) neighbors%dimensions
       read(iunit,*) neighbors%every
       read(iunit,*) neighbors%images
       read(iunit,*) neighbors%Lz
@@ -138,17 +140,21 @@ C     To be used only once, at the beginning of a simulation.
 
 C     Notes: Requires materials, potentials, nodes structures to have been
 C     read/initialized already
+
+C     Notes: Is rho correct for 3D materials?
       
       implicit none
       
 C     local variables
       integer :: i
+      real(dp) :: atompervol, rneighboxvol, rneighspherevol
       
-C     get rhomax (used to calculate nmaxbin for building bins)
-      neighbors%rhomax = 0.0_dp
+C     get max atoms/volume, used to calculate nmaxbin for building bins
+      neighbors%atompervolmax = 0.0_dp
       do i = 1, nmaterials
-          if (materials(i)%rho > neighbors%rhomax) then
-              neighbors%rhomax = materials(i)%rho
+          atompervol = materials(i)%rho/materials(i)%mass
+          if (atompervol > neighbors%atompervolmax) then
+              neighbors%atompervolmax = atompervol
           end if
       end do
 
@@ -162,16 +168,23 @@ C     first calculate largest force cutoff, then add skin distance
       end do
       neighbors%rneigh = neighbors%rneigh + neighbors%skin
       neighbors%rneighsq = (neighbors%rneigh)**2
+      
+      rneighboxvol = (neighbors%rneigh)**neighbors%dimensions
+      if (neighbors%dimensions == 2) then
+          rneighspherevol = PICONST*rneighboxvol
+      else if (neighbors%dimensions == 3) then
+          rneighspherevol = PICONST*4.0_dp/3.0_dp*rneighboxvol
+      end if    
 
-C     calculate nmaxneigh using area of circle, density,
+C     calculate nmaxneigh using area/volume of circle/sphere, atoms/volume,
 C     factor of safety of nmaxneighfac, then allocate neighlist
-      neighbors%nmaxneigh = ceiling(NMAXNEIGHFAC*neighbors%rhomax*
-     &                              PICONST*neighbors%rneighsq)
+      neighbors%nmaxneigh = ceiling(NMAXNEIGHFAC*
+     &                  neighbors%atompervolmax*PICONST*rneighspherevol)
       allocate(neighbors%neighlist(neighbors%nmaxneigh,nodes%natoms))
       
 C     similar for nmaxbin
-      neighbors%nmaxbin = ceiling(NMAXBINFAC*neighbors%rhomax*
-     &                            neighbors%rneighsq)
+      neighbors%nmaxbin = ceiling(NMAXBINFAC*neighbors%atompervolmax*
+     &                            rneighboxvol)
       
 C     allocate other arrays
       allocate(neighbors%neighcount(nodes%natoms))
@@ -208,6 +221,7 @@ C     use explicit logical -> integer conversion
       temp = logicalToInt(neighbors%checkdisp)  
       write(iunit,*) temp
       write(iunit,*) neighbors%delay
+      read(iunit,*) neighbors%dimensions            
       write(iunit,*) neighbors%every
       write(iunit,*) neighbors%images
       write(iunit,*) neighbors%Lz
@@ -223,7 +237,7 @@ C     Inputs: deltaincrement --- change in incrementcurr (incrementcurrnew - inc
 
 C     Outputs: None
 
-C     Purpose: Update current increment...usually, usage is updateIncrementCurr(1), to advance by 1 step
+C     Purpose: Update current increment...usually, usage is updateNeighIncrementCurr(1), to advance by 1 step
       
       implicit none
       

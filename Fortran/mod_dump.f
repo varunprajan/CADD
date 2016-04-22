@@ -384,6 +384,8 @@ C     Outputs: None
 
 C     Purpose: Write nodal displacements for dump
 
+      implicit none
+
 C     input variables
       integer :: iunit
 

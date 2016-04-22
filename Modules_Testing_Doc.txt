@@ -10,11 +10,15 @@ Fix test:
 
 Check:
     mod_utils
+    mod_neighbors
             
 To be checked:            
     mod_disl_detect_pass
         passContinuumtoAtomistic
         recrossDetection
+    mod_mesh_find
+        findInOneMatInitially
+        getElGuessBrute
     Redo integration tests (to check mod_io, others?)
         
 To be checked, later:
@@ -39,7 +43,13 @@ mod_moving_mesh_crack_cadd
     writeCADDMovingMeshData
         Doc: Done!
         Test: Done!
-    moveMeshCrack
+    assignCrackXShift
+        Doc: Done!
+        Test: 
+    shiftAllPos
+        Doc: Done!
+        Test: Awaits full test of moving mesh method
+    updateAllShiftedObjects
         Doc: Done!
         Test: Awaits full test of moving mesh method
     passDislocationsBefore
@@ -59,13 +69,13 @@ mod_moving_mesh_crack_cadd
         Test: Implicitly, through passDislocationsBefore/After
     shiftPosnDisp
         Doc: Done!
-        Test: Awaits full test of moving mesh method
+        Test: Implicitly, through moving_mesh_k_test
     interpFromFEPoint
         Doc: Done!
-        Test: Awaits full test of moving mesh method
+        Test: Implicitly, through moving_mesh_k_test
     interpFromAtomPoint
         Doc: Done!
-        Test: Awaits full test of moving mesh method
+        Test: Implicitly, through moving_mesh_k_test
     atomicDispInterpolation
         Doc: Done!
         Test: Done!

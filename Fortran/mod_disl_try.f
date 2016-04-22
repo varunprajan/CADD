@@ -52,8 +52,8 @@ C     etc.
 C     read-in
       integer :: cut
       real(dp) :: posn(2)
+      integer :: sgn      
       integer :: slipsys
-      integer :: sgn
 C     processed
       logical :: active
       real(dp) :: disp
@@ -1161,6 +1161,7 @@ C     local variables
       else
           call findInAllWithGuessDef(x,y,mnumfe,element,r,s,badflip)
       end if
+      
       call checkImproperAssignment(badflip,x,y)
       posn = [x,y]
       call getSlipPlane(posn,mnumfe,isys,iplane,relpos) ! adjusts posn slightly so that disl lies on slip plane

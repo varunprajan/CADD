@@ -83,6 +83,9 @@ C     file
 
       crackpos = [0.0_dp,0.0_dp] 
       
+      call applyKDispIso(KIstart,KII,mu,nu,crackpos(1),
+     &                                      crackpos(2),'all')
+      
 C     apply K, equilibrate, dump
       do i = 0, nstepsK
           if (i == 0) then

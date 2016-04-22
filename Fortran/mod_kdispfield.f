@@ -14,12 +14,12 @@ C     Possible extensions: Anisotropic K-fields
       implicit none
       
       private
-      public :: applyKDispIso
+      public :: applyKDispIsoSub, applyKDispIsoSet, applyKDispIsoIncr
       
       contains
 
 ************************************************************************
-      subroutine applyKDispIso(KI,KII,mu,nu,xc,yc,gname)
+      subroutine applyKDispIsoSet(KI,KII,mu,nu,xc,yc,gname)
 
 C     Inputs: KI - mode I stress intensity factor
 C             KII - mode II stress intensity factor
@@ -29,6 +29,63 @@ C             xc - x-coordinate of crack
 C             yc - y-coordinate of crack
 C             gname - group name
 C                    (displacements applied only to nodes in group)
+
+C     Outputs: None
+      
+C     Purpose: Set group of nodes to have plane strain K field in isotropic body.
+C     I.e. x_{curr,new} = x_{ref} + u
+
+      implicit none
+      
+C     input variables
+      real(dp) :: KI, KII
+      real(dp) :: mu, nu
+      real(dp) :: xc, yc
+      character(len=*) :: gname      
+      
+      call applyKDispIsoSub(KI,KII,mu,nu,xc,yc,gname,.false.)
+      
+      end subroutine
+************************************************************************
+      subroutine applyKDispIsoIncr(KIincr,KIIincr,mu,nu,xc,yc,gname)
+
+C     Inputs: KIincr - mode I stress intensity factor increment
+C             KIIincr - mode II stress intensity factor increment
+C             mu - shear modulus (2d, isotropic)
+C             nu - Poisson's ratio (2d, isotropic)
+C             xc - x-coordinate of crack
+C             yc - y-coordinate of crack
+C             gname - group name
+C                    (displacements applied only to nodes in group)
+
+C     Outputs: None
+      
+C     Purpose: Incrementally apply plane strain K field to group of nodes in isotropic body.
+C     I.e. x_{curr,new} = x_{curr} + u
+
+      implicit none
+      
+C     input variables
+      real(dp) :: KIincr, KIIincr
+      real(dp) :: mu, nu
+      real(dp) :: xc, yc
+      character(len=*) :: gname      
+      
+      call applyKDispIsoSub(KIincr,KIIincr,mu,nu,xc,yc,gname,.true.)
+      
+      end subroutine
+************************************************************************
+      subroutine applyKDispIsoSub(KI,KII,mu,nu,xc,yc,gname,incr)
+
+C     Inputs: KI - mode I stress intensity factor
+C             KII - mode II stress intensity factor
+C             mu - shear modulus (2d, isotropic)
+C             nu - Poisson's ratio (2d, isotropic)
+C             xc - x-coordinate of crack
+C             yc - y-coordinate of crack
+C             gname - group name
+C                    (displacements applied only to nodes in group)
+C             incr - flag indicating whether displacements should be incrementally applied or not (see below)
 
 C     Outputs: None
       
@@ -42,6 +99,7 @@ C     input variables
       real(dp) :: mu, nu
       real(dp) :: xc, yc
       character(len=*) :: gname
+      logical :: incr
       
 C     local variables
       integer :: gnum
@@ -84,12 +142,16 @@ C         disp fields (again, see Bower) without prefactor
           unorm(1) = uxInorm + uxIInorm
           unorm(2) = uyInorm + uyIInorm
           u = (sqrt(r)*prefac)*unorm
-          nodes%posn(1:2,i) = nodes%posn(1:2,i) + u
-          nodes%posn(4:5,i) = nodes%posn(4:5,i) + u
+          if (incr) then
+              nodes%posn(1:2,i) = nodes%posn(1:2,i) + u
+              nodes%posn(4:5,i) = nodes%posn(4:5,i) + u
+          else
+              nodes%posn(1:2,i) = posnundef + u
+              nodes%posn(4:5,i) = u
+          end if
       end if
       end do
       
-      end subroutine applyKDispIso
-************************************************************************      
-      
+      end subroutine applyKDispIsoSub
+************************************************************************
       end module

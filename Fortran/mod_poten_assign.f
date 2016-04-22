@@ -26,7 +26,7 @@ C     of potential (misc%potstyle). Currently only implemented for tabular
 C     pair potential.
       
       select case (trim(misc%potstyle))
-          case ('table')
+          case ('pair_table')
               getPotForcesAll_ptr => getPotForcesAllTable
           case default
               write(*,*) 'Potential style has not yet been defined'

@@ -64,6 +64,7 @@ C     module variables (private)
 C     HARD-CODED CONSTANTS
       integer, parameter :: COUNTERMAX = 1000
       integer, parameter :: COUNTERMAX2 = 20
+      integer, parameter :: MAXEL = 10
       real(dp), parameter :: NORMCONST = 1.0e-5_dp
       
       contains
@@ -332,10 +333,20 @@ C     output variables
       real(dp) :: r, s
       logical :: badflip
       
-C     get a (very good) guess
-      element = getElGuessBrute(mnumfe,undeformed,xp,yp)
+C     local variables
+      integer :: i
+      integer, allocatable :: elements(:)
+      
+C     get very good guesses for elements
+      elements = getElGuessBrute(mnumfe,undeformed,xp,yp)
 C     search in material
-      call findInOneMat(mnumfe,undeformed,element,xp,yp,r,s,badflip)
+      do i = 1, size(elements)
+          element = elements(i)
+          call findInOneMat(mnumfe,undeformed,element,xp,yp,r,s,badflip)
+          if (.not.badflip) then
+              return
+          end if
+      end do    
      
       end subroutine findInOneMatInitially
 ************************************************************************
@@ -543,21 +554,26 @@ C     input variables
       real(dp) :: xp, yp
       
 C     output variables
-      integer :: elguess
+      integer, allocatable :: elguess(:)
       
 C     local variables
       integer :: j, k
       integer :: closestnode
+      integer :: counter
+      integer :: elguesstemp(MAXEL)
 
       closestnode = getNodeGuessBrute(mnumfe,undeformed,xp,yp)
+      counter = 0
       do j = 1, size(feelements(mnumfe)%connect,2)
           do k = 1, size(feelements(mnumfe)%connect,1)
               if (feelements(mnumfe)%connect(k,j) == closestnode) then
-                  elguess = j
-                  return
+                  counter = counter + 1
+                  elguesstemp(counter) = j
               end if    
           end do
       end do
+      
+      elguess = elguesstemp(1:counter)
       
       end function getElGuessBrute
 ************************************************************************

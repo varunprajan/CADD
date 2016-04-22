@@ -1,222 +1,887 @@
-Variables/Arrays:
+"Global" variables:
 
 *************************************************
-nodes (structure):
-    Contains:
-        (Read-in)
-        %nnodes (integer)
-        %posn (double array):
-            Dimensions: nnodes by 7
-            Columns: x (current), y (current), z (current), ux (total), uy (total), vx (current), vy (current)
-            I.e. X = x - ux, Y = y - uy (X, Y = original coordinates)
-        %types (integer array):
-            Dimensions: nnodes by 3
-            Columns: material, isrelaxed, bcflag
-            Code for isrelaxed: -1 = pad
+nodes
+    (Read-in)
+    %posn
+        Explanation: Position, displacement, velocity of all nodes in simulation
+        Type: real 2d array
+        Dimensions: 7 by nnodes
+        Rows: x (current), y (current), z (current), ux (total), uy (total), vx (current), vy (current)
+        I.e. X = x - ux, Y = y - uy (X, Y = original coordinates)
+    %types
+        Explanation: Stores information on node types: material number, type of node, boundary condition
+        Type: integer 2d array
+        Dimensions: 3 by nnodes
+        Rows: material, node type, boundary condition
+        Code for type of node: -1 = pad
                                 0 = continuum (bulk)
-                                1 = atom
+                                1 = (normal) atom
                                 2 = interface
-            Code for bcflag: 0 = free
-                             1 = u-fixed
-                             2 = v-fixed
-                             3 = u and v-fixed
-            (The bcflag for the interface is just for the atomistic step; in the FE/DD step, the interface atoms are held fixed. So, bcflag for pad = 3?)
-            (No force boundary conditions implemented yet)
-        (Generated)
-        %natoms
-        %atomlist (integer array):
-            Dimensions: natoms
-            Purpose: List of (row) indices that correspond to atoms in %types and %posn arrays
-        %nfenodes
-        %fenodelist (integer array):
-            Dimensions: nfenodes
-            Purpose: List of (row) indices that correspond to FE nodes in %types and %posn
-            Notes: Includes interface
+        Code for boundary condition: 0 = free
+                                     1 = u-fixed
+                                     2 = v-fixed
+                                     3 = u and v-fixed
+        (The bcflag for the interface is just for the atomistic step; in the FE/DD step, the interface atoms are held fixed. bcflag for pad must equal 3.)
+        (No force boundary conditions implemented yet)
+    (Processed)
+    %nnodes
+        Explanation: Number of nodes in simulation
+        Type: integer
+    %natoms
+        Explanation: Number of atoms (pad + interface + normal) in simulation
+        Type: integer
+    %atomlist
+        Explanation: List of indices that correspond to atoms (pad, interface, and normal) in %types and %posn arrays
+        Type: integer 1d array
+        Dimensions: natoms
+    %nfenodes
+        Explanation: Number of fe nodes (continuum + interface)
+        Type: integer
+    %fenodelist
+        Explanation: List of indices that correspond to FE nodes in %types and %posn
+        Type: integer 1d array
+        Dimensions: nfenodes
+        Notes: Includes interface atoms
+    %npadatoms
+        Explanation: Number of pad atoms
+        Type: integer
+    %padatomlist
+        Explanation: List of indices that correspond to pad atoms in %types and %posn
+        Type: integer 1d array
+        Dimensions: npadatoms
+    %nrealatoms
+        Explanation: Number of "real" atoms (i.e., excluding pad)
+        Type: integer
+    %realatomlist
+        Explanation: List of indices that correspond to "real" atoms in %types and %posn
+        Type: integer 1d array
+        Dimensions: nrealatoms
 **************************************************
-(Read-in)
-feelements (array of structures):
-    Dimensions: nfematerials by 1
-    feelement (structure)
-        Contains:
-            %elname (character string)
-                Explanation: Uses ABAQUS naming convention 'CPE3', etc. Currently, only 'CPE3' and 'CPE4' are defined/implemented.
-            %connect (integer array):
-                Dimensions: nel by nnodeel
-                Notes: For triangular elements, nnodeel = 3
-                Notes: Listed in consistent (counterclockwise) order
+materials
+    Dimensions: nmaterials
+    material
+        (Read-in)
+        %burgers
+            Explanation: Magnitude of burgers vector
+            Type: real
+        %disldrag
+            Explanation: Dislocation drag coefficient (see van der Giessen and Needleman, 1995) --- units of [stress*distance/velocity]
+            Type: real
+        %dislvmax
+            Explanation: Maximum dislocation velocity
+            Type: real
+        %elconst
+            Explanation: 2D elastic stiffness matrix (plane strain)
+            Type: real 2d array
+            Dimensions: 3 by 3
+        %lannih
+            Explanation: Annihilation distance for dislocations of opposite sign
+            Type: real
+        %lattice
+            Explanation: Name of lattice for material (e.g., "hex", "fcc")
+            Type: character string
+        %mass
+            Explanation: Atomic mass
+            Type: real
+        %mname
+            Explanation: Name of material
+            Type: character string
+        %rho
+            Explanation: Atomic density (# atoms/volume)
+            Type: real
+        (Processed)
+        %rcoresq
+            Explanation: Radius of dislocation core, squared (rcore = corefac*burgers). Used to cut off dislocation fields
+            Type: real
+        %mu
+            Explanation: Shear modulus of material (plane strain, isotropic)
+            Type: real
+        %nu
+            Explanation: Poisson's ratio of material (plane strain, isotropic)
+            Type: real
+        %dispprefac
+            Explanation: Prefactor used to compute isotropic displacement fields
+            Type: real
+        %stressprefac
+            Explanation: Prefactor used to compute isotropic stress fields
+            Type: real               
 **************************************************
-(Read-in)
-materials (array of structures):
-    Dimensions: nmaterials by 1
-    material (structure):
-        Contains:
-            %burgers (double):
-                Purpose: Magnitude of burgers vector (using slip plane orientation will give components)
-            %disldrag (double):
-                Purpose: Dislocation drag coefficient (see van der Giessen
-                and Needleman, 1995) --- units of [stress*distance/velocity] = [(force/distance)/velocity] (since third dimension is artificial)
-            %elconst (double array):
-                Dimensions: 3 by 3 (Voigt notation)
-            %lannih (double):
-                Purpose: Annihilation distance for dislocations of opposite sign (units of burgers)
-            %lnuc (double):
-                Purpose: Nucleation distance for dislocation dipole
-                Notes: Can be computed using elastic constants, burgers
-            %mass (double)
-            %mname (character string)
-
+misc
+    (Read-in)
+    %dumpincrement
+        Explanation: Dump should be written every "dumpincrement" increments, if writeOutput() is used. Set to 0 if not desired.
+        Type: integer
+    %incrementcurr
+        Explanation: Current increment of simulation
+        Type: integer
+    %increments
+        Explanation: Total number of increments for simulation
+        Type: integer
+    %iscrackproblem
+        Explanation: Flag indicating whether we have a crack problem
+        Type: logical
+    %potstyle
+        Explanation: Name of the potential style (e.g., 'pair_table')
+        Type: character string
+    %restartincrement
+        Explanation: Restart should be written every "restartincrement" increments, if writeOutput() is used. Set to 0 if not desired
+        Type: integer
+    %simname
+        Explanation: Name of simulation
+        Type: character string
+    %simtype
+        Explanation: Type of simulation ('fe', 'dd', 'atomistic', 'cadd_nodisl', 'cadd')
+        Type: character string
 *************************************************
-(Read-in)
-potentials (array of structures):
-    Dimensions: npotentials by 1
-    potential (structure):
-        Contains:
-            %forcecutoff (double) --- r (interatomic separation) at which force is zero
-            %pname (character string)
-            %pottable (double array)
-                Dimensions: npts by 3
-                Columns: r (interatomic separation), energy, force
-                Notes: Need to be careful about sign convention for force
+groups
+    Dimensions: ngroups
+    group
+        (Read-in)
+        %gname
+            Explanation: Name of group
+            Type: character string
+        %members
+            Explanation: Nodes belonging to group
+            Type: integer 1d array
+            Dimensions: nmembers
+        (Processed)
+        %nmembers
+            Explanation: Number of nodes in group
+            Type: integer
+        %maskatoms
+            Explanation: Mask for atoms: True for members of group and False otherwise
+            Type: logical 1d array
+            Dimensions: natoms
+        %maskfenodes
+            Explanation: Mask for FE nodes: True for members of group and False otherwise
+            Type: logical 1d array
+            Dimensions: nfenodes
+        %maskall
+            Explanation: Mask for all nodes: True for members of group and False otherwise
+            Type: logical 1d array
+            Dimensions: nnodes           
+*************************************************
+compute
+    %cdata
+        %active
+            Explanation: Flag indicating whether specific compute is active
+            Type: logical
+        %gname
+            Explanation: Name of group to which compute corresponds
+            Type: character string
+        %params
+            Explanation: Parameters for compute 
+            Type: real 1d array (integers must be converted explicitly from real)
+            Dimensions: nparams
+        %res
+            Explanation: Result of compute
+            Type: real 1d array (single values can be represented using array of length 1)
+            Dimensions: ? (depends on compute)
+            Notes: E.g., for centrosymmetry compute, res would contain the centrosymmetry of each atom, so its dimensions would be natoms
+*************************************************
+normaldamping
+    %flag:
+        Explanation: Flag indicating whether damping is on or off
+        Type: logical
+    %gamma:
+        Explanation: Damping coefficient
+        Type: real
+    %gname:
+        Explanation: Name of group to which damping applies
+        Type: character string    
+*************************************************
+neighbors
+    (Read-in)
+    %checkdisp
+        Explanation: Flag for whether displacements should be checked before rebuilding neighbor list
+        Type: logical
+    %delay
+        Explanation: Don't rebuild neighbor list until at least "delay" steps have passed
+        Type: integer
+    %every
+        Explanation: Rebuild neighbor list every "every" steps. Set to zero to disregard.
+        Type: integer
+    %images
+        Explanation: Out-of-plane images of atomistic region (used to calculate forces on atoms). E.g., zero for 2D case.
+        Type: integer
+    %Lz
+        Explanation: Out-of-plane distance between images
+        Type: real
+    %skin:
+        Explanation: Skin distance; see rneigh
+        Type: real
+    (Processed)
+    %atompervolmax
+        Explanation: Max. number of atoms/volume
+        Type: real
+    %delaunayregencrack
+        Explanation: Flag indicating whether delaunay triangulation for moving mesh (crack problems) should be regenerated
+        Type: logical
+    %delaunayregencrack
+        Explanation: Flag indicating whether delaunay triangulation for detection band should be regenerated
+        Type: logical
+    %incrementcurr
+        Explanation: Counter for atomistic increments
+        Type: integer
+    %binlist
+        Explanation: List of bins that atoms belong to
+        Type: integer 2d array
+        Dimensions: 2 by natoms
+        Rows: binx (x-bin for atom), biny (y-bin for atom)
+    %binarray
+        Explanation: Bins for atoms --- binarray(:,binx,biny) contains atoms in bin described by indices binx, biny
+        Type: integer 3d array
+        Dimensions: nmaxbin by nbinsx by nbinsy (see below for nmaxbin)
+    %bincount
+        Explanation: Count of number of atoms in each bin: i.e., bincount(binx,biny) gives the number of atoms in bin described by indices binx, biny
+        Type: integer 2d array
+        Dimensions: nbinsx by nbinsy
+    %neighlist
+        Explanation: Stores neighbors for each atom; neighlist(:,atomnum) gives the neighbors for atom with index atomnum (where nodes%atomlist(atomnum) gives the node number)
+        Type: integer 2d array
+        Dimensions: nmaxneigh by natoms 
+    %neighcount
+        Explanation: Number of neighbors for each atom; neighcount(atomnum) gives the number of neighbors for atom with index atomnum
+        Type: integer 1d array
+        Dimensions: natoms
+    %nmaxneigh
+        Explanation: Max number of allowable neighbors for an atom
+        Type: integer
+    %nmaxbin
+        Explanation: Max number of allowable atoms in a bin
+        Type: integer
+    %incrsincelastupdate
+        Explanation: Atomistic increment number when neighbor list was last built
+        Type: integer
+    %possincelastcheck
+        Explanation: Positions of atoms when the neighbor list was last built; new displacements can be computed against this list, and checked against the skin distance to see if the neighbor list should be updated (if checkdisp is True)
+        Type: real 2d array
+        Dimensions: 2 by natoms
+    %rcut
+        Explanation: Largest of all of the force cutoffs for the potentials
+        Type: real
+    %rneigh
+        Explanation: Affects creation/rebuilding of neighbor lists. Atoms within rneigh = rcut + skin are included in list
+        Type: real
+    %rneighsq
+        Explanation: Square of rneigh (cached to prevent unnecessary calculations in highly-used loop)
+        Type: real
+*************************************************
+potentials
+    Dimensions: npotentials
+    potential
+        (Read-in)
+        %forcecutoff
+            Explanation: If interatomic separation >= forcecutoff, then force = 0
+            Type: real
+        %pname
+            Explanation: Name of interatomic potential
+            Type: character string
+        %pottable
+            Explanation: Stores r/force/energy
+            Type: real 2d array
+            Dimensions: 3 by ndatapoints
+            Rows: r (interatomic separation), energy, force
+            Notes: Need to be careful about sign convention for force --- repulsive force is positive
+            
 Notes: Can add more structure fields for more complicated potentials
 *************************************************
-(Read-in)
-groups (array of structures):
-    Dimensions: ngroups by 1
-    group (structure):
-        Contains:
-            %gname (character string)
-            %members (integer array)
-                Dimensions: nmembers by 1
-            %nmembers (integer)
+interactions
+    (Read-in)
+    %table
+        Explanation: Each row is an interaction: 1 2 3 means that atom types 1 and 2 interact through potential 3
+        Type: integer 2d array
+        Dimensions: 3 by ninteractions
+    (Processed)
+    %mat
+        Explanation: mat[i,j] gives the number of the potential for interactions between an atom of material i and an atom of material j
+        Type: integer 2d array
+        Dimensions: nmaterials by nmaterials
 *************************************************
-(Read-in)
-interactions (structure):
-    Contains:
-        %table (integer array):
-            Dimensions: ninteract by 3
-            Explanation: Each row is an interaction: 1 2 3 means that atom types 1 and 2 interact through potential 3
-        %mat (integer array):
-            Dimensions: nmaterials by nmaterials
-            Explanation: mat[i,j] gives the number of the potential for interactions between an atom of material i and an atom of material j
-*************************************************
-(Read-in)
-%disls (array of structures):
-    Dimensions: nfematerials by 1
-    %disl (structure)
-    Contains:
-        %ndisl (integer):
-            Purpose: Current number of dislocations in continuum
-        %posn (double array):
-            Dimensions: nmaxdisl by 3
-            Columns: x, y, orientation (radians)
-        %localpos (double array):
-            Dimensions: nmaxdisl by 2
-            Columns: r, s
-            Purpose: Tabulate local coordinates of dislocation in continuum
-        %element (integer array):
-            Dimensions: nmaxdisl by 1
-            Columns: element (number)
-        %sgn (integer array)
-            Dimensions: nmaxdisl by 1
-            Columns: dislocation sign (+1 or -1)
-*************************************************
-%imagedisl (structure)
-Contains:
-    %nimagedisl (integer):
-        Purpose: Current number of image dislocations
-    %posn (double array):
-        Dimensions: nmaxdisl by 3
-        Columns: x, y, orientation (radians)
-    %mnumfe (integer array):
-        Dimensions: nmaxdisl by 1
-        Columns: mnumfe (number)
-    %sgn (integer array)
-        Dimensions: nmaxdisl by 1
-        Columns: dislocation sign (+1 or -1)
-*************************************************
-(Read-in)
-%damping (structure)
-Contains:
-    %flag (logical):
-        Purpose: Is damping on or off
-    %gamma (double):
-        Purpose: Damping coefficient
-    %gnum (integer):
-        Purpose: Group to which damping applies
-*************************************************
-(Read-in)
-%detect (structure)
-Contains:
-    %passdistance (float):
-        Purpose: Max. distance between inner part of detection band and interface
-*************************************************
-%neighbors (structure):
-    Contains:
+padatoms
+    Dimensions: npadatoms
+    padatom
+        %mnumfe
+            Explanation: FE material number for pad atom
+            Type: integer
+        %element
+            Explanation: FE element number
+            Type: integer
+        %localpos
+            Explanation: Local position within FE element (r, s)
+            Type: real 1d array
+            Dimensions: 2
+**************************************************   
+felibs
+    Dimensions: nfeeltypes, which is the number of finite element types in the library
+    felib
+        (Processed)
+        %nedges
+            Explanation: Number of element edges (e.g., CPE4 -> 4)
+            Type: integer
+        %nedgenodes
+            Explanation: Number of nodes on a single element edge (e.g., CPE4 -> 2)
+            Type: integer
+        %nelnodes
+            Explanation: Number of nodes per element (e.g., CPE4 -> 4)
+            Type: integer
+        %neldof
+            Explanation: Number of degrees of freedom per element (e.g., CPE4 -> 8)
+            Type: integer
+        %nelip
+            Explanation: Number of integration points per element (e.g., CPE4 -> 4)
+            Type: integer
+        %nedgeip
+            Explanation: Number of integration points per element edge (e.g., CPE4 -> 2)
+            Type: integer
+        %rgauss
+            Explanation: Local positions (r) of gauss quadrature points within element
+            Type: real 1d array
+            Dimensions: nelip
+        %sgauss
+            Explanation: Local positions (s) of gauss quadrature points within element
+            Type: real 1d array
+            Dimensions: nelip
+        %wgauss
+            Explanation: Weights for gauss quadrature points
+            Type: real 1d array
+            Dimensions: nelip
+        %sedgegauss
+            Explanation: Local positions of gauss quadrature points along edge (for traction calculation)
+            Type: real 1d array
+            Dimensions: nedgeip
+        %wedgegauss
+            Explanation: Weights for gauss quadrature points along edge for each edge node
+            Type: real 2d array
+            Dimensions: nedgenodes by nedgeip
+        %getN_2d_ptr
+            Explanation: Gets shape functions for element
+            Type: pointer
+        %getdN_2d_ptr
+            Explanation: Gets derivative of shape functions for element
+            Type: pointer
+        %findinElement_ptr
+            Explanation: Determines local coordinates (r, s) of point within element
+            Type: pointer
+        %checkElement_ptr
+            Explanation: Checks whether point resides within element
+            Type: pointer
+**************************************************       
+feelements
+    Dimensions: nfematerials
+    feelement
         (Read-in)
-        %check (integer):
-        %delay (integer):
-            Purpose: Don't rebuild neighbor list until at least delay steps have passed
-        %every (integer):
-        %skin (double):
-            Purpose: See rneigh
-        (Generated)
-        %neighlist (integer array):
-            Dimensions: nrealatoms x nmaxneigh 
-            Notes: Is this the best way to allocate the storage?
-        %nmaxneigh (integer):
-            Purpose: For memory allocation for neighbor list
-        %rcut (double):
-            Explanation: Largest of all of the force cutoffs for the potentials
-        %rneigh (double):
-            Purpose: Affects creation/rebuilding of neighbor lists.
-                     Atoms within rneigh = rcut + skin are included in list
-                     If max(displacement)[1] + max(displacement)[2] (since last rebuild) > skin, rebuild list.
-        %rhomax (double): Largest rho for all materials. Used to figure out nmaxneigh
-        %possincelastcheck (double array):
-            Dimensions: natoms by 2
-            Purpose: Positions of all atoms the last time the neighbor array was updated (x_{current} - x_{last} = u, which must be checked against skin distance to see if new neighbor list needs to be generated) 
+        %connect
+            Explanation: Element connectivity
+            Type: integer 2d array
+            Dimensions: nnodeel by nfeelements, where nnodeel is the number of nodes per element, and nfeelements is the number of elements
+            Notes: Listed in consistent (counterclockwise) order        
+        %elname
+            Explanation: Element name, using ABAQUS naming convention 'CPE3', etc. Currently, only 'CPE3' and 'CPE4' are defined/implemented.
+            Type: characters tring
+        %mnum
+            Explanation: Number of material (in "materials", see above) to which FE material corresponds
+            Type: integer
+        (Processed)
+        %eltypenum
+            Explanation: Code for element in FE library (e.g., CPE4 = 1, CPE3 = 2) (in "felib", see above)
+            Type: integer
+        %nfeelements
+            Explanation: Number of FE elements in fe material
+            Type: integer
+        %bdedges
+            Explanation: Contains information about boundary edges for FE mesh for the material
+            Type: integer 2d array
+            Dimensions: 3 by nbdedges, where nbdedges is the number of boundary edges
+            Rows: node1, node2, element number
+            Notes: Oriented the same as the elements
+        %neighbors
+            Explanation: Contains information about element neighbors
+            Type: integer 2d array
+            Dimensions: nedges by nfeelements
+            Rows: neighbor for edge 1,...,neighbor for edge nedges
+        %nodelist
+            Explanation: Nodes in FE mesh for the material
+            Type: integer 1d array
+            Dimensions: nfenodes (number of finite element nodes in mesh)
+        %nodeinvlist
+            Explanation: Indices of nodes in FE mesh for the material (i.e., nodeinvlist(nodelist(i)) = i)
+            Type: integer 1d array
+            Dimensions: nnodes
+        %bdnodelist
+            Explanation: Boundary nodes in FE mesh for the material
+            Type: integer 1d array
+            Dimensions: nbdnodes (number of nodes on boundary in mesh)
 *************************************************
-Obsolete:
-    %slipplanes (double array):
-        Dimensions: nslipplanes by 6
-        Columns: angle (rad), xstart, ystart, xend, yend, length
-        Note: ddata%slipplanes(i,1) is like phislp(i) from dd code
-    %realatomforces (double array):
-        Dimensions: nrealatoms by 2
-        Purpose: Forces (fx, fy) on all of the real atoms, computed using pair potential
-    %realatomlist (integer array):
-        Dimensions: nrealatoms
-        Purpose: List of (row) indices that correspond to atoms in %types and %posn arrays
-        Notes: Includes interface atoms, not pad atoms
-(Read-in)
-%obstacles (structure):
-    Contains:
-        %data (double array):
-            Dimensions: nobstacles by 2
-            Columns: s (relative coordinate along slip plane), tau (critical stress to break)
-        %slipplane (integer array):
-            Dimensions: nobstacles
-%sources (structure):
-    Contains:
-        %data (double array):
-            Dimensions: nsources x 3
-            Columns: s (relative coordinate along slip plane), tau (critical stress to activate),
-            tnext (time that next activation is allowed)
-        %slipplane (integer array):
+fematerials
+    (Processed)
+    %list
+        Explanation: Material numbers (i.e., in materials struct) corresponding to FE material numbers
+        Type: integer 1d array
+        Dimensions: nfematerials
+    %invlist
+        Explanation: Indices of fematerials (i.e., invlist(list(i)) = i)
+        Type: integer 1d array
+        Dimensions: nmaterials
+*************************************************
+interfaceedges
+    (Processed)
+    %array
+        Explanation: Array of FE element edges along the atomistic/continuum interface
+        Type: integer 2d array
+        Dimensions: 4 by nbdedges
+        Rows: node1, node2, fe material number, fe element
+*************************************************
+assembly
+    Dimensions: nfematerials
+    assembly
+        %rowindex
+            Explanation: Row index of stiffness matrix entries
+            Type: integer 1d array
+            Dimensions: nentriestot
+        %colindex
+            Explanation: Column index of stiffness matrix entries
+            Type: integer 1d array
+            Dimensions: nentriestot
+        %Ksparse
+            Explanation: Stiffness matrix entry (with row index and column index given by %rowindex/%colindex)
+            Type: real 1d array
+            Dimensions: nentriestot
+        %rhs
+            Explanation: Right hand side vector (f, in Ku = f)
+            Type: real 1d array
+            Dimensions: neqnstot
+        %fact/%ifact
+            Explanation: Array used by numerical library for decomposing K, outputting error messages, etc.
+            Type: real/integer 1d array
+        %neqnsnormal
+            Explanation: Number of "normal" (i.e. non-Lagrange) equations for FE. Should equal the number of FE nodes*2.
+            Type: integer
+        %nentriesnormal
+            Explanation: Number of "normal" (i.e. non-Lagrange) entries for FE stiffness matrix. E.g., for CPE4, each element contributes 8 diagonal entries and 28 off-diagonal
+            Type: integer
+        %neqnstot
+            Explanation: Total number of equations for FE, including Lagrange constraint equations.
+            Type: integer
+        %nentriestot
+            Explanation: Total number of entries for FE stiffness matrix, including Lagrange entries
+            Type: integer
+*************************************************
+dislmisc
+    (Read-in)
+    %gradientcorrection
+        Explanation: Flag indicating whether gradient correction (see Chakravarthy and Curtin, 2011, MSMSE) is used
+        Type: logical
+    %nmaxdisl
+        Explanation: Maximum number of dislocations for each FE material
+        Type: integer 1d array
+        Dimensions: nfematerials
+    %nmaxdislslip
+        Explanation: Maximum number of dislocations on a slip plane for each FE material
+        Type: integer 1d array
+        Dimensions: nfematerials
+    %nmaxescapeddisl
+        Explanation: Maximum number of escaped dislocations for each FE material
+        Type: integer 1d array
+        Dimensions: nfematerials
+    %nmaxghosdisl
+        Explanation: Maximum number of ghost dislocations for each FE material
+        Type: integer 1d array
+        Dimensions: nfematerials
+    %nmaxobsslip
+        Explanation: Maximum number of obstacles on a slip plane for each FE material
+        Type: integer 1d array
+        Dimensions: nfematerials
+    %nmaxsrcslip
+        Explanation: Maximum number of sources on a slip plane for each FE material
+        Type: integer 1d array
+        Dimensions: nfematerials
+*************************************************
+slipsys
+    Dimensions: nfematerials
+    slipsys (one material)
+        (Read-in)
+        %nslipplanes
+            Explanation: Number of slip planes for each slip system
+            Type: integer 1d array
+            Dimensions: nslipsys
+        %origin
+            Explanation: Origin of slip system
+            Type: real 2d array
+            Dimensions: 2 by nslipsys
+            Rows: x, y
+        %space
+            Explanation: Spacing between slip planes
+            Type: real 1d array
+            Dimensions: nslipsys
+        %theta
+            Explanation: Angle (radians) of slip system
+            Type: real 1d array
+            Dimensions: nslipsys
+        (Processed)
+        %trig
+            Explanation: Direction vector of slip system
+            Type: real 2d array
+            Dimensions: 2 by nslipsys
+            Rows: cos(theta), sin(theta)
+*************************************************    
+disl
+    Dimensions: nfematerials
+    disl (one material)
+        %ndisl
+            Explanation: Current number of dislocations in FE material
+            Type: integer
+        %list
+            Dimensions: ndisl
+            (Read-in)
+            %cut:
+                Explanation: Branch cut of dislocation (0 for left, 1 for right)
+                Type: integer
+            %posn
+                Explanation: Current position of dislocation (x, y)
+                Type: real 1d array
+                Dimensions: 2
+            %slipsys
+                Explanation: Number of slip system
+                Type: integer
+            %sgn
+                Explanation: Sign of dislocation (+1 or -1)
+                Type: integer
+            (Processed)
+            %active
+                Explanation: Flag indicating whether dislocation is active
+                Type: logical
+            %disp
+                Explanation: Displacement of dislocation along slip plane
+                Type: real
+            %element
+                Explanation: FE element that the dislocation belongs to
+                Type: integer
+            %localpos
+                Explanation: Local position of dislocation within FE element (r, s)
+                Type: real 1d array
+                Dimensions: 2
+        %splanes
+            Explanation: Container for slip planes with dislocations
+            Dimensions: nslipsys
+            %splane
+                %nmax
+                    Explanation: Maximum number of dislocations along slip plane
+                    Type: integer
+                %ncount
+                    Explanation: Actual count of number of dislocations along slip plane
+                    Type: integer
+                %objnum
+                    Explanation: Indices of dislocations along slip plane (within list)
+                    Type: integer 1d array
+                    Dimensions: nmaxdislslip (Max. number of dislocations along single plane)
+                %relpos
+                    Explanation: Relative positions of dislocations along slip plane
+                    Type: real 1d array
+                    Dimensions: nmaxdislslip (Max. number of dislocations along single plane)  
+*************************************************
+sources
+    Dimensions: nfematerials
+    sources (one material)
+        %list
             Dimensions: nsources
+            (Read-in)
+            %posn
+                Explanation: Current position of source (x, y)
+                Type: real 1d array
+                Dimensions: 2
+            %slipsys
+                Explanation: Number of slip system
+                Type: integer
+            %taucr
+                Explanation: Critical resolved shear stress to activate source
+                Type: real
+            %tnuc
+                Explanation: Critical time to activate source
+                Type: real
+            (Processed)
+            %element
+                Explanation: FE element that the dislocation belongs to
+                Type: integer
+            %localpos
+                Explanation: Local position of dislocation within FE element (r, s)
+                Type: real 1d array
+                Dimensions: 2
+            %lnuc
+                Explanation: Separation length between dislocations in dipole nucleated by source
+                Type: real
+            %tauprev
+                Explanation: Resolved shear stress on source during previous timestep
+                Type: real
+            %time
+                Explanation: Time counter for source (once time > tnuc, source "pops")
+                Type: real
+        %splanes
+            Explanation: Container for slip planes with sources
+            Dimensions: nslipsys
+            %splane
+                %nmax
+                    Explanation: Maximum number of sources along slip plane
+                    Type: integer
+                %ncount
+                    Explanation: Actual count of number of sources along slip plane
+                    Type: integer
+                %objnum
+                    Explanation: Indices of sources along slip plane (within list)
+                    Type: integer 1d array
+                    Dimensions: nmaxdislslip (Max. number of dislocations along single plane)
+                %relpos
+                    Explanation: Relative positions of sources along slip plane
+                    Type: real 1d array
+                    Dimensions: nmaxdislslip (Max. number of dislocations along single plane)
 *************************************************
-(Read-in)
-misc (atomistics):
-    Contains
-damping
-dumpincrement
-elementtype
-incrementcurr
-increments
-restartincrement
-timestep
-
-(Generated)
-simname
-
+obstacles
+    Dimensions: nfematerials
+    obstacles (one material)
+        %list
+            Dimensions: nobstacles
+            (Read-in)
+            %posn
+                Explanation: Current position of obstacle (x, y)
+                Type: real 1d array
+                Dimensions: 2
+            %slipsys
+                Explanation: Number of slip system
+                Type: integer
+            %taucr
+                Explanation: Critical resolved shear stress to overcome obstacle
+                Type: real
+            (Processed)
+            %active
+                Explanation: Flag indicating whether obstacle is active
+                Type: logical
+            %computed
+                Explanation: Flag indicating whether resolved shear stress on obstacle has already been calculated
+                Type: logical
+            %element
+                Explanation: FE element that the dislocation belongs to
+                Type: integer
+            %localpos
+                Explanation: Local position of dislocation within FE element (r, s)
+                Type: real 1d array
+                Dimensions: 2
+        %splanes
+            Explanation: Container for slip planes with obstacles
+            Dimensions: nslipsys
+            %splane
+                %nmax
+                    Explanation: Maximum number of obstacles along slip plane
+                    Type: integer
+                %ncount
+                    Explanation: Actual count of number of obstacles along slip plane
+                    Type: integer
+                %objnum
+                    Explanation: Indices of obstacles along slip plane (within list)
+                    Type: integer 1d array
+                    Dimensions: nmaxdislslip (Max. number of dislocations along single plane)
+                %relpos
+                    Explanation: Relative positions of obstacles along slip plane
+                    Type: real 1d array
+                    Dimensions: nmaxdislslip (Max. number of dislocations along single plane) 
+*************************************************
+escapeddisl
+    Dimensions: nfematerials
+    escapeddisl (one material)
+        %nescapeddisl
+            Explanation: Current number of escaped dislocations associated with FE material
+            Type: integer
+        %list
+            Dimensions: nescapeddisl
+            (Read-in)
+            %cut:
+                Explanation: Branch cut of dislocation (0 for left, 1 for right)
+                Type: integer
+            %posn
+                Explanation: Current position of dislocation (x, y)
+                Type: real 1d array
+                Dimensions: 2
+            %region
+                Explanation: Only relevant for crack problems. Code for which region the dislocation originated from (see mod_escaped_disl)
+                Type: integer
+            %sgn
+                Explanation: Sign of dislocation (+1 or -1)
+                Type: integer
+            %slipsys
+                Explanation: Number of slip system
+                Type: integer
+*************************************************
+ghostdisl
+    Dimensions: nfematerials
+    ghostdisl (one material)
+        %nghostdisl
+            Explanation: Current number of ghost dislocations associated with FE material
+            Type: integer
+        %list
+            Dimensions: nghostdisl
+            (Read-in)
+            %cut:
+                Explanation: Branch cut of dislocation (0 for left, 1 for right)
+                Type: integer
+            %posn
+                Explanation: Current position of dislocation (x, y)
+                Type: real 1d array
+                Dimensions: 2
+            %sgn
+                Explanation: Sign of dislocation (+1 or -1)
+                Type: integer
+            %slipsys
+                Explanation: Number of slip system
+                Type: integer
+*************************************************
+detection
+    (Read-in)
+    %bandtype
+        Explanation: Name of type of band used to detect dislocations. Current options are "rect_annulus" (rectangular annulus) and "annulus" (circular annulus)
+        Type: character string
+    %damp
+        %flag:
+            Explanation: Flag indicating whether damping is on or off
+            Type: logical
+        %gamma:
+            Explanation: Damping coefficient
+            Type: real
+        %gname:
+            Explanation: Name of group to which damping applies
+            Type: character string
+    %impermissibleedges
+        Explanation: Edges that the dislocation cannot cross (e.g. crack face edges)
+        Type: integer 2d array
+        Dimensions: 2 by nedges
+        Rows: node1, node2
+    %maxdisttointerface
+        Explanation: Maximum distance from any point in the detection band to corresponding point along interface where dislocation would exit
+        Type: real
+    %mdnincrements
+        Explanation: Number of increments to run damped MD to relax atoms where core once was (or now is, depending on direction passing)
+        Type: integer
+    %mdtimestep
+        Explanation: Timestep for damped MD
+        Type: real
+    %mnumfe
+        Explanation: FE material number for region to which dislocation will be passed
+        Type: integer
+    %params
+        Explanation: Parameters for detection band
+        Type: real 1d array
+        Dimensions: ndetectionparams
+    %passdistanceatoc
+        Explanation: If dislocation being passed outward (atomistic -> continuum) intersects interface at p1, try to place dislocation at p1 + passdistanceatoc*directionvec
+        Type: real
+    %passdistancectoa
+        Explanation: If dislocation being passed inward (continuum -> atomistic) intersects interface at p1, try to place dislocation at p1 + passdistancectoa*directionvec
+        Type: real
+    (Processed)
+    %burgers
+        Explanation: Magnitude of burgers vector of detected dislocation
+        Type: real
+    %lattice
+        Explanation: Name of lattice for atoms in detection band
+        Type: character string
+    %comp
+        Explanation: Structure for comparing detected burgers vector to actual possible burgers vectors for lattice, in order to determine closest match
+        Dimensions: npossiblebvec
+        comp (single possible burgers vector)
+            %burgersvec
+                Explanation: Burgers vector (bx, by)
+                Type: real 1d array
+                Dimensions: 2
+            %isys
+                Explanation: Number of slip system (in continuum) associated with burgers vector
+                Type: integer
+            %bsgn
+                Explanation: Sign of burgers vector (+1 or -1)
+                Type: integer 
+    %paramspadded
+        Explanation: Parameters for slightly larger ("padded") detection band
+        Type: real 1d array
+        Dimensions: ndetectionparams
+    %delaunay
+        Explanation: See delaunay...Delaunay triangulation is used in Stukowski method to detect dislocations
+        Type: delaunaydata
+*************************************************
+identsimple
+    %mnum
+        Explanation: Material number for dislocation identification
+        Type: real
+    %lattice
+        Explanation: Name of lattice of material that dislocation resides in
+        Type: character string
+    %burgers
+        Explanation: Magnitude of burgers vector of detected dislocation
+        Type: real
+    %ideal
+        Explanation: Set of ideal vectors for lattice (see Stukowski algorithm)
+        Type: real 2d array
+        Dimensions: 2 by nidealvectors
+*************************************************
+delaunay
+    %circumradiussqcutoff
+        Explanation: Triangles are labeled "bad" if their circumradius**2 exceeds this value
+        Type: real
+    %nodenums
+        Explanation: Numbers of nodes that are included in the triangulation
+        Type: integer 1d array
+        Dimensions: nvertices
+    %xy
+        Explanation: XY coordinates of nodes in the triangulation (either deformed or undeformed positions)
+        Type: real 2d array
+        Dimensions: 2 by nvertices
+    %numtri
+        Explanation: Number of triangles in triangulation
+        Type: integer
+    %trivert
+        Explanation: Vertices comprising triangles in counterclockwise order (indexed using index of nodenums, *not* nodenum itself).
+        Type: integer 2d array
+        Dimensions: 3 by numtri
+        Rows: vertex 1, vertex 2, vertex 3
+    %trineigh
+        Explanation: Neighbors of triangles in triangulation; negative indices indicate no neighbor
+        Type: integer 2d array
+        Dimensions: 3 by numtri
+        Rows: neighbor of edge from vertex 1 to vertex 2; neighbor of edge from vertex 2 to vertex 3; neighbor of edge from vertex 3 to vertex 1
+    %trigood
+        Explanation: Flag indicating whether triangles in triangulation are "good" (triangles that are too large are labeled bad)
+        Type: logical 1d array
+        Dimensions: numtri
+*************************************************
+crackfinding
+    (Read-in)
+    %mnum
+        Explanation: Material number in which (atomistic) crack resides
+        Type: integer
+    (Processed)
+    %burgers
+        Explanation: Magnitude of burgers vector for material in which crack resides (used to determine atomistic spacing)
+        Type: real
+    %delaunay
+        Explanation: See delaunay...delaunay triangulation of atomistic region is used to find the crack, using alpha shapes
+        Type: delaunaydata
+    %lattice
+        Explanation: Name of lattice for material in which crack resides
+        Type: character string
+*************************************************
+movingmesh
+    (Read-in)
+    %deltaxcrack
+        Explanation: Shift of crack must be a multiple of this distance (which should be something like an atomic spacing/burgers vector, so that displacements are interpolated accurately)
+        Type: real
+    %maxshift
+        Explanation: Maximum distance by which crack position can be shifted. This is related to the size of the atomistic region
+        Type: real
+    (Processed)
+    %delaunay
+        Explanation: See delaunay...delaunay triangulation of atomistic region is used to interpolate displacements
+        Type: delaunaydata
+    %xshift
+        Explanation: Actual shift of crack in x-direction
+        Type: real
+    %eltypenum
+        Explanation: Number of FE element type for triangular elements
+        Type: integer
 *************************************************
