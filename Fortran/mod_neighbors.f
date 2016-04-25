@@ -179,7 +179,7 @@ C     first calculate largest force cutoff, then add skin distance
 C     calculate nmaxneigh using area/volume of circle/sphere, atoms/volume,
 C     factor of safety of nmaxneighfac, then allocate neighlist
       neighbors%nmaxneigh = ceiling(NMAXNEIGHFAC*
-     &                  neighbors%atompervolmax*PICONST*rneighspherevol)
+     &                  neighbors%atompervolmax*rneighspherevol)
       allocate(neighbors%neighlist(neighbors%nmaxneigh,nodes%natoms))
       
 C     similar for nmaxbin
@@ -221,7 +221,7 @@ C     use explicit logical -> integer conversion
       temp = logicalToInt(neighbors%checkdisp)  
       write(iunit,*) temp
       write(iunit,*) neighbors%delay
-      read(iunit,*) neighbors%dimensions            
+      write(iunit,*) neighbors%dimensions            
       write(iunit,*) neighbors%every
       write(iunit,*) neighbors%images
       write(iunit,*) neighbors%Lz

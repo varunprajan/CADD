@@ -1,0 +1,47 @@
+******************************************************
+Test #1:
+
+Code:
+
+      real(dp) :: dispnorm(2), pint(2), pintnew(2)
+      logical :: isint
+      
+      detection%bandtype = 'rect_annulus'
+      detection%burgers = 0.01_dp
+      detection%passdistancectoa = 10.0_dp
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      pint = [-2.99_dp,3.0_dp]
+      dispnorm = normalizeVec([1.0_dp,1.0_dp])
+      
+      call assignDetectionBand(1.0_dp)
+      call recrossDetection(pint,dispnorm,pintnew,isint)
+      write(*,*) 'pint', pintnew
+      write(*,*) 'isint', isint
+
+Output: 
+ pint  -1.9899388793679647        4.0000611206320356     
+ isint T
+******************************************************
+Test #2: Path too short
+
+Code:
+
+      real(dp) :: dispnorm(2), pint(2), pintnew(2)
+      logical :: isint
+      
+      detection%bandtype = 'rect_annulus'
+      detection%burgers = 0.01_dp
+      detection%passdistancectoa = 0.5_dp
+      detection%params = [0.0_dp,0.0_dp,3.0_dp,4.0_dp,4.0_dp,5.0_dp]
+      pint = [-2.99_dp,3.0_dp]
+      dispnorm = normalizeVec([1.0_dp,1.0_dp])
+      
+      call assignDetectionBand(1.0_dp)
+      call recrossDetection(pint,dispnorm,pintnew,isint)
+      write(*,*) 'pint', pintnew
+      write(*,*) 'isint', isint
+
+Output: 
+ pint  -2.6363758987286352        3.3536241012713650     
+ isint F
+******************************************************

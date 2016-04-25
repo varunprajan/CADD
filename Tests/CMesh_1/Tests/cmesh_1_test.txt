@@ -27,6 +27,8 @@ C     number of dislocations on each slip plane
           write(*,*) disl(mnumfe)%splanes(isys)%splane(i)%nmax
       end do
       iplane = 7
+
+
       
 C     create fake displacements to move dislocations out of body
       disl(1)%list(1)%disp = 2.0_dp
@@ -74,9 +76,6 @@ Output:
            0
            0
            0
-           1           2           7           1
-           1           2           7           2
-   12.313708498984763        22.095917942265427     
-  -10.313708498984763       -17.095917942265427     
-
+   12.023644989523667        22.263386187534877     
+  -10.603772008445860       -16.928449696995973     
 ******************************************************

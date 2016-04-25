@@ -9,7 +9,7 @@
       use mod_neighbors, only: updateNeighborsCheck, 
      &   updateNeighborsNoCheck, updateNeighIncrementCurr
       use mod_math, only: isMultiple
-      use mod_kdispfield, only: applyKDispIso
+      use mod_kdispfield, only: applyKDispIsoSet, applyKDispIsoIncr
       use mod_materials, only: materials
       use mod_fe_elements, only: fematerials
       use mod_nodes, onlY: nodes
@@ -83,21 +83,15 @@ C     file
 
       crackpos = [0.0_dp,0.0_dp] 
       
-      call applyKDispIso(KIstart,KII,mu,nu,crackpos(1),
-     &                                      crackpos(2),'all')
+C     set initial K-field
+      call applyKDispIsoSet(KIstart,KII,mu,nu,crackpos(1),
+     &                      crackpos(2),'all')
       
 C     apply K, equilibrate, dump
-      do i = 0, nstepsK
-          if (i == 0) then
-              KIapply = KIstart
-          else
-              KIapply = KIincr
-          end if    
+      do i = 0, nstepsK   
           KIcurr = KIstart + i*KIincr
           write(*,*) 'Current KI', KIcurr
           
-          call applyKDispIso(KIapply,KII,mu,nu,crackpos(1),
-     &                                         crackpos(2),'all')
           call equilibrateCADD(natomisticsteps,dt,dtdd,normaldamping,
      &                    counter,forcetol,natomisticstepstot)
           write(iunit,*) KIcurr, counter, natomisticstepstot
@@ -106,7 +100,10 @@ C     apply K, equilibrate, dump
           call updateMiscIncrementCurr(1)
           write(*,*) 'increment', misc%incrementcurr
           call writeDump_ptr()
-          call writePadStuff()
+          ! call writePadStuff()
+          
+          call applyKDispIsoIncr(KIincr,KII,mu,nu,crackpos(1),
+     &                                         crackpos(2),'all')          
           
       end do
       

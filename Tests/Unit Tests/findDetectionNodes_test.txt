@@ -1,0 +1,83 @@
+******************************************************
+Test #1:
+ 
+Code:
+      integer :: i, node
+
+      call initSimulation('detect_test_1','cadd')
+      detection%paramspadded = detection%params
+      call findDetectionNodes()
+      write(*,*) 'xy'
+      do i = 1, size(detection%delaunay%nodenums)
+          node = detection%delaunay%nodenums(i)
+          write(*,*) nodes%posn(1:2,node)
+      end do
+
+Output:
+ xy
+  0.50000000000000000       -2.0000000000000000     
+   1.0000000000000000       -1.0000000000000000     
+   1.5000000000000000        0.0000000000000000     
+  0.50000000000000000        0.0000000000000000     
+   1.0000000000000000        1.0000000000000000     
+  0.50000000000000000        2.0000000000000000     
+   1.5000000000000000        2.0000000000000000
+******************************************************
+Test #2: Move non-real atom into detection band
+ 
+Code:
+
+      integer :: i, node
+      real(dp) :: disp(2)
+      
+      call initSimulation('detect_test_1','cadd')
+      detection%paramspadded = detection%params
+C     apply displacement
+      disp = [0.0_dp,-1.0_dp]
+      nodes%posn(4:5,15) = nodes%posn(4:5,15) + disp
+      nodes%posn(1:2,15) = nodes%posn(1:2,15) + disp
+      write(*,*) nodes%posn(1:2,15)
+      call findDetectionNodes()
+      write(*,*) 'xy'
+      do i = 1, size(detection%delaunay%nodenums)
+          node = detection%delaunay%nodenums(i)
+          write(*,*) nodes%posn(1:2,node)
+      end do
+
+Output:
+   1.0000000000000000        1.7500000000000000     
+ xy
+  0.50000000000000000        1.0000000000000000        1.5000000000000000       0.50000000000000000        1.0000000000000000       0.50000000000000000        1.5000000000000000     
+  -2.0000000000000000       -1.0000000000000000        0.0000000000000000        0.0000000000000000        1.0000000000000000        2.0000000000000000        2.0000000000000000     
+******************************************************
+Test #3: Move real atom out of detection band
+ 
+Code:
+
+      integer :: i, node
+      real(dp) :: disp(2)
+      
+      call initSimulation('detect_test_1','cadd')
+      detection%paramspadded = detection%params
+C     apply displacement
+      disp = [-1.5_dp,0.0_dp]
+      nodes%posn(4:5,5) = nodes%posn(4:5,5) + disp
+      nodes%posn(1:2,5) = nodes%posn(1:2,5) + disp
+      write(*,*) nodes%posn(1:2,5)
+      call findDetectionNodes()
+      write(*,*) 'xy'
+      do i = 1, size(detection%delaunay%nodenums)
+          node = detection%delaunay%nodenums(i)
+          write(*,*) nodes%posn(1:2,node)
+      end do
+
+Output:
+   0.0000000000000000        0.0000000000000000     
+ xy
+  0.50000000000000000       -2.0000000000000000     
+   1.0000000000000000       -1.0000000000000000     
+  0.50000000000000000        0.0000000000000000     
+   1.0000000000000000        1.0000000000000000     
+  0.50000000000000000        2.0000000000000000     
+   1.5000000000000000        2.0000000000000000             
+******************************************************

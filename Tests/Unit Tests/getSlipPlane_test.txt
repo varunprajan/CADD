@@ -75,3 +75,22 @@ Output:
  slip plane           5
  relpos   2.8284271247251231     
 ******************************************************
+Test #5: Not on slip plane
+ 
+Code:
+
+integer:: iplane
+real(dp) :: relpos
+real(dp) :: pt(2)
+call initSlipSysData('simple_dd_slipsys')
+pt = [0.0_dp,0.5_dp]
+call getSlipPlane(pt,1,2,iplane,relpos)
+write(*,*) 'pt', pt
+write(*,*) 'slip plane', iplane
+write(*,*) 'relpos', relpos
+
+Output:
+ pt -0.24999999998802336       0.74999999999174749     
+ slip plane           6
+ relpos  -2.4748737341766165     
+******************************************************

@@ -12,6 +12,10 @@ C     initialize simulation, reset timestep, output dump
       misc%incrementcurr = 0
       call writeDump_ptr()
       
+C     crack finding stuff
+      crackfinding%mnum = 1
+      call processAtomFindCrackData()
+      
 C     reset node types
       do i = 1, nodes%nnodes
           x = nodes%posn(1,i)

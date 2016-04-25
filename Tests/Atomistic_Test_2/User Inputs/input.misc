@@ -3,6 +3,5 @@ dumpincrement: 100
 restartincrement: 0
 incrementcurr: 0
 increments: 5000
-timestep: 0.02
-potstyle: table
+potstyle: pair_table
 iscrackproblem: 1

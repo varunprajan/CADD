@@ -3,15 +3,16 @@ Test #1:
  
 Code:
 
-call initNodeData('example_nodes_test')
-call initMaterialData('example_materials_test')
-call initPotentialData('example_potentials_test')
-call initMiscData('example_misc_test')
-call initNeighborData('example_neighbors_test')
-write(*,*) neighbors%rhomax
-write(*,*) neighbors%rneigh
-write(*,*) neighbors%nmaxneigh
-call prettyPrintRealMat(transpose(neighbors%possincelastcheck),'since last')
+      call initNodeData('example_nodes_test')
+      call initMaterialData('example_materials_test')
+      call initPotentialData('example_potentials_test')
+      call initMiscData('example_misc_test')
+      call initNeighborData('example_neighbors_test')
+      write(*,*) neighbors%atompervolmax
+      write(*,*) neighbors%rneigh
+      write(*,*) neighbors%nmaxneigh
+      call prettyPrintMat(transpose(neighbors%possincelastcheck),
+     & 'since last')
 
 Output:
   0.91648642465999997     

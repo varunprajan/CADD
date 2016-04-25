@@ -42,8 +42,8 @@ C     module variables (local)
       type(assemblydata), allocatable :: assembly(:)
       
 C     HARD-CODED CONSTANTS
-      real(dp), parameter :: LFACTFAC = 1.25_dp
-      real(dp), parameter :: LIFACTFAC = 1.25_dp
+      real(dp), parameter :: LFACTFAC = 3.0_dp
+      real(dp), parameter :: LIFACTFAC = 3.0_dp
       real(dp), parameter :: LKEEPFAC = 1.25_dp
       real(dp), parameter :: LWORKFAC = 1.25_dp
       

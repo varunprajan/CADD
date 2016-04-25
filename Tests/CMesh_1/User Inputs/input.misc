@@ -1,4 +1,5 @@
 # use defaults for restartincrement, etc.
 increments: 10
-timestep: 0.1
 iscrackproblem: 1
+# irrelevant
+potstyle: pair_table

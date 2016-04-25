@@ -9,7 +9,7 @@
       use mod_neighbors, only: updateNeighborsCheck, 
      &   updateNeighborsNoCheck, updateNeighIncrementCurr
       use mod_math, only: isMultiple
-      use mod_kdispfield, only: applyKDispIso
+      use mod_kdispfield, only: applyKDispIsoSet, applyKDispIsoIncr
       use mod_materials, only: materials
       use mod_fe_elements, only: fematerials
       use mod_nodes, onlY: nodes
@@ -35,7 +35,7 @@
       real(dp) :: crackpos(2)
       
 C     read, initialize
-      call initSimulation('cadd_nodisl_k_test_medium','cadd_nodisl')
+      call initSimulation('cadd_nodisl_k_test_large','cadd_nodisl')
       call writeDump_ptr()
       write(*,*) 'Wrote dump'
       
@@ -71,20 +71,17 @@ C     file
      &                             //'_steps_'//trim(stepssuffix)
       open(newunit=iunit,file=filename)
 
-      crackpos = [0.0_dp,0.0_dp]      
+      crackpos = [0.0_dp,0.0_dp]
       
-C     apply K, equilibrate, dump
-      do i = 0, nstepsK          
-          if (i == 0) then
-              KIapply = KIstart
-          else
-              KIapply = KIincr
-          end if    
+C     set initial K-field
+      call applyKDispIsoSet(KIstart,KII,mu,nu,crackpos(1),
+     &                      crackpos(2),'all')
+      
+C     equilibrate, dump, increment K
+      do i = 0, nstepsK  
           KIcurr = KIstart + i*KIincr
           write(*,*) 'Current KI', KIcurr
-          
-          call applyKDispIso(KIapply,KII,mu,nu,crackpos(1),
-     &                                         crackpos(2),'all')
+      
           call equilibrateCADDNoDisl(natomisticsteps,dt,normaldamping,
      &                               forcetol,natomisticstepstot)
           write(iunit,*) KIcurr, natomisticstepstot
@@ -92,6 +89,9 @@ C     apply K, equilibrate, dump
           call writeDump_ptr()
           crackpos = findCrack()
           write(*,*) 'Crack position', crackpos
+          
+          call applyKDispIsoIncr(KIincr,KII,mu,nu,crackpos(1),
+     &                                         crackpos(2),'all')
       end do
       
       close(iunit)

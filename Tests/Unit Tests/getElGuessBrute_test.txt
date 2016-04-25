@@ -3,53 +3,53 @@ Test #1:
  
 Code:
 
-real(dp) :: xp, yp
-integer :: elguess
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-xp = 3.5_dp
-yp = 1.5_dp
-elguess = getElGuessBrute(1,xp,yp)
-write(*,*) elguess
+      real(dp) :: xp, yp
+      integer, allocatable :: elguess(:)
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      xp = 3.5_dp
+      yp = 1.5_dp
+      elguess = getElGuessBrute(1,.true.,xp,yp)
+      write(*,*) elguess
 
 Output:
-           3   
+           3           4           7           8 
 ****************************************************** 
 Test #2:
  
 Code:
 
-real(dp) :: xp, yp
-integer :: elguess
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-xp = 3.6_dp
-yp = 1.5_dp
-elguess = getElGuessBrute(1,xp,yp)
-write(*,*) elguess
+      real(dp) :: xp, yp
+      integer, allocatable :: elguess(:)
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      xp = 3.6_dp
+      yp = 1.5_dp
+      elguess = getElGuessBrute(1,.true.,xp,yp)
+      write(*,*) elguess
 
 Output:
-          4
+           4           8
 ****************************************************** 
 Test #3:
  
 Code:
 
-real(dp) :: xp, yp
-integer :: elguess
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-xp = 3.6_dp
-yp = 1.6_dp
-elguess = getElGuessBrute(1,xp,yp)
-write(*,*) elguess
-
+      real(dp) :: xp, yp
+      integer, allocatable :: elguess(:)
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      xp = 3.6_dp
+      yp = 1.6_dp
+      elguess = getElGuessBrute(1,.true.,xp,yp)
+      write(*,*) elguess
+      
 Output:
           8
 ****************************************************** 
@@ -57,16 +57,16 @@ Test #4:
  
 Code:
 
-real(dp) :: xp, yp
-integer :: elguess
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-xp = 10.0_dp
-yp = 10.0_dp
-elguess = getElGuessBrute(1,xp,yp)
-write(*,*) elguess
+      real(dp) :: xp, yp
+      integer, allocatable :: elguess(:)
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      xp = 10.0_dp
+      yp = 10.0_dp
+      elguess = getElGuessBrute(1,.true.,xp,yp)
+      write(*,*) elguess
 
 Output:
           8

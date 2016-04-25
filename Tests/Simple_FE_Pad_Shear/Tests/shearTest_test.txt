@@ -3,7 +3,7 @@ Test #1:
  
 Code:
 
-      integer :: i
+integer :: i
       integer :: eltypenum
       real(dp) :: u
       real(dp) :: stress(3)
@@ -11,8 +11,8 @@ Code:
       
       ! note: lfactfac = 3.0_dp, lifactfac = 3.0_dp
       
-      ! simple_fe_pad
-      call initSimulation()
+      ! simple_fe_pad_shear
+      call initSimulation('simple_fe_pad_shear','cadd_nodisl')
       
       ! write dump
       call writeDump_ptr()

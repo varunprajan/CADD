@@ -1,0 +1,79 @@
+******************************************************
+Test #1: Point in mesh
+ 
+Code:
+
+      integer :: mnumfe
+      integer :: element
+      real(dp) :: xp, yp
+      real(dp) :: r, s
+      logical :: badflip
+      mnumfe = 1
+      xp = 3.5_dp
+      yp = 1.5_dp
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      call findInOneMatInitiallyDef(mnumfe,xp,yp,element,r,s,badflip)
+      write(*,*) 'Element', element
+      write(*,*) 'Local coords', r, s
+      write(*,*) 'Not successful?', badflip
+
+Output:
+ Element           8
+ Local coords   0.0000000000000000        0.0000000000000000     
+ Not successful? F
+******************************************************
+Test #2: Point not in mesh
+ 
+Code:
+
+      integer :: mnumfe
+      integer :: element
+      real(dp) :: xp, yp
+      real(dp) :: r, s
+      logical :: badflip
+      mnumfe = 1
+      xp = 2.5_dp
+      yp = 2.5_dp
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      call findInOneMatInitiallyDef(mnumfe,xp,yp,element,r,s,badflip)
+      write(*,*) 'Element', element
+      write(*,*) 'Local coords', r, s
+      write(*,*) 'Not successful?', badflip
+
+Output:
+ Element           7
+ Local coords   1.4570407898551598E-307                       NaN
+ Not successful? T
+******************************************************
+Test #3: Point not in mesh
+ 
+Code:
+
+      integer :: mnumfe
+      integer :: element
+      real(dp) :: xp, yp
+      real(dp) :: r, s
+      logical :: badflip
+      mnumfe = 1
+      xp = -0.5_dp
+      yp = 2.5_dp
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      call findInOneMatInitiallyDef(mnumfe,xp,yp,element,r,s,badflip)
+      write(*,*) 'Element', element
+      write(*,*) 'Local coords', r, s
+      write(*,*) 'Not successful?', badflip
+
+Output:
+ Element           5
+ Local coords   3.0499118687709751E-309                       NaN
+ Not successful? T
+******************************************************

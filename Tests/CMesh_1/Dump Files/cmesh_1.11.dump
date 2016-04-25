@@ -296,3 +296,8 @@
  end
  obstacle_positions:
  end
+ slipsys_angles:
+   0.0000000000000000     
+   1.0471975511965976     
+  -1.0471975511965976     
+ end

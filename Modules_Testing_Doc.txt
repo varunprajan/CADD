@@ -10,15 +10,12 @@ Fix test:
 
 Check:
     mod_utils
-    mod_neighbors
             
-To be checked:            
+To be checked:      
     mod_disl_detect_pass
         passContinuumtoAtomistic
-        recrossDetection
-    mod_mesh_find
-        findInOneMatInitially
-        getElGuessBrute
+    mod_moving_mesh_crack
+        assignCrackXShift
     Redo integration tests (to check mod_io, others?)
         
 To be checked, later:
@@ -28,6 +25,7 @@ To be checked, later:
         Dislocation fields on boundary, in element
     mod_mesh_find
         findInOneMatSub (after reworking)
+
         
 mod_moving_mesh_crack_cadd
     Doc: Done!
@@ -46,7 +44,7 @@ mod_moving_mesh_crack_cadd
     assignCrackXShift
         Doc: Done!
         Test: 
-    shiftAllPos
+    shiftAllPosn
         Doc: Done!
         Test: Awaits full test of moving mesh method
     updateAllShiftedObjects
@@ -103,7 +101,6 @@ mod_moving_mesh_crack_cadd
     updateObstaclePosMovingMesh
         Doc: Done!
         Test: Done!
-
 mod_compute
     Doc: Done!
     initComputeData
@@ -1064,16 +1061,16 @@ mod_math
         Test: Done!
 mod_mesh_find
     Doc: Done!
-    findInAllWithGuess
+    findInAllWithGuessDef/Undef
         Doc: Done!
         Test: Sort of...Awaits multi-material model
-    findInAllInitially
+    findInAllInitiallyDef/Undef
         Doc: Done!
         Test: Sort of...Awaits multi-material model
     findInAllSub
         Doc: Done!
         Test: Awaits multi-material model
-    findInOneMatInitially
+    findInOneMatInitially(Def)
         Doc: Done!
         Test: Done!
     findInOneMat

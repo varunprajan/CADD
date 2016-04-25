@@ -539,9 +539,9 @@ C     Inputs: xp, yp --- coordinates of point to search
 C             undeformed --- flag indicating whether undeformed coordinates should be used
 C             mnumfe --- continuum material to search in
 
-C     Outputs: elguess --- element that is reasonably close to point
+C     Outputs: elguess --- list of elements that are reasonably close to point
 
-C     Purpose: Find an element reasonably close the point of interest
+C     Purpose: Find many elements that are reasonably close the point of interest
 C              within a certain material, using brute force search
 C              (i.e. to supply initial guess for more sophisticated
 C              point finding schemes)

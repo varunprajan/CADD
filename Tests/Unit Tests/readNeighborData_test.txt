@@ -13,6 +13,7 @@ write(*,*) neighbors%Lz
 write(*,*) neighbors%images
 write(*,*) neighbors%delay
 write(*,*) neighbors%checkdisp
+write(*,*) neighbors%dimensions
 
 Output:
   0.50000000000000000     
@@ -20,4 +21,5 @@ Output:
            0
            5
  T
+           2
 ******************************************************

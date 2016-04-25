@@ -60,7 +60,7 @@
      &            readGroupData, writeGroupData, getMaskSortedIntersect,
      &            ngroups, genGroupMaskAll, genGroupMaskAtoms,
      &            genGroupMaskFENodes, getGroupNum
-      use mod_kdispfield, only: applyKDispIso
+      use mod_kdispfield, only: applyKDispIsoSet, applyKDispIsoIncr
       use mod_disl_fields2, only: getDispAtPointSub,
      & getStressAtPointSub, adjustDxnDyn, getDispAtPoint,
      & getStressAtPoint
@@ -80,9 +80,10 @@
      &  mergeSubCols, insertionSortPlane, mergeSortReal, mergeSubReal,
      &  mergeSortColsReal, mergeSubColsReal
       use mod_mesh_find, only: getLocalCoords, findInOneMatSub,
-     &   getElGuessBrute, getNodeGuessBrute,
+     &   getElGuessBrute, getNodeGuessBrute, findInOneMatInitiallyDef,
      &   findInOneMat, findinOneMatSub, findInAllWithGuess,
-     &   findInAllSub, findInOneMatInitially
+     &   findInAllSub, findInOneMatInitially, findInAllWithGuessDef,
+     &   findInAllInitiallyDef
       use mod_fe_main_2d, only: solveAll, solveOneMat, countEqns,
      &  assembleAndFactorAll, assembleKNormal, assembleLagrange,
      &  getDislForceRHS, getDislForceSub, getDispRHS, initAssembly,
@@ -148,7 +149,7 @@
       use mod_find_crack_atomistic, only: initAtomFindCrackData,
      & readAtomFindCrackData, writeAtomFindCrackData, isTriangleOnEdge,
      & processAtomFindCrackData, crackfinding, findCrack
-      use mod_moving_mesh_crack_cadd, only: moveMeshCrack, 
+      use mod_moving_mesh_crack_cadd, only: assignCrackXShift,
      &  interpFromFEPoint, interpFromAtomPoint, readCADDMovingMeshData,
      &  writeCADDMovingMeshData, passDislocationsBefore, shiftPosnDisp,
      &  passDislocationsAfter, passDislocationsSub, shiftPosnDisp,
@@ -158,68 +159,15 @@
      &  updateSourcePosMovingMesh, updateObstaclePosMovingMesh,
      &  initCADDMovingMeshData, movingmesh, processCADDMovingMeshData,
      &  getNewDetectionBandAfter, getNewDetectionBandBefore,
-     &  atomicDispInterpolation
+     &  atomicDispInterpolation, shiftAllPosn, updateAllShiftedDDObjects
      
       implicit none
       
-      integer :: mnumfe, mnum
-      real(dp) :: KI, KII
-      real(dp) :: xc, yc
-      real(dp) :: mu, nu
-      real(dp) :: dislpos(2), dislpos2(2)
-      integer :: isys, elguess, bsgn, bcut
-      real(dp) :: disldisp
-      integer :: k
-      
-C     read, initialize
-      call initSimulation('cadd_k_test_medium','cadd')
-      
-C     material stuff
-      mnumfe = 1
-      mnum = fematerials%list(mnumfe)
-      mu = materials(mnum)%mu
-      nu = materials(mnum)%nu
+      call initSimulation('detect_test_1','cadd')
+      call writeDump_ptr()
+      call writeRestart_ptr()
 
-C     crack center (slightly offset from atom)
-      xc = 0.5_dp
-      yc = 0.3_dp
-      
-C     K-field
-      KI = 7.5_dp
-      KII = 0.0_dp  
-      
-C     apply field
-      call applyKDispIso(KI,KII,mu,nu,xc,yc,'all')
-      call solveAll_ptr() ! step 3
-      call updatePad() ! step 4
-      
-C     create dipole
-      dislpos = [-22.0_dp,-14.8_dp]
-      isys = 2 ! 60 degrees
-      dislpos2 = dislpos - slipsys(mnumfe)%trig(:,isys)*5.0_dp
-      elguess = 0 ! initial element is unknown
-      bsgn = 1
-      bcut = 0
-      call addDislocation(mnumfe,elguess,dislpos(1),dislpos(2),
-     &                    isys,bsgn,bcut)
-      call addDislocation(mnumfe,elguess,dislpos2(1),dislpos2(2),
-     &                    isys,-bsgn,bcut)
-     
-C     dump
-      call updateMiscIncrementCurr(8)
-      call writeDump_ptr()
-     
-C     move dislocation
-      disldisp = 5.0_dp
-      disl(mnumfe)%list(1)%disp = disldisp
-      disl(mnumfe)%list(2)%disp = 0.0_dp
-      do k = 1, size(disl(mnumfe)%splanes(isys)%splane) 
-          call updateDislPos(mnumfe,isys,k)
-      end do
-      
-      call updateMiscIncrementCurr(1)
-      call writeDump_ptr()
-      
+            
             
       
       

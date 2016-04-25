@@ -3,24 +3,24 @@ Test #1: Point in mesh
  
 Code:
 
-integer :: mnumfe
-integer :: element
-real(dp) :: xp, yp
-real(dp) :: r, s
-logical :: badflip
-xp = 3.5_dp
-yp = 1.5_dp
-mnumfe = 1
-element = 1
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-call findInAllInitially(xp,yp,mnumfe,element,r,s,badflip)
-write(*,*) 'Search unsuccesful?', badflip
-write(*,*) 'Element', element
-write(*,*) 'Material number', mnumfe
-write(*,*) 'Local coords', r, s
+      integer :: mnumfe
+      integer :: element
+      real(dp) :: xp, yp
+      real(dp) :: r, s
+      logical :: badflip
+      xp = 3.5_dp
+      yp = 1.5_dp
+      mnumfe = 1
+      element = 1
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      call findInAllInitiallyDef(xp,yp,mnumfe,element,r,s,badflip)
+      write(*,*) 'Search unsuccesful?', badflip
+      write(*,*) 'Element', element
+      write(*,*) 'Material number', mnumfe
+      write(*,*) 'Local coords', r, s
 
 Output:
  Search unsuccesful? F
@@ -32,53 +32,53 @@ Test #2: Point not in mesh
  
 Code:
 
-integer :: mnumfe
-integer :: element
-real(dp) :: xp, yp
-real(dp) :: r, s
-logical :: badflip
-xp = 2.5_dp
-yp = 2.5_dp
-mnumfe = 1
-element = 1
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-call findInAllInitially(xp,yp,mnumfe,element,r,s,badflip)
-write(*,*) 'Search unsuccesful?', badflip
-write(*,*) 'Element', element
-write(*,*) 'Material number', mnumfe
-write(*,*) 'Local coords', r, s
+      integer :: mnumfe
+      integer :: element
+      real(dp) :: xp, yp
+      real(dp) :: r, s
+      logical :: badflip
+      xp = 2.5_dp
+      yp = 2.5_dp
+      mnumfe = 1
+      element = 1
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      call findInAllInitiallyDef(xp,yp,mnumfe,element,r,s,badflip)
+      write(*,*) 'Search unsuccesful?', badflip
+      write(*,*) 'Element', element
+      write(*,*) 'Material number', mnumfe
+      write(*,*) 'Local coords', r, s
 
 Output:
  Search unsuccesful? T
  Element           7
  Material number           1
- Local coords   0.0000000000000000        2.0000000000000000
+ Local coords   1.2901602504671197E-307                       NaN
 ******************************************************
 Test #3: Point not in mesh
  
 Code:
 
-integer :: mnumfe
-integer :: element
-real(dp) :: xp, yp
-real(dp) :: r, s
-logical :: badflip
-xp = -0.5_dp
-yp = 2.5_dp
-mnumfe = 1
-element = 1
-call initNodeData('simplefe_nodes')
-call initMaterialData('simplefe_materials')
-call initFELibrary()
-call initFEElementData('simplefe_feelements')
-call findInAllInitially(xp,yp,mnumfe,element,r,s,badflip)
-write(*,*) 'Search unsuccesful?', badflip
-write(*,*) 'Element', element
-write(*,*) 'Material number', mnumfe
-write(*,*) 'Local coords', r, s
+      integer :: mnumfe
+      integer :: element
+      real(dp) :: xp, yp
+      real(dp) :: r, s
+      logical :: badflip
+      xp = -0.5_dp
+      yp = 2.5_dp
+      mnumfe = 1
+      element = 1
+      call initNodeData('simplefe_nodes')
+      call initMaterialData('simplefe_materials')
+      call initFELibrary()
+      call initFEElementData('simplefe_feelements')
+      call findInAllInitiallyDef(xp,yp,mnumfe,element,r,s,badflip)
+      write(*,*) 'Search unsuccesful?', badflip
+      write(*,*) 'Element', element
+      write(*,*) 'Material number', mnumfe
+      write(*,*) 'Local coords', r, s
 
 Output:
  Search unsuccesful? T
